@@ -162,12 +162,14 @@ def load_puzzles_from_hf(max_puzzles: int = 50000) -> Tuple[List[List[float]], L
 
     inputs = []
     targets = []
-    print(f"[HF] Streaming up to {max_puzzles} puzzles from HuggingFace (Lichess/chess-puzzles)...")
-    ds = load_dataset("Lichess/chess-puzzles", split="train", streaming=True)
+    print(f"[DATASET] Loading from full Lichess dataset (6,100,960 puzzles available)...")
+    ds = load_dataset("Lichess/chess-puzzles", split="train")
 
-    for item in ds:
-        if len(targets) >= max_puzzles:
-            break
+    total_to_load = min(len(ds), max_puzzles)
+    print(f"[DATASET] Pre-encoding {total_to_load} puzzles into spatial tensors...")
+
+    for idx in range(total_to_load):
+        item = ds[idx]
         row = item.get("row", item)
         fen = row.get("FEN")
         moves_str = row.get("Moves", "")
@@ -188,12 +190,12 @@ def load_puzzles_from_hf(max_puzzles: int = 50000) -> Tuple[List[List[float]], L
             encoded = encoder.encode_flat(game.get_state())
             inputs.append(encoded)
             targets.append(action)
-            if len(targets) % 5000 == 0:
-                print(f"[HF] Pre-encoded {len(targets)}/{max_puzzles} puzzles...")
+            if len(targets) % 10000 == 0:
+                print(f"[DATASET] Pre-encoded {len(targets)}/{total_to_load} puzzles...")
         except Exception:
             continue
 
-    print(f"[HF] Successfully loaded and pre-encoded {len(targets)} puzzles.")
+    print(f"[DATASET] Successfully loaded and pre-encoded {len(targets)} valid chess puzzles.")
     return inputs, targets
 
 
