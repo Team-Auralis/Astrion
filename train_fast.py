@@ -26,7 +26,7 @@ from orion.utils.checkpoint import Checkpoint
 
 
 def uci_to_move(uci: str) -> Tuple[int, int, int, int]:
-    if len(uci) != 4:
+    if len(uci) < 4:
         raise ValueError(f"Invalid UCI move: {uci}")
     return (
         8 - int(uci[1]),
@@ -151,21 +151,64 @@ def load_puzzles_from_dir(data_dir: str, max_puzzles: int = 50000) -> Tuple[List
         except Exception as e:
             print(f"[WARN] Error reading {fpath}: {e}")
 
-    print(f"[DATA] Successfully pre-encoded {len(targets)} valid chess puzzles.")
+def load_puzzles_from_hf(max_puzzles: int = 50000) -> Tuple[List[List[float]], List[int]]:
+    from datasets import load_dataset
+    encoder = ChessEncoder()
+    game = ChessEnvironment()
+
+    inputs = []
+    targets = []
+    print(f"[HF] Streaming up to {max_puzzles} puzzles from HuggingFace (Lichess/chess-puzzles)...")
+    ds = load_dataset("Lichess/chess-puzzles", split="train", streaming=True)
+
+    for item in ds:
+        if len(targets) >= max_puzzles:
+            break
+        row = item.get("row", item)
+        fen = row.get("FEN")
+        moves_str = row.get("Moves", "")
+        if not fen or not moves_str:
+            continue
+        moves = moves_str.split()
+        if not moves:
+            continue
+        target_uci = moves[0]
+        if len(target_uci) < 4:
+            continue
+        try:
+            game.load_fen(fen)
+            target_move = uci_to_move(target_uci)
+            if target_move not in game.legal_moves():
+                continue
+            action = ChessActionSpace.encode(target_move)
+            encoded = encoder.encode_flat(game.get_state())
+            inputs.append(encoded)
+            targets.append(action)
+            if len(targets) % 5000 == 0:
+                print(f"[HF] Pre-encoded {len(targets)}/{max_puzzles} puzzles...")
+        except Exception:
+            continue
+
+    print(f"[HF] Successfully loaded and pre-encoded {len(targets)} puzzles.")
     return inputs, targets
 
 
 def main():
     parser = argparse.ArgumentParser(description="Fast Batched PyTorch Training for ORION.")
     parser.add_argument("--data-dir", default="data", help="Directory containing lichess_*.json files")
+    parser.add_argument("--use-hf", action="store_true", help="Stream directly from HuggingFace Lichess dataset")
     parser.add_argument("--batch-size", type=int, default=128, help="Batch size for training")
     parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
-    parser.add_argument("--max-puzzles", type=int, default=50000, help="Max puzzles to load from local data")
+    parser.add_argument("--max-puzzles", type=int, default=50000, help="Max puzzles to load")
     parser.add_argument("--checkpoint-dir", default="checkpoints/fast_torch", help="Checkpoint output directory")
     args = parser.parse_args()
 
-    inputs, targets = load_puzzles_from_dir(args.data_dir, max_puzzles=args.max_puzzles)
+    if args.use_hf:
+        inputs, targets = load_puzzles_from_hf(max_puzzles=args.max_puzzles)
+    else:
+        inputs, targets = load_puzzles_from_dir(args.data_dir, max_puzzles=args.max_puzzles)
+
     if not targets:
         print("[ERROR] No training samples available.")
         sys.exit(1)

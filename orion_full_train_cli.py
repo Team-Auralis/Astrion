@@ -15,8 +15,8 @@ from orion.utils.checkpoint import Checkpoint
 
 
 def uci_to_move(uci: str):
-    """Convert a UCI string like 'e2e4' to a move tuple (r1, c1, r2, c2)."""
-    if len(uci) != 4:
+    """Convert a UCI string like 'e2e4' or 'h7h8q' to a move tuple (r1, c1, r2, c2)."""
+    if len(uci) < 4:
         raise ValueError(f"Invalid UCI move: {uci}")
     return (
         8 - int(uci[1]),

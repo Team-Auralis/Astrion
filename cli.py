@@ -44,6 +44,8 @@ def cmd_train(args):
         "--max-puzzles", str(args.max_puzzles),
         "--checkpoint-dir", args.checkpoint_dir
     ]
+    if getattr(args, "use_hf", False):
+        sys.argv.append("--use-hf")
     train_main()
 
 
@@ -185,6 +187,7 @@ Examples:
     # TRAIN
     train_parser = subparsers.add_parser("train", help="High-speed supervised training on Lichess data")
     train_parser.add_argument("--data-dir", default="data", help="Directory containing lichess_*.json")
+    train_parser.add_argument("--use-hf", action="store_true", help="Stream directly from HuggingFace Lichess dataset")
     train_parser.add_argument("--batch-size", type=int, default=128, help="Batch size")
     train_parser.add_argument("--epochs", type=int, default=5, help="Epochs")
     train_parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")

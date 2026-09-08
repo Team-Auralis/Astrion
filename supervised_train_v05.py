@@ -14,7 +14,7 @@ CHECKPOINT_DIR = "checkpoints/v0.5_supervised"
 
 
 def uci_to_move(uci):
-    if len(uci) != 4:
+    if len(uci) < 4:
         raise ValueError(f"Invalid UCI move: {uci}")
 
     return (

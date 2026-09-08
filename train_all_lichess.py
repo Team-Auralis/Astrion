@@ -12,7 +12,7 @@ from orion.utils.checkpoint import Checkpoint
 
 
 def uci_to_move(uci: str):
-    if len(uci) != 4:
+    if len(uci) < 4:
         raise ValueError(f"Invalid UCI move: {uci}")
     return (
         8 - int(uci[1]),
