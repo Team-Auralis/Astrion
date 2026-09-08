@@ -63,10 +63,30 @@ class GreedyMaterialBot(ChessBot):
             # Favor moving toward center
             score += (3.5 - abs(3.5 - r2)) + (3.5 - abs(3.5 - c2))
 
+            # Anti-repetition check
+            prev_board = [row[:] for row in env.board]
+            prev_turn = env.turn
+            prev_castling = env.castling.copy()
+            prev_en_passant = env.en_passant
+            prev_halfmove = env.halfmove_clock
+            prev_move_count = env.move_count
+            prev_history = env.position_history.copy()
+
+            if env.make_move(move):
+                if prev_history.get(env._position_key(), 0) >= 1:
+                    score -= 400.0
+                env.board = prev_board
+                env.turn = prev_turn
+                env.castling = prev_castling
+                env.en_passant = prev_en_passant
+                env.halfmove_clock = prev_halfmove
+                env.move_count = prev_move_count
+                env.position_history = prev_history
+
             if score > best_score:
                 best_score = score
                 best_moves = [move]
-            elif score == best_score:
+            elif score >= best_score - 1.0:
                 best_moves.append(move)
 
         return random.choice(best_moves) if best_moves else moves[0]
@@ -119,6 +139,7 @@ class MinimaxBot(ChessBot):
             prev_en_passant = env.en_passant
             prev_halfmove = env.halfmove_clock
             prev_move_count = env.move_count
+            prev_history = env.position_history.copy()
 
             if not env.make_move(move):
                 continue
@@ -132,6 +153,7 @@ class MinimaxBot(ChessBot):
             env.en_passant = prev_en_passant
             env.halfmove_clock = prev_halfmove
             env.move_count = prev_move_count
+            env.position_history = prev_history
 
             if score > best_score:
                 best_score = score

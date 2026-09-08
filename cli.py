@@ -21,15 +21,34 @@ from orion.utils.checkpoint import Checkpoint
 from orion.arena import OrionBot, RandomBot, GreedyMaterialBot, MinimaxBot, StockfishBot, Arena
 
 
-def load_network_checkpoint(network: ORIONNetwork, checkpoint_path: str = "checkpoints/v0.5_supervised/orion_1000.json"):
-    if os.path.exists(checkpoint_path):
+import glob
+
+
+def find_best_checkpoint(requested_path: str = None) -> str:
+    if requested_path and os.path.exists(requested_path) and requested_path != "checkpoints/v0.5_supervised/orion_1000.json":
+        return requested_path
+
+    # Auto-discover newest checkpoint
+    candidates = []
+    for pattern in ["checkpoints/fast_torch/*.json", "checkpoints/full_hf/*.json", "checkpoints/v0.5_supervised/*.json"]:
+        candidates.extend(glob.glob(pattern))
+
+    if candidates:
+        candidates.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+        return candidates[0]
+    return requested_path or "checkpoints/v0.5_supervised/orion_1000.json"
+
+
+def load_network_checkpoint(network: ORIONNetwork, checkpoint_path: str = None):
+    actual_path = find_best_checkpoint(checkpoint_path)
+    if os.path.exists(actual_path):
         try:
-            ep = Checkpoint().load(network, checkpoint_path)
-            print(f"[CHECKPOINT] Successfully loaded model from {checkpoint_path} (ep: {ep})")
+            ep = Checkpoint().load(network, actual_path)
+            print(f"[CHECKPOINT] Successfully loaded model from {actual_path} (ep: {ep})")
         except Exception as e:
-            print(f"[WARN] Failed to load checkpoint {checkpoint_path}: {e}")
+            print(f"[WARN] Failed to load checkpoint {actual_path}: {e}")
     else:
-        print(f"[INFO] No checkpoint at {checkpoint_path}, using initialized weights.")
+        print(f"[INFO] No checkpoint found, using initialized weights.")
 
 
 def cmd_train(args):

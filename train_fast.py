@@ -151,6 +151,10 @@ def load_puzzles_from_dir(data_dir: str, max_puzzles: int = 50000) -> Tuple[List
         except Exception as e:
             print(f"[WARN] Error reading {fpath}: {e}")
 
+    print(f"[DATA] Successfully pre-encoded {len(targets)} valid chess puzzles.")
+    return inputs, targets
+
+
 def load_puzzles_from_hf(max_puzzles: int = 50000) -> Tuple[List[List[float]], List[int]]:
     from datasets import load_dataset
     encoder = ChessEncoder()
