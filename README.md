@@ -8,6 +8,7 @@
 [![Organization](https://img.shields.io/badge/Team-Auralis-purple.svg)](https://github.com/Team-Auralis)
 [![Repository](https://img.shields.io/badge/Repo-orion--gaming--mind-brightgreen.svg)](https://github.com/Team-Auralis/orion-gaming-mind)
 [![UCI Compliant](https://img.shields.io/badge/UCI-Compatible-success.svg)](#universal-chess-interface-uci)
+[![Android APK](https://img.shields.io/badge/Android%20APK-Download%20Release-brightgreen?logo=android&logoColor=white)](https://github.com/Team-Auralis/orion-gaming-mind/releases/tag/mobile-latest)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -200,10 +201,13 @@ python cli.py app --port 8000
   - `POST /api/move`: Submit FEN position `{"fen": "...", "depth": 2}` and receive `{best_move, score, nodes}` in milliseconds.
 
 #### Native Android App (`android-chess-src/`):
+- **⚡ Automated GitHub Actions APK Release**: Every push to `main` automatically compiles, signs, and publishes the ready-to-install Android APK to GitHub Releases:
+  - 📲 **[Download ORION-Chess-AI.apk](https://github.com/Team-Auralis/orion-gaming-mind/releases/tag/mobile-latest)**
+  - Direct install on any phone or tablet running Android 7.0+ (API 24+).
 - Customized from [jcarolus/android-chess](https://github.com/jcarolus/android-chess).
 - Features [`OrionEngine.java`](android-chess-src/app/src/main/java/jwtc/android/chess/engine/OrionEngine.java) connecting the Android chessboard directly to the ORION neural engine via HTTP/REST.
 - Automatic offline fallback to local search if disconnected.
-- Open `android-chess-src` in Android Studio and click **Run** to install on any Android device or emulator.
+- To build locally: Open `android-chess-src` in Android Studio and click **Run** (`Shift + F10`).
 
 ---
 

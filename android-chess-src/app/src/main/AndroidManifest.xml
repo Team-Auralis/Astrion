@@ -23,7 +23,8 @@
         android:banner="@drawable/ic_feature"
         android:supportsRtl="true"
         android:enableOnBackInvokedCallback="false"
-        android:resizeableActivity="true">
+        android:resizeableActivity="true"
+        android:usesCleartextTraffic="true">
         <service
             android:name=".ics.ICSServer"
             android:exported="true" />

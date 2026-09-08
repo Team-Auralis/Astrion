@@ -3,7 +3,9 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            storeFile file('../../android-keystore')
+            if (file('../../android-keystore').exists()) {
+                storeFile file('../../android-keystore')
+            }
         }
     }
     compileSdkVersion 36
@@ -18,10 +20,14 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
-            signingConfig signingConfigs.config
+            if (file('../../android-keystore').exists()) {
+                signingConfig signingConfigs.config
+            } else {
+                signingConfig signingConfigs.debug
+            }
         }
     }
     flavorDimensions "deps"
@@ -34,8 +40,8 @@ android {
         }
     }
 
-    // not yet forcing; @TODO
-    ndkVersion "29.0.14033849"
+    // NDK version auto-detected from environment/SDK (or pinned if specified)
+    // ndkVersion "29.0.14033849"
 
     externalNativeBuild {
         ndkBuild {
