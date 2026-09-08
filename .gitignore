@@ -22,6 +22,10 @@ checkpoints/
 *.log
 scratch/
 
+# Executables & Binaries
+*.exe
+stockfish.exe
+
 # Operating System & Editor Files
 .DS_Store
 Thumbs.db

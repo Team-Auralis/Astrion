@@ -193,6 +193,8 @@ class StockfishBot(ChessBot):
     def _find_stockfish() -> Optional[str]:
         """Auto-detect Stockfish binary from PATH or standard directories."""
         candidates = [
+            os.path.join(os.getcwd(), "stockfish.exe"),
+            r"D:\orion-game-ai\stockfish.exe",
             shutil.which("stockfish"),
             shutil.which("stockfish.exe"),
             r"C:\Program Files\Stockfish\stockfish.exe",
