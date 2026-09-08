@@ -186,7 +186,28 @@ Enter moves in standard algebraic/UCI format (`e2e4`, `e7e5`, `g1f3`, `b8c6`).
 
 ---
 
-### 4. 🌐 Universal Chess Interface (UCI)
+### 4. 📱 Mobile App & Web Interface (Android & PWA)
+
+ORION includes both a **native Android app** and a **zero-install Mobile Web / PWA**:
+
+#### Start the Backend Engine Server:
+```powershell
+python cli.py app --port 8000
+```
+- **Mobile Web / PWA**: Open `http://localhost:8000` (or `http://<LAN-IP>:8000` on your Android phone). A responsive, touch-optimized chess board will load with live move hints and real-time ORION AI evaluation!
+- **REST API**:
+  - `GET /api/status`: Engine info, active checkpoint, and default search depth.
+  - `POST /api/move`: Submit FEN position `{"fen": "...", "depth": 2}` and receive `{best_move, score, nodes}` in milliseconds.
+
+#### Native Android App (`android-chess-src/`):
+- Customized from [jcarolus/android-chess](https://github.com/jcarolus/android-chess).
+- Features [`OrionEngine.java`](android-chess-src/app/src/main/java/jwtc/android/chess/engine/OrionEngine.java) connecting the Android chessboard directly to the ORION neural engine via HTTP/REST.
+- Automatic offline fallback to local search if disconnected.
+- Open `android-chess-src` in Android Studio and click **Run** to install on any Android device or emulator.
+
+---
+
+### 5. 🌐 Universal Chess Interface (UCI)
 
 Run ORION as a standard UCI engine to connect with **Arena Chess GUI**, **Cutechess**, **Banksia**, or run a 24/7 bot on **Lichess**:
 
@@ -208,7 +229,7 @@ Compatible UCI commands:
 
 ```
 orion-gaming-mind/
-├── orion/
+├── orion/                     # Core Neural Chess Intelligence Engine
 │   ├── arena/                 # Bot Arena & FIDE Elo Tracker
 │   │   ├── battle.py          # Arena match loop & Elo math
 │   │   └── bots.py            # RandomBot, GreedyBot, MinimaxBot, StockfishBot
@@ -224,9 +245,13 @@ orion-gaming-mind/
 │   ├── training/              # RL, TD-learning, and Self-Play modules
 │   └── utils/
 │       └── checkpoint.py      # Checkpoint serialization & loading
+├── android-chess-src/         # Complete Native Android App (Java/Kotlin Gradle project)
+│   ├── app/                   # Android Application module with OrionEngine.java
+│   └── build.gradle           # Root Gradle configuration
 ├── checkpoints/               # Trained model weights (JSON format)
 ├── data/                      # Lichess training datasets
-├── cli.py                     # Unified Master CLI (train, battle, play, uci)
+├── cli.py                     # Unified Master CLI (train, battle, play, app, uci)
+├── orion_app_server.py        # Mobile App API server & interactive Web PWA
 ├── train_fast.py              # High-speed vectorized PyTorch training
 ├── orion_uci.py               # UCI Protocol implementation
 ├── test_*.py                  # Complete automated test suite

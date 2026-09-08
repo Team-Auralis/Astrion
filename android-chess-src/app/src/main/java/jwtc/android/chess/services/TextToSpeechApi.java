@@ -1,0 +1,390 @@
+package jwtc.android.chess.services;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.LocaleList;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.Voice;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+public class TextToSpeechApi implements TextToSpeech.OnInitListener {
+    private static final String TAG = "TextToSpeechApi";
+    private static final String PROTECTED_PREFIX = "protected-";
+    private static final String LAST_MOVE_PREFIX = "last-move-";
+    private final Context context;
+    private TextToSpeech textToSpeech;
+    private final Object speechStateLock = new Object();
+    private final LastMoveSpeechQueue lastMoveSpeechQueue = new LastMoveSpeechQueue();
+    private SharedPreferences prefs;
+    private final InitStateListener initStateListener;
+    private final LocaleList appLocales;
+    private Locale selectedLocale = Locale.US;
+    protected float speechRate = 1.0f;
+    protected float speechPitch = 1.0f;
+    private boolean enabled = true;
+    private boolean initializing = false;
+    private boolean ready = false;
+    private int lastInitStatus = TextToSpeech.ERROR;
+    private int lastLanguageStatus = TextToSpeech.LANG_NOT_SUPPORTED;
+    private final Map<Locale, Integer> localeAvailabilityCache = new HashMap<>();
+
+    public interface InitStateListener {
+        void onTtsInitStateChanged(int initStatus, int languageStatus);
+    }
+
+    public TextToSpeechApi(Context context, @Nullable InitStateListener initStateListener) {
+        this.context = context;
+        this.initStateListener = initStateListener;
+        textToSpeech = null;
+        appLocales = context.getResources().getConfiguration().getLocales();
+    }
+
+    public int setDefaults() {
+        if (textToSpeech == null) {
+            ready = false;
+            return TextToSpeech.ERROR;
+        }
+        setSpeechRate(prefs.getFloat("speechRate", 1.0F));
+        setSpeechPitch(prefs.getFloat("speechPitch", 1.0F));
+
+        String defaultEngine = textToSpeech.getDefaultEngine();
+        Log.i(TAG, "TTS default engine package: " + defaultEngine);
+
+        for (TextToSpeech.EngineInfo engine : textToSpeech.getEngines()) {
+            Log.i(TAG, "Available engine: " + engine.name + " label=" + engine.label);
+        }
+
+        selectedLocale = findBestSupportedLocale();
+        Log.i(TAG, "setDefaults locale=" + selectedLocale);
+        int result = textToSpeech.setLanguage(selectedLocale);
+
+        String selectedVoiceName = prefs.getString("speechVoice", null);
+        if (selectedVoiceName != null && !selectedVoiceName.isEmpty() && setVoiceByName(selectedVoiceName)) {
+            result = TextToSpeech.SUCCESS;
+        }
+        ready = result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED;
+
+        return result;
+    }
+
+    public void saveDefaults(SharedPreferences.Editor editor) {
+        editor.putFloat("speechRate", speechRate);
+        editor.putFloat("speechPitch", speechPitch);
+    }
+
+    public void setSpeechRate(float speechRate) {
+        this.speechRate = speechRate;
+        if (textToSpeech != null) {
+            textToSpeech.setSpeechRate(speechRate);
+        }
+    }
+
+    public void setSpeechPitch(float speechPitch) {
+        this.speechPitch = speechPitch;
+        if (textToSpeech != null) {
+            textToSpeech.setPitch(speechPitch);
+        }
+    }
+
+    public void doSpeak(String sMoveSpeech) {
+        doSpeak(sMoveSpeech, TextToSpeech.QUEUE_FLUSH);
+    }
+
+    public void doSpeak(String sMoveSpeech, int queueMode) {
+        if (!enabled || !ready) {
+            Log.d(TAG, "doSpeak not enabled or not ready " + enabled + " " + ready);
+            return;
+        }
+        if (textToSpeech == null) {
+            Log.d(TAG, "textToSpeech == null");
+            return;
+        }
+        synchronized (speechStateLock) {
+            if (lastMoveSpeechQueue.hasProtectedSpeech() && queueMode == TextToSpeech.QUEUE_FLUSH) {
+                return;
+            }
+            if (queueMode == TextToSpeech.QUEUE_FLUSH) {
+                lastMoveSpeechQueue.clear();
+            }
+            String id = "utt-" + System.nanoTime();
+            this.textToSpeech.speak(sMoveSpeech, queueMode, null, id);
+        }
+    }
+
+    // Starts a last-move sequence immediately, then appends further last moves
+    // until the sequence drains. Protected moves prevent QUEUE_FLUSH speech from
+    // interrupting them.
+    public void doSpeakLastMove(String sMoveSpeech, boolean protectSpeech) {
+        if (!enabled || !ready) {
+            return;
+        }
+        if (textToSpeech == null) {
+            return;
+        }
+        Log.d(TAG, "doSpeakLastMove " + protectSpeech + " " + sMoveSpeech);
+        synchronized (speechStateLock) {
+            String prefix = protectSpeech ? PROTECTED_PREFIX : LAST_MOVE_PREFIX;
+            String id = prefix + System.nanoTime();
+            boolean append = lastMoveSpeechQueue.start(id, protectSpeech);
+            int queueMode = append ? TextToSpeech.QUEUE_ADD : TextToSpeech.QUEUE_FLUSH;
+            int result = this.textToSpeech.speak(sMoveSpeech, queueMode, null, id);
+            if (result == TextToSpeech.ERROR) {
+                lastMoveSpeechQueue.finish(id);
+            }
+        }
+    }
+
+    public void queueSpeech(String sSpeech) {
+        if (!enabled || !ready) {
+            return;
+        }
+        if (textToSpeech == null) {
+            return;
+        }
+        String id = "utt-" + System.nanoTime();
+        this.textToSpeech.speak(sSpeech, TextToSpeech.QUEUE_ADD, null, id);
+    }
+
+    public List<Voice> getSupportedVoices() {
+        List<Voice> filteredVoices = new ArrayList<>();
+        if (textToSpeech == null) {
+            return filteredVoices;
+        }
+        if (textToSpeech.getVoices() == null) {
+            return filteredVoices;
+        }
+
+        for (Voice voice : textToSpeech.getVoices()) {
+            if (voice == null || voice.getLocale() == null) {
+                continue;
+            }
+            if (isLocaleSupported(voice.getLocale()) && isSupportedByAppLocales(voice.getLocale())) {
+                filteredVoices.add(voice);
+            }
+        }
+
+        filteredVoices.sort(Comparator
+                .comparing((Voice voice) -> voice.getLocale().toLanguageTag())
+                .thenComparing(Voice::getName));
+        return filteredVoices;
+    }
+
+    public boolean setVoiceByName(String voiceName) {
+        if (textToSpeech == null) {
+            return false;
+        }
+        if (voiceName == null || textToSpeech.getVoices() == null) {
+            return false;
+        }
+
+        for (Voice voice : textToSpeech.getVoices()) {
+            if (voice != null && voiceName.equals(voice.getName())) {
+                int result = textToSpeech.setVoice(voice);
+                if (result == TextToSpeech.SUCCESS) {
+                    selectedLocale = voice.getLocale();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String getCurrentVoiceName() {
+        if (textToSpeech == null) {
+            return null;
+        }
+        Voice voice = textToSpeech.getVoice();
+        return voice == null ? null : voice.getName();
+    }
+
+    public void useSystemDefaultVoice() {
+        if (textToSpeech == null) {
+            return;
+        }
+        selectedLocale = findBestSupportedLocale();
+        textToSpeech.setLanguage(selectedLocale);
+    }
+
+    public List<TextToSpeech.EngineInfo> getInstalledEngines() {
+        if (textToSpeech == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(textToSpeech.getEngines());
+    }
+
+    public void shutdown() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+            textToSpeech = null;
+        }
+        synchronized (speechStateLock) {
+            lastMoveSpeechQueue.clear();
+        }
+        localeAvailabilityCache.clear();
+        initializing = false;
+        ready = false;
+    }
+
+    public void setEnabled(boolean enabled, SharedPreferences prefs) {
+        this.enabled = enabled;
+        if (enabled) {
+            this.prefs = prefs;
+            ensureInitialized();
+        } else if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+            textToSpeech = null;
+            synchronized (speechStateLock) {
+                lastMoveSpeechQueue.clear();
+            }
+            initializing = false;
+            ready = false;
+        }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public int getLastInitStatus() {
+        return lastInitStatus;
+    }
+
+    public int getLastLanguageStatus() {
+        return lastLanguageStatus;
+    }
+
+    @Override
+    public void onInit(int status) {
+        if (!enabled || textToSpeech == null) {
+            initializing = false;
+            ready = false;
+            return;
+        }
+        initializing = false;
+        lastInitStatus = status;
+        if (status == TextToSpeech.SUCCESS) {
+            lastLanguageStatus = setDefaults();
+            ready = lastLanguageStatus != TextToSpeech.LANG_MISSING_DATA
+                && lastLanguageStatus != TextToSpeech.LANG_NOT_SUPPORTED;
+        } else {
+            lastLanguageStatus = TextToSpeech.LANG_NOT_SUPPORTED;
+            ready = false;
+        }
+
+        if (initStateListener != null) {
+            initStateListener.onTtsInitStateChanged(lastInitStatus, lastLanguageStatus);
+        }
+    }
+
+    private Locale findBestSupportedLocale() {
+        if (textToSpeech == null) {
+            return Locale.US;
+        }
+        for (int i = 0; i < appLocales.size(); i++) {
+            Locale candidate = appLocales.get(i);
+            if (isLocaleSupported(candidate)) {
+                return candidate;
+            }
+
+            Locale languageOnly = new Locale(candidate.getLanguage());
+            if (isLocaleSupported(languageOnly)) {
+                return languageOnly;
+            }
+        }
+
+        return Locale.US;
+    }
+
+    private boolean isLocaleSupported(Locale locale) {
+        if (textToSpeech == null) {
+            return false;
+        }
+        Integer cachedStatus = localeAvailabilityCache.get(locale);
+        if (cachedStatus == null) {
+            cachedStatus = textToSpeech.isLanguageAvailable(locale);
+            localeAvailabilityCache.put(locale, cachedStatus);
+        }
+        int status = cachedStatus;
+        return status == TextToSpeech.LANG_AVAILABLE
+                || status == TextToSpeech.LANG_COUNTRY_AVAILABLE
+                || status == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE;
+    }
+
+    private boolean isSupportedByAppLocales(Locale locale) {
+        String language = locale.getLanguage();
+        if (language == null || language.isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0; i < appLocales.size(); i++) {
+            Locale appLocale = appLocales.get(i);
+            if (language.equals(appLocale.getLanguage())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Resources getLocalizedResources() {
+        Configuration configuration = new Configuration(context.getResources().getConfiguration());
+        configuration.setLocales(new LocaleList(selectedLocale));
+        return context.createConfigurationContext(configuration).getResources();
+    }
+
+    private void ensureInitialized() {
+        if (textToSpeech != null || initializing) {
+            return;
+        }
+        initializing = true;
+        String enginePackage = prefs.getString("speechEngine", null);
+        if (enginePackage == null || enginePackage.isEmpty()) {
+            textToSpeech = new TextToSpeech(context, this);
+        } else {
+            textToSpeech = new TextToSpeech(context, this, enginePackage);
+        }
+        textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                synchronized (speechStateLock) {
+                    lastMoveSpeechQueue.finish(utteranceId);
+                }
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+                synchronized (speechStateLock) {
+                    lastMoveSpeechQueue.finish(utteranceId);
+                }
+            }
+
+            @Override
+            public void onStop(String utteranceId, boolean interrupted) {
+                synchronized (speechStateLock) {
+                    lastMoveSpeechQueue.finish(utteranceId);
+                }
+            }
+        });
+    }
+}

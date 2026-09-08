@@ -186,6 +186,12 @@ def cmd_uci(args):
     uci_main()
 
 
+def cmd_app(args):
+    """Launch ORION mobile app API server & PWA."""
+    from orion_app_server import run_server
+    run_server(host=args.host, port=args.port, checkpoint=args.checkpoint, depth=args.depth)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="ORION Gaming Mind - Chess AI Platform by Team-Auralis",
@@ -198,6 +204,7 @@ Examples:
   python cli.py battle --opponent minimax --rounds 4
   python cli.py battle --opponent stockfish --stockfish-elo 1400 --rounds 2
   python cli.py play --color white --depth 2
+  python cli.py app --port 8000
   python cli.py uci
         """
     )
@@ -238,6 +245,13 @@ Examples:
     # UCI
     subparsers.add_parser("uci", help="Launch UCI engine protocol for Arena/Cutechess/Lichess")
 
+    # APP / SERVER
+    app_parser = subparsers.add_parser("app", aliases=["server"], help="Launch ORION mobile app API server & PWA interface")
+    app_parser.add_argument("--host", default="0.0.0.0", help="Host address (default: 0.0.0.0)")
+    app_parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
+    app_parser.add_argument("--depth", type=int, default=2, help="ORION search depth")
+    app_parser.add_argument("--checkpoint", default=None, help="Model checkpoint path")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -251,6 +265,8 @@ Examples:
         cmd_play(args)
     elif args.command == "uci":
         cmd_uci(args)
+    elif args.command in ("app", "server"):
+        cmd_app(args)
 
 
 if __name__ == "__main__":

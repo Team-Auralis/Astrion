@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dip">
+
+        <jwtc.android.chess.views.FixedDropdownView
+            android:id="@+id/DropdownPieceSet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/chessboard_hint_piece_set" />
+
+        <jwtc.android.chess.views.FixedDropdownView
+            android:id="@+id/DropdownColorScheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/chessboard_hint_color_scheme" />
+
+        <LinearLayout
+            android:id="@+id/CustomColorControls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/custom_square_colors" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ButtonCustomDarkColor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/custom_dark_square_color" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ButtonCustomLightColor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/custom_light_square_color" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/SliderSaturation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:value="1"
+            android:valueFrom="0.5"
+            android:valueTo="1.0"
+            android:stepSize="0.05"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="24dp" />
+
+        <jwtc.android.chess.views.FixedDropdownView
+            android:id="@+id/DropdownTileSet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/chessboard_hint_tile_effect" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxCoordinates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dip"
+            android:text="@string/pref_showCoords" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxShowMoves"
+            android:text="@string/pref_show_possible_moves"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dip" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxUsePieceAnimation"
+            android:text="@string/pref_use_piece_animation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dip" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxShowCapturedPieces"
+            android:text="@string/pref_show_captured_pieces"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginEnd="8dip" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxUseSound"
+            android:text="@string/pref_sound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginEnd="8dip" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxUseHapticFeedback"
+            android:text="@string/pref_haptic_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginEnd="8dip" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxUseWakeLock"
+            android:text="@string/pref_wakelock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginEnd="8dip" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dip"
+            android:layout_marginEnd="8dip"
+            android:layout_marginBottom="8dip"
+            android:text="@string/pref_wakelock_desc" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxFullscreen"
+            android:text="@string/pref_fullscreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginEnd="8dip" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dip"
+            android:layout_marginEnd="8dip"
+            android:layout_marginBottom="8dip"
+            android:text="@string/pref_fullscreen_desc" />
+
+        <CheckBox
+            android:id="@+id/CheckBoxForceNightMode"
+            android:text="@string/pref_night_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginEnd="8dip" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dip"
+            android:layout_marginEnd="8dip"
+            android:layout_marginBottom="8dip"
+            android:text="@string/pref_night_mode_desc" />
+    </LinearLayout>
+</ScrollView>

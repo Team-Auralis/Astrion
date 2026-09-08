@@ -1,0 +1,59 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        config {
+            storeFile file('../../android-keystore')
+        }
+    }
+    compileSdkVersion 36
+    buildToolsVersion '36'
+    defaultConfig {
+        applicationId "jwtc.android.chess"
+        minSdkVersion 24
+        targetSdkVersion 36
+        resourceConfigurations += ['en', 'zh', 'it', 'pt', 'es', 'ru', 'de', 'fr', 'tr', 'ro', 'ar', 'fa']
+        // place correct redirectScheme~
+        manifestPlaceholders = [appAuthRedirectScheme: 'jwtc.android.chess']
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.config
+        }
+    }
+    flavorDimensions "deps"
+    productFlavors {
+        playStore {
+            dimension "deps"
+        }
+        foss {
+            dimension "deps"
+        }
+    }
+
+    // not yet forcing; @TODO
+    ndkVersion "29.0.14033849"
+
+    externalNativeBuild {
+        ndkBuild {
+            path file('../native/project/jni/Android.mk')
+        }
+    }
+    namespace 'jwtc.android.chess'
+//    lint {
+//        disable 'MissingTranslation'
+//    }
+}
+
+dependencies {
+    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'androidx.mediarouter:mediarouter:1.8.1'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    implementation 'com.google.code.gson:gson:2.13.2'
+    implementation 'net.openid:appauth:0.11.1'
+    playStoreImplementation 'com.google.android.gms:play-services-cast:22.1.0'
+}
