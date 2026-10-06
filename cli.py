@@ -30,7 +30,7 @@ def find_best_checkpoint(requested_path: str = None) -> str:
 
     # Auto-discover newest checkpoint
     candidates = []
-    for pattern in ["checkpoints/fast_torch/*.json", "checkpoints/full_hf/*.json", "checkpoints/v0.5_supervised/*.json"]:
+    for pattern in ["checkpoints/resnet_v1/*.json", "checkpoints/fast_torch/*.json", "checkpoints/full_hf/*.json", "checkpoints/v0.5_supervised/*.json"]:
         candidates.extend(glob.glob(pattern))
 
     if candidates:
@@ -224,10 +224,10 @@ Examples:
     battle_parser = subparsers.add_parser("battle", aliases=["arena"], help="Arena match against real bots with Elo tracking")
     battle_parser.add_argument("--opponent", default="random", choices=["random", "greedy", "minimax", "stockfish"], help="Opponent bot")
     battle_parser.add_argument("--rounds", type=int, default=6, help="Number of games to play")
-    battle_parser.add_argument("--search-depth", type=int, default=2, help="ORION search depth")
+    battle_parser.add_argument("--search-depth", type=int, default=3, help="ORION search depth")
     battle_parser.add_argument("--policy-only", action="store_true", help="Disable search and use pure policy network")
-    battle_parser.add_argument("--checkpoint", default="checkpoints/v0.5_supervised/orion_1000.json", help="Checkpoint file")
-    battle_parser.add_argument("--orion-elo", type=float, default=1200.0, help="Starting Elo for ORION")
+    battle_parser.add_argument("--checkpoint", default=None, help="Checkpoint file (auto-discovered if not set)")
+    battle_parser.add_argument("--orion-elo", type=float, default=1500.0, help="Starting Elo for ORION")
     battle_parser.add_argument("--minimax-depth", type=int, default=2, help="Depth for MinimaxBot")
     battle_parser.add_argument("--stockfish-path", default=None, help="Path to stockfish executable")
     battle_parser.add_argument("--stockfish-elo", type=int, default=1400, help="Stockfish UCI Elo limit (1320-3190)")
@@ -238,9 +238,9 @@ Examples:
     # PLAY
     play_parser = subparsers.add_parser("play", help="Play interactively against ORION in the terminal")
     play_parser.add_argument("--color", default="white", choices=["white", "black"], help="Your piece color")
-    play_parser.add_argument("--depth", type=int, default=2, help="ORION search depth")
+    play_parser.add_argument("--depth", type=int, default=3, help="ORION search depth")
     play_parser.add_argument("--policy-only", action="store_true", help="Disable search")
-    play_parser.add_argument("--checkpoint", default="checkpoints/v0.5_supervised/orion_1000.json", help="Checkpoint file")
+    play_parser.add_argument("--checkpoint", default=None, help="Checkpoint file (auto-discovered if not set)")
 
     # UCI
     subparsers.add_parser("uci", help="Launch UCI engine protocol for Arena/Cutechess/Lichess")
@@ -249,7 +249,7 @@ Examples:
     app_parser = subparsers.add_parser("app", aliases=["server"], help="Launch ORION mobile app API server & PWA interface")
     app_parser.add_argument("--host", default="0.0.0.0", help="Host address (default: 0.0.0.0)")
     app_parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
-    app_parser.add_argument("--depth", type=int, default=2, help="ORION search depth")
+    app_parser.add_argument("--depth", type=int, default=3, help="ORION search depth")
     app_parser.add_argument("--checkpoint", default=None, help="Model checkpoint path")
 
     args = parser.parse_args()

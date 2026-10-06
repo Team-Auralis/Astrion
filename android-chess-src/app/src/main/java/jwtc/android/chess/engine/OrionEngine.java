@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jwtc.android.chess.constants.BoardConstants;
+import jwtc.chess.board.BoardConstants;
 import jwtc.android.chess.services.GameApi;
 import jwtc.chess.JNI;
 import jwtc.chess.Move;

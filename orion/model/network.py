@@ -2,57 +2,51 @@ import math
 import random
 
 
+class ResidualBlock:
+    """Single residual block with two FC layers (BN fused at export)."""
+
+    def __init__(self, channels, rng):
+        self.w_a = _matrix(rng, channels, channels)
+        self.b_a = [0.0] * channels
+        self.w_b = _matrix(rng, channels, channels)
+        self.b_b = [0.0] * channels
+
+
+def _rng_weight(rng):
+    limit = 1.0 / math.sqrt(256)
+    return rng.uniform(-limit, limit)
+
+
+def _matrix(rng, rows, cols):
+    limit = 1.0 / math.sqrt(cols)
+    return [[rng.uniform(-limit, limit) for _ in range(cols)] for _ in range(rows)]
+
+
 class ORIONNetwork:
 
-    INPUT_SIZE = 896
-    HIDDEN_1 = 256
-    HIDDEN_2 = 128
+    INPUT_SIZE = 1152
+    CHANNELS = 256
+    NUM_BLOCKS = 6
     POLICY_SIZE = 4096
 
     def __init__(self, seed=42):
 
-        random.seed(seed)
+        rng = random.Random(seed)
 
-        self.w1 = self._matrix(
-            self.HIDDEN_1,
-            self.INPUT_SIZE
-        )
+        self.input_w = _matrix(rng, self.CHANNELS, self.INPUT_SIZE)
+        self.input_b = [0.0] * self.CHANNELS
 
-        self.b1 = [0.0] * self.HIDDEN_1
+        self.blocks = [ResidualBlock(self.CHANNELS, rng) for _ in range(self.NUM_BLOCKS)]
 
-        self.w2 = self._matrix(
-            self.HIDDEN_2,
-            self.HIDDEN_1
-        )
+        self.policy_w1 = _matrix(rng, 512, self.CHANNELS)
+        self.policy_b1 = [0.0] * 512
+        self.policy_w2 = _matrix(rng, self.POLICY_SIZE, 512)
+        self.policy_b2 = [0.0] * self.POLICY_SIZE
 
-        self.b2 = [0.0] * self.HIDDEN_2
-
-        self.policy_w = self._matrix(
-            self.POLICY_SIZE,
-            self.HIDDEN_2
-        )
-
-        self.policy_b = [0.0] * self.POLICY_SIZE
-
-        self.value_w = [
-            self._random_weight()
-            for _ in range(self.HIDDEN_2)
-        ]
-
-        self.value_b = 0.0
-
-    def _random_weight(self):
-        return random.uniform(-0.05, 0.05)
-
-    def _matrix(self, rows, cols):
-
-        return [
-            [
-                self._random_weight()
-                for _ in range(cols)
-            ]
-            for _ in range(rows)
-        ]
+        self.value_w1 = _matrix(rng, 64, self.CHANNELS)
+        self.value_b1 = [0.0] * 64
+        self.value_w2 = [rng.uniform(-0.01, 0.01) for _ in range(64)]
+        self.value_b2 = 0.0
 
     @staticmethod
     def relu(x):
@@ -60,28 +54,19 @@ class ORIONNetwork:
 
     @staticmethod
     def sigmoid(x):
-
         if x < -60:
             return 0.0
-
         if x > 60:
             return 1.0
-
         return 1.0 / (1.0 + math.exp(-x))
 
     def dense(self, inputs, weights, bias):
-
         output = []
-
         for row, b in zip(weights, bias):
-
             total = b
-
             for x, w in zip(inputs, row):
                 total += x * w
-
             output.append(total)
-
         return output
 
     def forward(self, inputs, return_hidden=False, return_cache=False):
@@ -92,76 +77,51 @@ class ORIONNetwork:
                 f"received {len(inputs)}"
             )
 
-        # First hidden layer
-        z1 = self.dense(
-            inputs,
-            self.w1,
-            self.b1
-        )
+        h = self.dense(inputs, self.input_w, self.input_b)
+        h = [self.relu(x) for x in h]
 
-        h1 = [
-            self.relu(x)
-            for x in z1
-        ]
+        for block in self.blocks:
+            residual = h[:]
+            z = self.dense(h, block.w_a, block.b_a)
+            z = [self.relu(x) for x in z]
+            z = self.dense(z, block.w_b, block.b_b)
+            h = [r + z_i for r, z_i in zip(residual, z)]
+            h = [self.relu(x) for x in h]
 
-        # Second hidden layer
-        z2 = self.dense(
-            h1,
-            self.w2,
-            self.b2
-        )
+        policy_logits = self.dense(h, self.policy_w2, self.policy_b2)
 
-        h2 = [
-            self.relu(x)
-            for x in z2
-        ]
-
-        # Policy
-        policy = self.dense(
-            h2,
-            self.policy_w,
-            self.policy_b
-        )
-
-        # Value
-        value_raw = self.value_b
-
-        for x, w in zip(h2, self.value_w):
+        v = self.dense(h, self.value_w1, self.value_b1)
+        v = [self.relu(x) for x in v]
+        value_raw = self.value_b2
+        for x, w in zip(v, self.value_w2):
             value_raw += x * w
-
         value = self.sigmoid(value_raw)
 
         result = {
-            "policy": policy,
-            "value": value
+            "policy": policy_logits,
+            "value": value,
         }
 
         if return_hidden:
-            result["hidden"] = h2
+            result["hidden"] = h
 
         if return_cache:
             result["cache"] = {
                 "inputs": inputs,
-                "z1": z1,
-                "h1": h1,
-                "z2": z2,
-                "h2": h2,
-                "policy": policy,
+                "h": h,
+                "policy": policy_logits,
                 "value_raw": value_raw,
-                "value": value
+                "value": value,
             }
 
         return result
 
     def parameter_count(self):
-
-        return (
-            self.INPUT_SIZE * self.HIDDEN_1
-            + self.HIDDEN_1
-            + self.HIDDEN_1 * self.HIDDEN_2
-            + self.HIDDEN_2
-            + self.HIDDEN_2 * self.POLICY_SIZE
-            + self.POLICY_SIZE
-            + self.HIDDEN_2
-            + 1
-        )
+        total = self.CHANNELS * self.INPUT_SIZE + self.CHANNELS
+        for block in self.blocks:
+            total += self.CHANNELS * self.CHANNELS * 2 + self.CHANNELS * 2
+        total += self.CHANNELS * 512 + 512
+        total += 512 * self.POLICY_SIZE + self.POLICY_SIZE
+        total += self.CHANNELS * 64 + 64
+        total += 64 + 1
+        return total

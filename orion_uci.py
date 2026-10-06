@@ -15,6 +15,7 @@ from orion.model.encoder import ChessEncoder
 from orion.model.network import ORIONNetwork
 from orion.search.search_agent import StockfishInspiredSearchAgent
 from orion.utils.checkpoint import Checkpoint
+from cli import find_best_checkpoint
 
 
 def uci_to_move(uci_str: str):
@@ -29,14 +30,15 @@ def uci_to_move(uci_str: str):
 def main():
     network = ORIONNetwork()
     encoder = ChessEncoder()
-    default_ckpt = "checkpoints/v0.5_supervised/orion_1000.json"
-    if os.path.exists(default_ckpt):
+
+    best_ckpt = find_best_checkpoint()
+    if best_ckpt and os.path.exists(best_ckpt):
         try:
-            Checkpoint().load(network, default_ckpt)
+            Checkpoint().load(network, best_ckpt)
         except Exception:
             pass
 
-    depth = 2
+    depth = 3
     agent = StockfishInspiredSearchAgent(network, encoder, default_depth=depth)
     env = ChessEnvironment()
 
@@ -56,7 +58,7 @@ def main():
                 print("id name ORION Gaming Mind v0.6")
                 print("id author Team-Auralis")
                 print(f"option name Depth type spin default {depth} min 1 max 6")
-                print(f"option name Checkpoint type string default {default_ckpt}")
+                print(f"option name Checkpoint type string default {best_ckpt or 'none'}")
                 print("uciok")
                 sys.stdout.flush()
 
@@ -65,7 +67,6 @@ def main():
                 sys.stdout.flush()
 
             elif command == "setoption":
-                # setoption name Depth value 3
                 if len(parts) >= 5 and parts[1].lower() == "name" and parts[3].lower() == "value":
                     opt_name = parts[2].lower()
                     opt_val = parts[4]
@@ -80,8 +81,6 @@ def main():
                 env = ChessEnvironment()
 
             elif command == "position":
-                # position startpos [moves ...]
-                # position fen <fen...> [moves ...]
                 env = ChessEnvironment()
                 moves_index = -1
                 if parts[1] == "startpos":
@@ -108,7 +107,6 @@ def main():
                             env.make_move(move)
 
             elif command == "go":
-                # go depth 3 / go movetime 1000
                 search_d = depth
                 if "depth" in parts:
                     d_idx = parts.index("depth")

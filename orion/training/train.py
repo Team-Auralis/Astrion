@@ -33,6 +33,7 @@ class ORIONTrainer:
         )
 
         self.temperature = temperature
+        self._use_search = False
 
     def train_game(self, max_moves=200):
 

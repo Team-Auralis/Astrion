@@ -313,7 +313,7 @@ class OrionBot(ChessBot):
     """ORION Chess Agent playing with either pure Neural Policy or Stockfish-Inspired Search."""
     name = "ORION AI"
 
-    def __init__(self, network: ORIONNetwork, encoder: ChessEncoder, use_search: bool = True, depth: int = 2, rating: float = 1200.0):
+    def __init__(self, network: ORIONNetwork, encoder: ChessEncoder, use_search: bool = True, depth: int = 3, rating: float = 1500.0):
         self.network = network
         self.encoder = encoder
         self.use_search = use_search

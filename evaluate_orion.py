@@ -134,7 +134,7 @@ def evaluate(
             reasons[status] += 1
 
     print("================================")
-    print("      ORION v0.5 EVALUATION")
+    print("      ORION v0.6 EVALUATION")
     print("================================")
     print()
 
@@ -190,7 +190,7 @@ def evaluate(
     )
 
     print()
-    print("ORION v0.5 EVALUATION COMPLETE")
+    print("ORION v0.6 EVALUATION COMPLETE")
 
 
 if __name__ == "__main__":

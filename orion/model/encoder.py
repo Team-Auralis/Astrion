@@ -3,7 +3,7 @@ class ChessEncoder:
     Converts a ChessEnvironment state into a numerical tensor.
 
     Shape:
-        14 x 8 x 8
+        18 x 8 x 8
 
     Channels:
         0  = white pawn
@@ -20,6 +20,10 @@ class ChessEncoder:
         11 = black king
         12 = side to move
         13 = en-passant square
+        14 = white kingside castling right
+        15 = white queenside castling right
+        16 = black kingside castling right
+        17 = black queenside castling right
     """
 
     PIECE_CHANNELS = {
@@ -37,7 +41,7 @@ class ChessEncoder:
         "k": 11,
     }
 
-    CHANNELS = 14
+    CHANNELS = 18
 
     def encode(self, state):
         tensor = [
@@ -50,29 +54,40 @@ class ChessEncoder:
 
         board = state["board"]
 
-        # Piece planes
         for row in range(8):
             for col in range(8):
-
                 piece = board[row][col]
-
                 if piece in self.PIECE_CHANNELS:
                     channel = self.PIECE_CHANNELS[piece]
                     tensor[channel][row][col] = 1
 
-        # Side-to-move plane
         side_value = 1 if state["turn"] == "white" else 0
-
         for row in range(8):
             for col in range(8):
                 tensor[12][row][col] = side_value
 
-        # En-passant plane
         en_passant = state.get("en_passant")
-
         if en_passant is not None:
             row, col = en_passant
             tensor[13][row][col] = 1
+
+        castling = state.get("castling", {})
+        if castling.get("K"):
+            for row in range(8):
+                for col in range(8):
+                    tensor[14][row][col] = 1
+        if castling.get("Q"):
+            for row in range(8):
+                for col in range(8):
+                    tensor[15][row][col] = 1
+        if castling.get("k"):
+            for row in range(8):
+                for col in range(8):
+                    tensor[16][row][col] = 1
+        if castling.get("q"):
+            for row in range(8):
+                for col in range(8):
+                    tensor[17][row][col] = 1
 
         return tensor
 

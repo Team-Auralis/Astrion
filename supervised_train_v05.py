@@ -10,7 +10,7 @@ from orion.utils.checkpoint import Checkpoint
 
 
 DATASET = "lichess_1000.json"
-CHECKPOINT_DIR = "checkpoints/v0.5_supervised"
+CHECKPOINT_DIR = "checkpoints/resnet_v1"
 
 
 def uci_to_move(uci):

@@ -83,7 +83,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--checkpoint-dir",
-        default="checkpoints/full_hf",
+        default="checkpoints/resnet_v1",
         help="Directory to save model checkpoints",
     )
     parser.add_argument(

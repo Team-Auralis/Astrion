@@ -172,8 +172,9 @@ HTML_MOBILE_APP = """<!DOCTYPE html>
     <label>AI Strength:</label>
     <select id="depth-select">
       <option value="1">Depth 1 (Fast)</option>
-      <option value="2" selected>Depth 2 (Standard - 1200 Elo)</option>
-      <option value="3">Depth 3 (Tactical Master - 1350+ Elo)</option>
+      <option value="2">Depth 2 (Standard)</option>
+      <option value="3" selected>Depth 3 (Strong - 2000+ Elo)</option>
+      <option value="4">Depth 4 (Expert)</option>
     </select>
   </div>
 
