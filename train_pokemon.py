@@ -371,6 +371,7 @@ class PPOTrainer:
                 "optimizer_state_dict": self.optimizer.state_dict(),
                 "global_step": self.global_step,
                 "episode_count": self.episode_count,
+                "rollout": getattr(self, "_current_rollout", 0),
                 "best_reward": self.best_reward,
                 "best_badges": self.best_badges,
             },
@@ -388,6 +389,9 @@ class PPOTrainer:
         self.episode_count = ckpt.get("episode_count", 0)
         self.best_reward = ckpt.get("best_reward", -float("inf"))
         self.best_badges = ckpt.get("best_badges", 0)
+        # Older checkpoints have no "rollout" key; episodes and rollouts are
+        # 1:1 here (rollout_length == max_steps), so episode_count works.
+        self._resume_rollout = ckpt.get("rollout", ckpt.get("episode_count", 0))
         print(f"[RESUME] Loaded checkpoint: {path} (step={self.global_step})")
         print(
             f"[RESUME] Best: {self.best_badges} badges, reward {self.best_reward:.1f}"
@@ -409,7 +413,12 @@ class PPOTrainer:
 
         start_time = time.time()
 
+        # Absolute rollout numbering so resumed runs continue where they left
+        # off (checkpoints store the last completed rollout).
+        base_rollout = getattr(self, "_resume_rollout", 0)
+
         for rollout_idx in range(1, num_rollouts + 1):
+            self._current_rollout = base_rollout + rollout_idx
             buffer = self.collect_rollout()
             metrics = self.update(buffer)
 
@@ -427,7 +436,7 @@ class PPOTrainer:
                 max_badges = max(self.episode_badges) if self.episode_badges else 0
 
                 print(
-                    f"Rollout {rollout_idx:04d}/{num_rollouts} | "
+                    f"Rollout {self._current_rollout:04d}/{base_rollout + num_rollouts} | "
                     f"Ep: {self.episode_count:05d} | "
                     f"Steps: {self.global_step:08d} | "
                     f"R: {avg_reward:8.1f} | "
@@ -440,13 +449,13 @@ class PPOTrainer:
                 )
 
             # Save periodic checkpoint
-            if rollout_idx % 10 == 0:
+            if self._current_rollout % 10 == 0:
                 self.save_checkpoint("ppo_latest.pt")
 
                 # Save training log
                 log_path = os.path.join(self.checkpoint_dir, "training_log.json")
                 log = {
-                    "rollout": rollout_idx,
+                    "rollout": self._current_rollout,
                     "episodes": self.episode_count,
                     "global_step": self.global_step,
                     "avg_reward": float(np.mean(self.episode_rewards))
