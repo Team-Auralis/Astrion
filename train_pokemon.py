@@ -61,7 +61,7 @@ class PPOTrainer:
         gae_lambda: float = 0.95,
         clip_epsilon: float = 0.2,
         value_coef: float = 0.5,
-        entropy_coef: float = 0.02,
+        entropy_coef: float = 0.03,
         max_grad_norm: float = 0.5,
         ppo_epochs: int = 4,
         minibatch_size: int = 64,
@@ -81,6 +81,18 @@ class PPOTrainer:
         self.minibatch_size = minibatch_size
         self.rollout_length = rollout_length
         self.checkpoint_dir = checkpoint_dir
+
+        # Safeguard: rollout must be >= max_steps so episodes actually complete
+        max_steps = getattr(env, "max_steps", 2048)
+        if self.rollout_length < max_steps:
+            print(
+                f"[WARN] rollout_length ({self.rollout_length}) < max_steps ({max_steps}). "
+                f"Episodes would never complete. Auto-adjusting to {max_steps}."
+            )
+            self.rollout_length = max_steps
+
+        # Adaptive entropy: raise coefficient if policy collapses
+        self.min_entropy = 0.5  # Target minimum policy entropy (nats)
 
         if device == "auto":
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -227,7 +239,12 @@ class PPOTrainer:
                 episode_length = 0
             else:
                 screen, state = self.encoder.encode(obs)
-                last_value = 0.0
+                # Bootstrap with value estimate of last state (not 0)
+                with torch.no_grad():
+                    s = screen.unsqueeze(0).to(self.device)
+                    st = state.unsqueeze(0).to(self.device)
+                    _, last_value = self.model(s, st)
+                    last_value = last_value.item()
 
         # Compute advantages
         advantages, returns = self._compute_gae(
@@ -316,6 +333,15 @@ class PPOTrainer:
                     + self.value_coef * value_loss
                     - self.entropy_coef * entropy
                 )
+
+                # Adaptive entropy: if entropy is too low, boost the bonus
+                if entropy.item() < self.min_entropy:
+                    adaptive_entropy_coef = self.entropy_coef * 5.0
+                    loss = (
+                        policy_loss
+                        + self.value_coef * value_loss
+                        - adaptive_entropy_coef * entropy
+                    )
 
                 self.optimizer.zero_grad()
                 loss.backward()
