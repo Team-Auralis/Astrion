@@ -102,6 +102,7 @@ class PPOTrainer:
         self.global_step = 0
         self.episode_count = 0
         self.best_reward = -float("inf")
+        self.best_badges = 0
 
         # Episode tracking
         self.episode_rewards: deque = deque(maxlen=100)
@@ -200,9 +201,23 @@ class PPOTrainer:
                 self.episode_lengths.append(episode_length)
                 self.episode_badges.append(info.get("badges", 0))
 
-                if episode_reward > self.best_reward:
+                # Save best checkpoint based on badges first, then reward
+                episode_badges = info.get("badges", 0)
+                best_badges = max(self.episode_badges) if self.episode_badges else 0
+
+                # Prioritize badge count over reward (badges = real progress)
+                if episode_badges > self.best_badges or (
+                    episode_badges == self.best_badges
+                    and episode_reward > self.best_reward
+                ):
                     self.best_reward = episode_reward
+                    self.best_badges = episode_badges
                     self.save_checkpoint("ppo_best.pt")
+                    if episode_badges > 0:
+                        print(
+                            f"\n  [NEW BEST] {episode_badges} badges, "
+                            f"reward {episode_reward:.1f}"
+                        )
 
                 # Reset for next episode
                 self.encoder.reset()
@@ -331,6 +346,7 @@ class PPOTrainer:
                 "global_step": self.global_step,
                 "episode_count": self.episode_count,
                 "best_reward": self.best_reward,
+                "best_badges": self.best_badges,
             },
             path,
         )
@@ -345,7 +361,11 @@ class PPOTrainer:
         self.global_step = ckpt.get("global_step", 0)
         self.episode_count = ckpt.get("episode_count", 0)
         self.best_reward = ckpt.get("best_reward", -float("inf"))
+        self.best_badges = ckpt.get("best_badges", 0)
         print(f"[RESUME] Loaded checkpoint: {path} (step={self.global_step})")
+        print(
+            f"[RESUME] Best: {self.best_badges} badges, reward {self.best_reward:.1f}"
+        )
         return True
 
     def train(self, num_rollouts: int = 1000, log_interval: int = 1):
@@ -413,6 +433,7 @@ class PPOTrainer:
                     if self.episode_badges
                     else 0,
                     "best_reward": self.best_reward,
+                    "best_badges": self.best_badges,
                     "elapsed_s": elapsed,
                     **{k: v for k, v in metrics.items()},
                 }
