@@ -25,8 +25,15 @@ NUM_ACTIONS = len(BUTTONS)
 
 # Pokemon Red/Blue/Yellow RAM addresses (Gen 1)
 # These are well-documented in the speedrunning/emulation community
+#
+# NOTE (Pokemon Yellow): Yellow's WRAM layout is shifted by -1 relative to
+# Red/Blue for (almost) all addresses in these regions -- confirmed against
+# Data Crystal's Yellow RAM map, the pret/pokeyellow disassembly, and
+# empirical value-set fingerprinting of Red vs Yellow ROMs. The environment
+# applies this shift automatically via PokemonEnv._A() after detecting the
+# cartridge title "POKEMON YELLOW".
 class Gen1RAM:
-    """Pokemon Gen 1 RAM address map for state extraction."""
+    """Pokemon Gen 1 RAM address map for state extraction (Red/Blue base)."""
 
     # Party (6 pokemon, each has specific offsets)
     PARTY_COUNT = 0xD163
@@ -42,8 +49,11 @@ class Gen1RAM:
     BATTLE_TYPE = 0xD05A
 
     # Current pokemon HP (active pokemon in battle or first in party)
+    # Party mon struct starts at PARTY_START (0xD16B): HP at +1 (u16),
+    # level at +0x21, max HP at +0x22 (verified against PyBoy's
+    # GameWrapperPokemonGen1 and pret/pokered party_struct layout).
     CURRENT_HP = 0xD16C  # HP of first party member (2 bytes big-endian)
-    MAX_HP = 0xD16D
+    MAX_HP = 0xD18D  # max HP of first party member (0xD16B + 0x22)
 
     # Badges (bitfield)
     BADGES = 0xD356  # Each bit = one badge
@@ -138,6 +148,7 @@ class PokemonEnv:
         self._init_pyboy()
 
     def _init_pyboy(self):
+        import io
         from pyboy import PyBoy
 
         if self.headless:
@@ -147,10 +158,27 @@ class PokemonEnv:
 
         self._pyboy.set_emulation_speed(0)  # Unlimited speed
 
+        # Pokemon Yellow's WRAM is shifted by -1 vs Red/Blue (see Gen1RAM note).
+        title = getattr(self._pyboy, "cartridge_title", "") or ""
+        self._is_yellow = "YELLOW" in title.upper()
+        self._ram_offset = -1 if self._is_yellow else 0
+
         # Load state if provided
         if self.state_path and os.path.exists(self.state_path):
             with open(self.state_path, "rb") as f:
                 self._pyboy.load_state(f)
+            # Snapshot the loaded state so reset() returns here
+            buf = io.BytesIO()
+            self._pyboy.save_state(buf)
+            self._initial_state = buf.getvalue()
+        else:
+            # Boot the ROM past the Game Boy logo / intro to a stable state
+            for _ in range(600):  # ~10 seconds at 60fps
+                self._pyboy.tick()
+            # Snapshot this boot state so every reset() starts from here
+            buf = io.BytesIO()
+            self._pyboy.save_state(buf)
+            self._initial_state = buf.getvalue()
 
     @property
     def observation_shape(self) -> Tuple[int, int, int]:
@@ -194,77 +222,86 @@ class PokemonEnv:
     def _read_ram_16(self, addr: int) -> int:
         return (self._pyboy.memory[addr] << 8) | self._pyboy.memory[addr + 1]
 
+    def _A(self, addr: int) -> int:
+        """Resolve a Red/Blue base RAM address for the loaded ROM.
+
+        Returns addr unchanged for Red/Blue, addr-1 for Yellow.
+        """
+        return addr + getattr(self, "_ram_offset", 0)
+
     def _extract_state_features(self) -> np.ndarray:
         """Extract Pokemon-specific state features from emulator RAM."""
         features = np.zeros(self.state_feature_size, dtype=np.float32)
 
         try:
             # Badges (0-8)
-            badges_byte = self._read_ram(Gen1RAM.BADGES)
+            badges_byte = self._read_ram(self._A(Gen1RAM.BADGES))
             badge_count = bin(badges_byte).count("1")
             features[0] = badge_count / 8.0  # Normalized 0-1
 
             # Party count (0-6)
-            party_count = min(self._read_ram(Gen1RAM.PARTY_COUNT), 6)
+            party_count = min(self._read_ram(self._A(Gen1RAM.PARTY_COUNT)), 6)
             features[1] = party_count / 6.0
 
             # First party member HP (normalized)
-            current_hp = self._read_ram_16(Gen1RAM.CURRENT_HP)
-            max_hp = self._read_ram_16(Gen1RAM.MAX_HP)
+            current_hp = self._read_ram_16(self._A(Gen1RAM.CURRENT_HP))
+            max_hp = self._read_ram_16(self._A(Gen1RAM.MAX_HP))
             if max_hp > 0:
                 features[2] = min(current_hp / max_hp, 1.0)
             else:
                 features[2] = 0.0
 
             # First party member level (0-100)
-            level = self._read_ram(Gen1RAM.LEVEL_FIRST)
+            level = self._read_ram(self._A(Gen1RAM.LEVEL_FIRST))
             features[3] = min(level / 100.0, 1.0)
 
             # Map ID (normalized)
-            features[4] = self._read_ram(Gen1RAM.MAP_ID) / 255.0
+            features[4] = self._read_ram(self._A(Gen1RAM.MAP_ID)) / 255.0
 
             # In battle flag
-            features[5] = 1.0 if self._read_ram(Gen1RAM.IN_BATTLE) > 0 else 0.0
+            features[5] = 1.0 if self._read_ram(self._A(Gen1RAM.IN_BATTLE)) > 0 else 0.0
 
             # Player X position
-            features[6] = self._read_ram(Gen1RAM.PLAYER_X) / 255.0
+            features[6] = self._read_ram(self._A(Gen1RAM.PLAYER_X)) / 255.0
 
             # Player Y position
-            features[7] = self._read_ram(Gen1RAM.PLAYER_Y) / 255.0
+            features[7] = self._read_ram(self._A(Gen1RAM.PLAYER_Y)) / 255.0
 
             # Money (BCD, up to 999999)
             money = (
-                self._read_ram(Gen1RAM.MONEY_1) * 10000
-                + self._read_ram(Gen1RAM.MONEY_2) * 100
-                + self._read_ram(Gen1RAM.MONEY_3)
+                self._read_ram(self._A(Gen1RAM.MONEY_1)) * 10000
+                + self._read_ram(self._A(Gen1RAM.MONEY_2)) * 100
+                + self._read_ram(self._A(Gen1RAM.MONEY_3))
             )
             features[8] = min(money / 999999.0, 1.0)
 
             # Experience of first party member
             exp = (
-                self._read_ram(Gen1RAM.EXP_1) * 65536
-                + self._read_ram(Gen1RAM.EXP_2) * 256
-                + self._read_ram(Gen1RAM.EXP_3)
+                self._read_ram(self._A(Gen1RAM.EXP_1)) * 65536
+                + self._read_ram(self._A(Gen1RAM.EXP_2)) * 256
+                + self._read_ram(self._A(Gen1RAM.EXP_3))
             )
             features[9] = min(exp / 1000000.0, 1.0)
 
             # Party levels (first 3 members)
             for i in range(min(party_count, 3)):
-                addr = Gen1RAM.LEVEL_FIRST + i * 0x2C
+                addr = self._A(Gen1RAM.LEVEL_FIRST + i * 0x2C)
                 features[10 + i] = min(self._read_ram(addr) / 100.0, 1.0)
 
             # Party HP (members 2 and 3, normalized by estimated max)
             # Simplified: just store raw HP normalized
             for i in range(min(party_count, 3)):
-                hp_addr = Gen1RAM.CURRENT_HP + i * 0x2C
+                hp_addr = self._A(Gen1RAM.CURRENT_HP + i * 0x2C)
                 hp = self._read_ram_16(hp_addr)
                 features[13 + i] = min(hp / 999.0, 1.0)
 
             # Game state
-            features[16] = self._read_ram(Gen1RAM.GAME_STATE) / 255.0
+            features[16] = self._read_ram(self._A(Gen1RAM.GAME_STATE)) / 255.0
 
             # Dialogue state
-            features[17] = 1.0 if self._read_ram(Gen1RAM.DIALOGUE_STATE) > 0 else 0.0
+            features[17] = (
+                1.0 if self._read_ram(self._A(Gen1RAM.DIALOGUE_STATE)) > 0 else 0.0
+            )
 
             # Step count normalized
             features[18] = min(self._step_count / self.max_steps, 1.0)
@@ -374,19 +411,24 @@ class PokemonEnv:
         return reward, info
 
     def reset(self, seed=None, options=None) -> Tuple[Dict, Dict]:
+        import io
+
         if seed is not None:
             np.random.seed(seed)
 
-        # Reset PyBoy by reinitializing or loading a save state
+        # Reset PyBoy by loading a snapshot of the initial boot state
         if options and "state_path" in options:
             with open(options["state_path"], "rb") as f:
                 self._pyboy.load_state(f)
         elif self.state_path and os.path.exists(self.state_path):
             with open(self.state_path, "rb") as f:
                 self._pyboy.load_state(f)
+        elif hasattr(self, "_initial_state") and self._initial_state:
+            self._pyboy.load_state(io.BytesIO(self._initial_state))
         else:
-            # Soft reset: just re-run from current state
-            self._pyboy.reset()
+            # Fallback: re-boot (should not happen after _init_pyboy)
+            for _ in range(600):
+                self._pyboy.tick()
 
         self._step_count = 0
         self._visited_maps = set()
