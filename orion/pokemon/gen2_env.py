@@ -321,6 +321,26 @@ class PokemonGen2Env(PokemonEnv):
             # If RAM reading fails, return zeros
             pass
 
+        # Pre-world gate (mirror of the Gen 1 base class): before the world
+        # initializes (boot/title/menu/intro) the party/level/HP/money RAM
+        # holds volatile or uninitialized memory (observed on the Crystal
+        # title screen: party=6 and levels 56/96 from garbage). The reward
+        # path already uses _in_game_world(); apply it to the observation
+        # features too so the policy and dashboard are not fed phantom state.
+        if not self._in_game_world(features):
+            features[0] = 0.0  # badges
+            features[1] = 0.0  # party count
+            features[2] = 0.0  # first member HP
+            features[3] = 0.0  # first member level
+            features[5] = 0.0  # in-battle flag
+            features[6] = 0.0  # player X
+            features[7] = 0.0  # player Y
+            features[8] = 0.0  # money
+            features[9] = 0.0  # experience
+            features[10:16] = 0.0  # party levels (3) + party HP (3)
+            features[16] = 0.0  # game-state byte
+            features[17] = 0.0  # dialogue flag
+
         return features
 
     def _party_mon_addr(self, index: int) -> Tuple[int, int]:

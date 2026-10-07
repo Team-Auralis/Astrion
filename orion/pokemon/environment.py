@@ -195,6 +195,24 @@ class PokemonEnv:
         """Human-readable name for the map in `features`."""
         return map_name(self._map_key(features))
 
+    def _in_game_world(self, features: np.ndarray) -> bool:
+        """True when the game is in a real world state (shaped rewards eligible).
+
+        Before the world initializes (boot logos, title screen, clock set,
+        intro) the map/party/money/level RAM addresses hold uninitialized or
+        volatile memory. Without this gate those phantom values get shaped
+        rewards -- observed on the Gen 2 Crystal title screen (party=6,
+        lvl=56, reward ~900k over 24 rollouts) because its bank-6 party
+        reads oscillate. A map is "real" when the knowledge tables can name
+        it; garbage groups (e.g. 195) are not nameable.
+        """
+        try:
+            return self._map_name_for(features) is not None
+        except Exception:
+            # A hook failure should not silently kill shaped rewards in an
+            # unknown generation; fall back to allowing them (old behavior).
+            return True
+
     def _init_pyboy(self):
         import io
         from pyboy import PyBoy
@@ -379,6 +397,26 @@ class PokemonEnv:
             # If RAM reading fails (wrong game, etc.), return zeros
             pass
 
+        # Pre-world gate: before the world initializes (boot logos, title,
+        # clock set, intro) the party/level/money/HP RAM holds volatile or
+        # uninitialized memory (observed on the Crystal title screen:
+        # party=6, lvl=96). The reward path already applies this gate; apply
+        # it to the observation features too so the policy and the dashboard
+        # are not fed phantom game state.
+        if not self._in_game_world(features):
+            features[0] = 0.0  # badges
+            features[1] = 0.0  # party count
+            features[2] = 0.0  # first member HP
+            features[3] = 0.0  # first member level
+            features[5] = 0.0  # in-battle flag
+            features[6] = 0.0  # player X
+            features[7] = 0.0  # player Y
+            features[8] = 0.0  # money
+            features[9] = 0.0  # experience
+            features[10:16] = 0.0  # party levels (3) + party HP (3)
+            features[16] = 0.0  # game-state byte
+            features[17] = 0.0  # dialogue flag
+
         return features
 
     def _get_screen(self) -> np.ndarray:
@@ -423,6 +461,19 @@ class PokemonEnv:
 
         old_features = old_state["state"]
         new_features = new_state["state"]
+
+        # Shaped bonuses only apply while the game is actually in a real
+        # world map. Before the world loads (boot/title/clock/intro) the RAM
+        # reads are garbage; rewarding them made the Gen 2 Crystal trainer
+        # chase phantom "progress" (party=6, lvl=56, ~900k reward while
+        # still on the title screen). Out of world, only the step penalty
+        # applies (the observed ~-10/rollout baseline).
+        if not (
+            self._in_game_world(old_features) and self._in_game_world(new_features)
+        ):
+            info["not_in_world"] = True
+            reward += self.reward_config["step_penalty"]
+            return reward, info
 
         # Badge reward (escalating: later badges are worth more because they
         # require progressively more of the game to have been completed).
