@@ -151,6 +151,7 @@ class PokemonEnv:
             "new_area_explored": 5.0,
             "new_tile_explored": 0.1,  # dense exploration signal
             "money_earned": 1.0,  # proxy for winning trainer battles
+            "exp_gained": 0.15,  # direct battle-win signal: EXP only rises from wins
             "map_progress": 2000.0,  # advance toward later-story maps
         }
 
@@ -548,6 +549,20 @@ class PokemonEnv:
                 (money - self._prev_money_raw) / 100.0
             )
         self._prev_money_raw = money
+
+        # EXP gained. Gen 1 EXP only increases when a battle is WON (each
+        # surviving party member earns EXP from a defeated opponent; running
+        # or catching awards none). This is the dense "you won this fight"
+        # signal that was missing: `money_earned` only fires for trainer
+        # battles, and the tile/map exploration bonuses actively discourage
+        # committing to wild encounters -- which is why the fleet stalled at
+        # Lv 6 in Oak's Lab. Paying per EXP point turns the level counter on.
+        old_exp = float(old_features[9]) * 1000000.0
+        new_exp = float(new_features[9]) * 1000000.0
+        if new_exp > old_exp:
+            gained = int(new_exp - old_exp)
+            reward += self.reward_config["exp_gained"] * gained
+            info["exp_gained"] = gained
 
         # Story-progress reward. Using the pret disassembly's map table we can
         # score how far into the intended progression each map sits, and pay
