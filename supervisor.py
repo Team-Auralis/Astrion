@@ -11,12 +11,14 @@ Usage:
 
 import argparse
 import datetime
+import json
 import os
 import subprocess
 import sys
 import time
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+END_TIME_FILE = os.path.join(ROOT, "end_time.txt")
 PY = sys.executable
 LOGDIR = os.path.join(ROOT, "logs")
 os.makedirs(LOGDIR, exist_ok=True)
@@ -91,15 +93,66 @@ def log(msg: str) -> None:
 def resume_for(ckpt: str, first: bool):
     best = os.path.join(ROOT, ckpt, "ppo_best.pt")
     latest = os.path.join(ROOT, ckpt, "ppo_latest.pt")
-    # First launch: warm-start from the best checkpoint we already have.
-    # Restarts: continue from the most recent (latest) checkpoint.
-    if first and os.path.exists(best):
-        return best
+    # Always continue from the most recent checkpoint. `ppo_best.pt` can be
+    # much older than `ppo_latest.pt` (best-reward snapshot from an early
+    # spike), so preferring it on first launch throws away training progress.
     if os.path.exists(latest):
         return latest
     if os.path.exists(best):
         return best
     return None
+
+
+def parse_end_time(val: str):
+    """HH:MM -> today's datetime at that time, rolling to tomorrow if past."""
+    try:
+        hh, mm = val.strip().split(":")
+        now = datetime.datetime.now()
+        dt = now.replace(hour=int(hh), minute=int(mm), second=0, microsecond=0)
+        if dt <= now:
+            dt += datetime.timedelta(days=1)
+        return dt
+    except (ValueError, AttributeError):
+        return None
+
+
+def read_end_time_file():
+    """Return the end datetime from end_time.txt (HH:MM), or None."""
+    try:
+        with open(END_TIME_FILE) as f:
+            return parse_end_time(f.read())
+    except OSError:
+        return None
+
+
+def write_fleet_report(runs):
+    lines = [f"Fleet stopped at {datetime.datetime.now():%Y-%m-%d %H:%M:%S}"]
+    for r in runs:
+        tl = os.path.join(ROOT, r["ckpt"], "training_log.json")
+        info = {}
+        try:
+            with open(tl) as f:
+                info = json.load(f)
+        except (OSError, ValueError):
+            pass
+        has_best = os.path.exists(os.path.join(ROOT, r["ckpt"], "ppo_best.pt"))
+        has_latest = os.path.exists(os.path.join(ROOT, r["ckpt"], "ppo_latest.pt"))
+        lines.append(
+            f"{r['name']}: rollout={info.get('rollout', '-')} "
+            f"steps={info.get('global_step', 0)} "
+            f"reward={info.get('avg_reward', 0):.1f} "
+            f"badges={info.get('max_badges', 0)} "
+            f"party={info.get('max_party', 0)} "
+            f"lvl={info.get('max_level', 0)} "
+            f"map={info.get('max_map', 0)} "
+            f"best={has_best} latest={has_latest}"
+        )
+    try:
+        with open(os.path.join(LOGDIR, "fleet_report.txt"), "w") as f:
+            f.write("\n".join(lines) + "\n")
+        log(f"fleet report written to logs/fleet_report.txt")
+    except OSError as e:
+        log(f"could not write fleet report: {e}")
 
 
 def launch(run: dict, first: bool):
@@ -157,16 +210,17 @@ def main():
     procs = {r["name"]: launch(r, True) for r in runs}
     first_done = {r["name"]: True for r in runs}
 
-    end_dt = None
-    if args.end_time:
-        hh, mm = args.end_time.split(":")
-        end_dt = datetime.datetime.now().replace(
-            hour=int(hh), minute=int(mm), second=0, microsecond=0
-        )
-        log(f"wall-clock stop scheduled for {args.end_time}")
+    end_dt = read_end_time_file()
+    if end_dt is None and args.end_time:
+        end_dt = parse_end_time(args.end_time)
+    if end_dt is not None:
+        log(f"wall-clock stop scheduled for {end_dt:%H:%M}")
 
     while True:
         time.sleep(30)
+        end_dt = read_end_time_file()
+        if end_dt is None and args.end_time:
+            end_dt = parse_end_time(args.end_time)
         if end_dt is not None and datetime.datetime.now() >= end_dt:
             log(
                 "END-TIME reached; stopping all children (latest checkpoints already on disk)"
@@ -182,6 +236,7 @@ def main():
                 if p.poll() is None:
                     p.kill()
                     log(f"{r['name']}: killed pid={p.pid}")
+            write_fleet_report(runs)
             log("supervisor exiting after stop time")
             return
 

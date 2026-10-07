@@ -14,6 +14,7 @@ import glob
 import json
 import os
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -69,21 +70,41 @@ def _load_history_file(name):
 
 def snapshot():
     runs = {}
-    for log in sorted(glob.glob(os.path.join(ROOT, BASE, "*", "training_log.json"))):
-        name = os.path.basename(os.path.dirname(log))
-        try:
-            with open(log) as f:
-                latest = json.load(f)
-        except (json.JSONDecodeError, OSError):
-            continue
+    logs = {
+        os.path.basename(os.path.dirname(p)): p
+        for p in glob.glob(os.path.join(ROOT, BASE, "*", "training_log.json"))
+    }
+    lives = {
+        os.path.basename(os.path.dirname(p))
+        for p in glob.glob(os.path.join(ROOT, BASE, "*", "live.png"))
+    }
+    for name in sorted(set(logs) | set(lives)):
+        latest = None
+        if name in logs:
+            try:
+                with open(logs[name]) as f:
+                    latest = json.load(f)
+            except (json.JSONDecodeError, OSError):
+                latest = None
         with _lock:
             if name not in _HISTORY:
                 _load_history_file(name)
-            _update_history(name, latest)
-            runs[name] = {
-                "latest": latest,
-                "series": {k: list(v) for k, v in _HISTORY[name].items()},
-            }
+            if latest:
+                _update_history(name, latest)
+            series = {k: list(v) for k, v in _HISTORY[name].items()}
+        live_age = -1
+        try:
+            live_age = int(
+                time.time()
+                - os.path.getmtime(os.path.join(ROOT, BASE, name, "live.png"))
+            )
+        except OSError:
+            pass
+        runs[name] = {
+            "latest": latest or {},
+            "series": series,
+            "live_age": live_age,
+        }
     return runs
 
 
@@ -144,9 +165,12 @@ async function tick(){
   draw("entropy",names,d,["entropy"]);
   draw("badges",names,d,["max_badges"]);
   draw("prog",names,d,["max_party","max_level","max_map"]);
-  let rows="<table><tr><th></th><th>Run</th><th>Rollout</th><th>Steps</th><th>Reward</th><th>Badges</th><th>Party</th><th>Level</th><th>Map</th><th>Entropy</th><th>Live</th></tr>";
+  let rows="<table><tr><th></th><th>Run</th><th>Status</th><th>Rollout</th><th>Steps</th><th>Reward</th><th>Badges</th><th>Party</th><th>Level</th><th>Map</th><th>Entropy</th><th>Live</th></tr>";
   for(const n of names){const L=d[n].latest||{};
-    rows+=`<tr><td><b>${n}</b></td><td>${L.rollout??"-"}</td><td>${(L.global_step||0).toLocaleString()}</td>
+    const st=(d[n].live_age>=0&&d[n].live_age<150)?"LIVE":"stopped";
+    const stc=st==="LIVE"?"color:#2ecc71;font-weight:700":"color:#e74c3c";
+    rows+=`<tr><td><b>${n}</b></td><td>${L.rollout??"-"}</td>
+      <td style="${stc}">${st}</td><td>${(L.global_step||0).toLocaleString()}</td>
       <td>${(L.avg_reward??0).toFixed(1)}</td><td>${L.max_badges??0}</td><td>${L.max_party??0}</td>
       <td>${L.max_level??0}</td><td>${L.max_map??0}</td><td>${(L.entropy??0).toFixed(2)}</td>
       <td><img src="/live/${encodeURIComponent(n)}?t=${Date.now()}" style="width:120px;height:108px;background:#000;border-radius:6px;image-rendering:pixelated" alt=""></td></tr>`;}
