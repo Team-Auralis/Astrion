@@ -116,13 +116,28 @@ def parse_end_time(val: str):
         return None
 
 
+_END_TIME_CACHE = {"content": None, "dt": None}
+
+
 def read_end_time_file():
-    """Return the end datetime from end_time.txt (HH:MM), or None."""
+    """Return the end datetime from end_time.txt (HH:MM), or None.
+
+    The parsed value is cached by file content: re-reading an unchanged file
+    must not re-roll an already-accepted today-time to tomorrow. Otherwise a
+    poll that runs *after* the deadline (e.g. the 30s poll reading 23:00 at
+    23:00:30) would parse `23:00` as already-past, roll it to tomorrow, and
+    the fleet would never stop.
+    """
     try:
         with open(END_TIME_FILE) as f:
-            return parse_end_time(f.read())
+            content = f.read().strip()
     except OSError:
         return None
+    if content == _END_TIME_CACHE["content"]:
+        return _END_TIME_CACHE["dt"]
+    _END_TIME_CACHE["content"] = content
+    _END_TIME_CACHE["dt"] = parse_end_time(content)
+    return _END_TIME_CACHE["dt"]
 
 
 def write_fleet_report(runs):
