@@ -17,6 +17,8 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from orion.pokemon.knowledge import map_name
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE = "checkpoints/pokemon"
 KEYS = [
@@ -104,6 +106,7 @@ def snapshot():
             "latest": latest or {},
             "series": series,
             "live_age": live_age,
+            "map_name": map_name(latest.get("max_map", 0)) if latest else None,
         }
     return runs
 
@@ -128,7 +131,7 @@ PAGE = """<!doctype html>
   <div class="card"><h2>Average Reward</h2><canvas id="reward"></canvas></div>
   <div class="card"><h2>Policy Entropy (health)</h2><canvas id="entropy"></canvas></div>
   <div class="card"><h2>Max Badges</h2><canvas id="badges"></canvas></div>
-  <div class="card"><h2>Progress (party / level / map)</h2><canvas id="prog"></canvas></div>
+  <div class="card"><h2>Progress (party / lvl / map) — map is the map ID, not level</h2><canvas id="prog"></canvas></div>
   <div class="card" style="grid-column:span 2"><h2>Status</h2><div id="table"></div></div>
 </div>
 <script>
@@ -169,10 +172,12 @@ async function tick(){
   for(const n of names){const L=d[n].latest||{};
     const st=(d[n].live_age>=0&&d[n].live_age<150)?"LIVE":"stopped";
     const stc=st==="LIVE"?"color:#2ecc71;font-weight:700":"color:#e74c3c";
+    const mn=(d[n].map_name||(L.max_map??""));
     rows+=`<tr><td><b>${n}</b></td><td>${L.rollout??"-"}</td>
       <td style="${stc}">${st}</td><td>${(L.global_step||0).toLocaleString()}</td>
       <td>${(L.avg_reward??0).toFixed(1)}</td><td>${L.max_badges??0}</td><td>${L.max_party??0}</td>
-      <td>${L.max_level??0}</td><td>${L.max_map??0}</td><td>${(L.entropy??0).toFixed(2)}</td>
+      <td style="font-weight:700">${L.max_level??0}</td>
+      <td>${(L.max_map??0)!=null&&L.max_map!=null?`${mn} (${L.max_map})`:"-"}</td><td>${(L.entropy??0).toFixed(2)}</td>
       <td><img src="/live/${encodeURIComponent(n)}?t=${Date.now()}" style="width:120px;height:108px;background:#000;border-radius:6px;image-rendering:pixelated" alt=""></td></tr>`;}
   rows+="</table>";document.getElementById("table").innerHTML=rows;
 }
