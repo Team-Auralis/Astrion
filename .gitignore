@@ -38,5 +38,9 @@ pokeyellow/
 pokegold/
 pokecrystal/
 
+# rgbds assembler toolchain (downloaded locally for symbol generation)
+tools/
+!tools/gen2_syms.py
+
 # Training logs / captures
 logs/

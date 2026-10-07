@@ -169,7 +169,31 @@ class PokemonEnv:
         self._prev_money_raw = 0
         self._max_map_progress = 0.0  # deepest story position reached
 
+        # Generation parameters. Gen 1 has 8 badges and map ids keyed 0..255;
+        # Gen 2 overrides these (16 badges, (group,map) pairs).
+        self.badge_max = 8
+        self._map_key_scale = 255.0
+
         self._init_pyboy()
+
+    # -- Generation hooks ---------------------------------------------------
+    # These let a subclass (e.g. Gen 2) change how badges / maps are read from
+    # the normalized state vector without touching the reward logic.
+
+    def _badges_from(self, features: np.ndarray) -> int:
+        return int(round(float(features[0]) * self.badge_max))
+
+    def _map_key(self, features: np.ndarray) -> int:
+        """Return a compact integer key for the current map."""
+        return int(round(float(features[4]) * self._map_key_scale))
+
+    def _map_progress_for(self, features: np.ndarray) -> float:
+        """Story-progress fraction (0..1) for the map in `features`."""
+        return map_progress_by_id(self._map_key(features))
+
+    def _map_name_for(self, features: np.ndarray) -> Optional[str]:
+        """Human-readable name for the map in `features`."""
+        return map_name(self._map_key(features))
 
     def _init_pyboy(self):
         import io
@@ -253,6 +277,14 @@ class PokemonEnv:
         """
         return addr + getattr(self, "_ram_offset", 0)
 
+    def _money_addrs(self) -> Tuple[int, int, int]:
+        """Return the three packed-BCD money address bytes for this game."""
+        return (
+            self._A(Gen1RAM.MONEY_1),
+            self._A(Gen1RAM.MONEY_2),
+            self._A(Gen1RAM.MONEY_3),
+        )
+
     def _read_money(self) -> int:
         """Read the player's money (stored as packed BCD in Gen 1)."""
 
@@ -260,9 +292,10 @@ class PokemonEnv:
             return (b >> 4) * 10 + (b & 0x0F)
 
         try:
-            m1 = self._read_ram(self._A(Gen1RAM.MONEY_1))
-            m2 = self._read_ram(self._A(Gen1RAM.MONEY_2))
-            m3 = self._read_ram(self._A(Gen1RAM.MONEY_3))
+            m1, m2, m3 = self._money_addrs()
+            m1 = self._read_ram(m1)
+            m2 = self._read_ram(m2)
+            m3 = self._read_ram(m3)
             return bcd(m1) * 10000 + bcd(m2) * 100 + bcd(m3)
         except Exception:
             return 0
@@ -275,7 +308,7 @@ class PokemonEnv:
             # Badges (0-8)
             badges_byte = self._read_ram(self._A(Gen1RAM.BADGES))
             badge_count = bin(badges_byte).count("1")
-            features[0] = badge_count / 8.0  # Normalized 0-1
+            features[0] = badge_count / float(self.badge_max)  # Normalized 0-1
 
             # Party count (0-6)
             party_count = min(self._read_ram(self._A(Gen1RAM.PARTY_COUNT)), 6)
@@ -393,8 +426,8 @@ class PokemonEnv:
 
         # Badge reward (escalating: later badges are worth more because they
         # require progressively more of the game to have been completed).
-        old_badges = int(old_features[0] * 8)
-        new_badges = int(new_features[0] * 8)
+        old_badges = self._badges_from(old_features)
+        new_badges = self._badges_from(new_features)
         if new_badges > old_badges:
             gained = new_badges - old_badges
             reward += self.reward_config["badge_earned"] * gained * new_badges
@@ -409,8 +442,8 @@ class PokemonEnv:
             info["levels_gained"] = levels_gained
 
         # New map exploration reward
-        old_map = int(old_features[4] * 255)
-        new_map = int(new_features[4] * 255)
+        old_map = self._map_key(old_features)
+        new_map = self._map_key(new_features)
         if new_map != old_map and new_map not in self._visited_maps:
             self._visited_maps.add(new_map)
             reward += self.reward_config["new_map_entered"]
@@ -445,7 +478,7 @@ class PokemonEnv:
         # provides the gradient that actually points "outward".
         try:
             tile = (
-                int(round(new_features[4] * 255)),
+                self._map_key(new_features),
                 int(round(new_features[6] * 255)),
                 int(round(new_features[7] * 255)),
             )
@@ -470,8 +503,7 @@ class PokemonEnv:
         # the agent the *first* time it pushes that frontier further. This is
         # monotonic (income never repeats), so it cannot be farmed.
         try:
-            map_id = int(round(new_features[4] * 255))
-            progress = map_progress_by_id(map_id)
+            progress = self._map_progress_for(new_features)
             if progress > self._max_map_progress:
                 reward += self.reward_config["map_progress"] * (
                     progress - self._max_map_progress
@@ -558,9 +590,9 @@ class PokemonEnv:
         terminated = False
         truncated = self._step_count >= self.max_steps
 
-        # Check for game completion (all 8 badges in Gen 1)
-        badges = int(obs["state"][0] * 8)
-        if badges >= 8:
+        # Check for game completion (all badges earned)
+        badges = self._badges_from(obs["state"])
+        if badges >= self.badge_max:
             terminated = True
             reward += 5000.0  # Big completion bonus
 
@@ -570,8 +602,8 @@ class PokemonEnv:
             "badges": badges,
             "party_count": int(obs["state"][1] * 6),
             "level": int(obs["state"][3] * 100),
-            "map_id": int(obs["state"][4] * 255),
-            "map_name": map_name(int(obs["state"][4] * 255)),
+            "map_id": self._map_key(obs["state"]),
+            "map_name": self._map_name_for(obs["state"]),
             "story_progress": round(self._max_map_progress, 3),
             "in_battle": bool(obs["state"][5] > 0),
             "visited_maps": len(self._visited_maps),

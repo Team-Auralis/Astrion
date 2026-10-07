@@ -594,8 +594,20 @@ def main():
     )
     args = parser.parse_args()
 
+    # Create environment (auto-detect Gen 2 by cartridge family in the ROM
+    # file name; supervisor passes full paths like "Pokemon - Gold ... .gbc").
+    from orion.pokemon.gen2_env import PokemonGen2Env
+
+    rom_lower = args.rom.lower()
+    is_gen2 = any(
+        tag in rom_lower for tag in ("gold", "silver", "crystal", "gen2", "g/s")
+    )
+    env_cls = PokemonGen2Env if is_gen2 else PokemonEnv
+    if is_gen2:
+        print(f"[gen2] detected Gen 2 ROM ({os.path.basename(args.rom)})")
+
     # Create environment
-    env = PokemonEnv(
+    env = env_cls(
         rom_path=args.rom,
         headless=args.headless,
         state_path=args.state,
