@@ -144,14 +144,15 @@ async function tick(){
   draw("entropy",names,d,["entropy"]);
   draw("badges",names,d,["max_badges"]);
   draw("prog",names,d,["max_party","max_level","max_map"]);
-  let rows="<table><tr><th>Run</th><th>Rollout</th><th>Steps</th><th>Reward</th><th>Badges</th><th>Party</th><th>Level</th><th>Map</th><th>Entropy</th></tr>";
+  let rows="<table><tr><th></th><th>Run</th><th>Rollout</th><th>Steps</th><th>Reward</th><th>Badges</th><th>Party</th><th>Level</th><th>Map</th><th>Entropy</th><th>Live</th></tr>";
   for(const n of names){const L=d[n].latest||{};
     rows+=`<tr><td><b>${n}</b></td><td>${L.rollout??"-"}</td><td>${(L.global_step||0).toLocaleString()}</td>
       <td>${(L.avg_reward??0).toFixed(1)}</td><td>${L.max_badges??0}</td><td>${L.max_party??0}</td>
-      <td>${L.max_level??0}</td><td>${L.max_map??0}</td><td>${(L.entropy??0).toFixed(2)}</td></tr>`;}
+      <td>${L.max_level??0}</td><td>${L.max_map??0}</td><td>${(L.entropy??0).toFixed(2)}</td>
+      <td><img src="/live/${encodeURIComponent(n)}?t=${Date.now()}" style="width:120px;height:108px;background:#000;border-radius:6px;image-rendering:pixelated" alt=""></td></tr>`;}
   rows+="</table>";document.getElementById("table").innerHTML=rows;
 }
-tick();setInterval(tick,5000);
+tick();setInterval(tick,3000);
 </script></body></html>"""
 
 
@@ -167,7 +168,15 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body if isinstance(body, bytes) else body.encode())
 
     def do_GET(self):
-        if self.path.startswith("/data.json"):
+        if self.path.startswith("/live/"):
+            name = os.path.basename(self.path.split("/")[2].split("?")[0])
+            p = os.path.join(ROOT, BASE, name, "live.png")
+            try:
+                with open(p, "rb") as f:
+                    self._send(200, f.read(), "image/png")
+            except OSError:
+                self._send(404, "no live frame yet", "text/plain")
+        elif self.path.startswith("/data.json"):
             self._send(200, json.dumps(snapshot()), "application/json")
         else:
             self._send(200, PAGE, "text/html; charset=utf-8")

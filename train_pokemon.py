@@ -135,6 +135,27 @@ class PPOTrainer:
         self.episode_levels: deque = deque(maxlen=100)
         self.episode_maps: deque = deque(maxlen=100)
 
+        # Live view: dump a color screenshot every `live_every` steps so the
+        # dashboard can show the agent's real screen (movement, battles, ...).
+        self.live_every = 100
+        self.live_path = os.path.join(checkpoint_dir, "live.png")
+
+    def _dump_live(self):
+        """Save a color PNG of the current emulator screen for the dashboard."""
+        try:
+            from PIL import Image
+
+            pyboy = getattr(self.env, "_pyboy", None)
+            if pyboy is None:
+                return
+            arr = pyboy.screen.ndarray  # (144, 160, 4) RGBA
+            img = Image.fromarray(arr[:, :, :3])
+            tmp = self.live_path + ".tmp"
+            img.save(tmp, "PNG")
+            os.replace(tmp, self.live_path)
+        except Exception:
+            pass
+
     def _select_action(
         self, screen: torch.Tensor, state: torch.Tensor, deterministic: bool = False
     ) -> Tuple[int, float, float]:
@@ -220,6 +241,9 @@ class PPOTrainer:
             episode_reward += reward
             episode_length += 1
             self.global_step += 1
+
+            if self.global_step % self.live_every == 0:
+                self._dump_live()
 
             if episode_ended:
                 # Get final value estimate
