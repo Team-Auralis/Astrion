@@ -14,12 +14,15 @@ import argparse
 import glob
 import json
 import os
+import sys
 import time
 from collections import defaultdict
 
 import matplotlib
 
-matplotlib.use("TkAgg")  # Interactive window
+# Headless backend when only writing a snapshot, so the dashboard can run
+# unattended (no display / background service); interactive Tk otherwise.
+matplotlib.use("Agg" if "--save" in sys.argv else "TkAgg")
 import matplotlib.pyplot as plt
 import numpy as np
 

@@ -31,3 +31,12 @@ stockfish.exe
 Thumbs.db
 .vscode/
 .idea/
+
+# pret disassembly reference repos (cloned locally, too large to version)
+pokered/
+pokeyellow/
+pokegold/
+pokecrystal/
+
+# Training logs / captures
+logs/

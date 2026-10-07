@@ -14,6 +14,8 @@ from typing import Optional, Tuple, Dict, Any, List
 
 import numpy as np
 
+from orion.pokemon.knowledge import map_progress_by_id, map_name
+
 # Game Boy screen dimensions
 SCREEN_WIDTH = 160
 SCREEN_HEIGHT = 144
@@ -106,12 +108,22 @@ class PokemonEnv:
         state_path: Optional[str] = None,
         max_steps: int = 2048,
         reward_config: Optional[Dict[str, float]] = None,
+        frame_skip: int = 8,
+        persistent: bool = False,
     ):
         self.rom_path = rom_path
         self.headless = headless
         self.render_mode = render_mode
         self.max_steps = max_steps
         self.state_path = state_path
+        # Frames emulated per decision. A larger skip advances more game time
+        # per policy step, which is what a long-horizon game like Pokemon needs.
+        self.frame_skip = max(1, int(frame_skip))
+        # Persistent mode: when True, reset()/soft_reset() keep the current
+        # game state instead of rewinding to the boot snapshot, so the agent
+        # can actually travel across the whole game rather than replaying the
+        # intro every episode.
+        self.persistent = persistent
 
         if not os.path.exists(rom_path):
             raise FileNotFoundError(
@@ -119,18 +131,27 @@ class PokemonEnv:
                 f"Place your Pokemon Red/Blue/Yellow ROM at this path."
             )
 
-        # Reward configuration
+        # Reward configuration.
+        #
+        # These defaults are tuned for *actual game progress* (badges > party >
+        # levels > exploration) rather than milking the old healing/step terms.
+        # In particular the step penalty is tiny (a 2048-step episode costs
+        # ~20 reward, not ~205) and the in-battle penalty is gone so the agent
+        # is not discouraged from fighting the battles it must win.
         self.reward_config = reward_config or {
-            "badge_earned": 1000.0,
+            "badge_earned": 1000.0,  # scaled by new badge count (escalating)
             "new_pokemon_caught": 500.0,
-            "pokemon_leveled_up": 50.0,
+            "pokemon_leveled_up": 25.0,
             "new_map_entered": 100.0,
-            "hp_healed": 200.0,
-            "in_battle_penalty": -1.0,
-            "step_penalty": -0.1,
-            "talked_to_npc": 10.0,
-            "menu_open_penalty": -0.5,
-            "new_area_explored": 25.0,
+            "hp_healed": 20.0,
+            "in_battle_penalty": 0.0,
+            "step_penalty": -0.005,
+            "talked_to_npc": 2.0,
+            "menu_open_penalty": -0.02,
+            "new_area_explored": 5.0,
+            "new_tile_explored": 0.1,  # dense exploration signal
+            "money_earned": 1.0,  # proxy for winning trainer battles
+            "map_progress": 2000.0,  # advance toward later-story maps
         }
 
         self._pyboy = None
@@ -144,6 +165,9 @@ class PokemonEnv:
         self._party_count = 0
         self._max_levels = [0] * 6
         self._total_reward = 0.0
+        self._visited_tiles = set()  # (map_id, x, y) visited this game
+        self._prev_money_raw = 0
+        self._max_map_progress = 0.0  # deepest story position reached
 
         self._init_pyboy()
 
@@ -229,6 +253,20 @@ class PokemonEnv:
         """
         return addr + getattr(self, "_ram_offset", 0)
 
+    def _read_money(self) -> int:
+        """Read the player's money (stored as packed BCD in Gen 1)."""
+
+        def bcd(b: int) -> int:
+            return (b >> 4) * 10 + (b & 0x0F)
+
+        try:
+            m1 = self._read_ram(self._A(Gen1RAM.MONEY_1))
+            m2 = self._read_ram(self._A(Gen1RAM.MONEY_2))
+            m3 = self._read_ram(self._A(Gen1RAM.MONEY_3))
+            return bcd(m1) * 10000 + bcd(m2) * 100 + bcd(m3)
+        except Exception:
+            return 0
+
     def _extract_state_features(self) -> np.ndarray:
         """Extract Pokemon-specific state features from emulator RAM."""
         features = np.zeros(self.state_feature_size, dtype=np.float32)
@@ -267,13 +305,8 @@ class PokemonEnv:
             # Player Y position
             features[7] = self._read_ram(self._A(Gen1RAM.PLAYER_Y)) / 255.0
 
-            # Money (BCD, up to 999999)
-            money = (
-                self._read_ram(self._A(Gen1RAM.MONEY_1)) * 10000
-                + self._read_ram(self._A(Gen1RAM.MONEY_2)) * 100
-                + self._read_ram(self._A(Gen1RAM.MONEY_3))
-            )
-            features[8] = min(money / 999999.0, 1.0)
+            # Money (packed BCD, up to 999999)
+            features[8] = min(self._read_money() / 999999.0, 1.0)
 
             # Experience of first party member
             exp = (
@@ -358,15 +391,14 @@ class PokemonEnv:
         old_features = old_state["state"]
         new_features = new_state["state"]
 
-        # Badge reward
+        # Badge reward (escalating: later badges are worth more because they
+        # require progressively more of the game to have been completed).
         old_badges = int(old_features[0] * 8)
         new_badges = int(new_features[0] * 8)
         if new_badges > old_badges:
-            badge_reward = self.reward_config["badge_earned"] * (
-                new_badges - old_badges
-            )
-            reward += badge_reward
-            info["badges_earned"] = new_badges - old_badges
+            gained = new_badges - old_badges
+            reward += self.reward_config["badge_earned"] * gained * new_badges
+            info["badges_earned"] = gained
 
         # Level up reward
         old_level = old_features[3] * 100
@@ -408,6 +440,47 @@ class PokemonEnv:
         if new_features[17] > 0 and old_features[17] == 0:
             reward += self.reward_config["talked_to_npc"]
 
+        # Dense exploration bonus: reaching a new (map, x, y) tile. The
+        # milestone rewards are far too sparse in a game this long, so this
+        # provides the gradient that actually points "outward".
+        try:
+            tile = (
+                int(round(new_features[4] * 255)),
+                int(round(new_features[6] * 255)),
+                int(round(new_features[7] * 255)),
+            )
+            if tile not in self._visited_tiles:
+                self._visited_tiles.add(tile)
+                reward += self.reward_config["new_tile_explored"]
+        except Exception:
+            pass
+
+        # Money gained. Money only rises when the player wins a trainer battle
+        # or sells an item, so a positive delta is a decent proxy for having
+        # actually won a fight (which has no direct RAM signal).
+        money = self._read_money()
+        if money > self._prev_money_raw:
+            reward += self.reward_config["money_earned"] * (
+                (money - self._prev_money_raw) / 100.0
+            )
+        self._prev_money_raw = money
+
+        # Story-progress reward. Using the pret disassembly's map table we can
+        # score how far into the intended progression each map sits, and pay
+        # the agent the *first* time it pushes that frontier further. This is
+        # monotonic (income never repeats), so it cannot be farmed.
+        try:
+            map_id = int(round(new_features[4] * 255))
+            progress = map_progress_by_id(map_id)
+            if progress > self._max_map_progress:
+                reward += self.reward_config["map_progress"] * (
+                    progress - self._max_map_progress
+                )
+                info["story_progress"] = round(progress, 3)
+                self._max_map_progress = progress
+        except Exception:
+            pass
+
         return reward, info
 
     def reset(self, seed=None, options=None) -> Tuple[Dict, Dict]:
@@ -432,6 +505,11 @@ class PokemonEnv:
 
         self._step_count = 0
         self._visited_maps = set()
+        self._visited_tiles = set()
+        # Baseline money at the loaded state so a rich save does not pay a
+        # fake "money gained" reward on the very first step of a reboot.
+        self._prev_money_raw = self._read_money()
+        self._max_map_progress = 0.0
         self._total_reward = 0.0
 
         obs = self._get_obs()
@@ -439,17 +517,34 @@ class PokemonEnv:
 
         return obs, {"step_count": 0}
 
+    def soft_reset(self) -> Dict[str, np.ndarray]:
+        """Reset per-episode bookkeeping WITHOUT restarting the game.
+
+        Used in persistent mode: the emulator keeps its current state (and the
+        explored-tile/map sets are preserved so exploration bonuses cannot be
+        farmed by walking back and forth), but the step counter is rewound so
+        the next rollout behaves like a fresh episode.
+        """
+        self._step_count = 0
+        self._total_reward = 0.0
+        obs = self._get_obs()
+        self._prev_state = obs
+        return obs
+
     def step(self, action: int) -> Tuple[Dict, float, bool, bool, Dict]:
         assert 0 <= action < NUM_ACTIONS, f"Invalid action {action}"
 
         button = BUTTONS[action]
 
-        # Press and release button
+        # Press then release the button, spending `frame_skip` frames total.
+        # More frames per decision = more game time travelled per policy step.
+        hold = max(1, self.frame_skip // 2)
+        release = max(1, self.frame_skip - hold)
         self._pyboy.button_press(button)
-        for _ in range(4):  # Hold for a few frames
+        for _ in range(hold):
             self._pyboy.tick()
         self._pyboy.button_release(button)
-        for _ in range(4):  # Release frames
+        for _ in range(release):
             self._pyboy.tick()
 
         self._step_count += 1
@@ -476,6 +571,8 @@ class PokemonEnv:
             "party_count": int(obs["state"][1] * 6),
             "level": int(obs["state"][3] * 100),
             "map_id": int(obs["state"][4] * 255),
+            "map_name": map_name(int(obs["state"][4] * 255)),
+            "story_progress": round(self._max_map_progress, 3),
             "in_battle": bool(obs["state"][5] > 0),
             "visited_maps": len(self._visited_maps),
             **reward_info,

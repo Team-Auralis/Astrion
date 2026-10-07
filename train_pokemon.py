@@ -68,6 +68,8 @@ class PPOTrainer:
         rollout_length: int = 2048,
         device: str = "auto",
         checkpoint_dir: str = "checkpoints/pokemon",
+        persist: bool = False,
+        persist_max_steps: int = 400000,
     ):
         self.env = env
         self.encoder = encoder
@@ -81,6 +83,15 @@ class PPOTrainer:
         self.minibatch_size = minibatch_size
         self.rollout_length = rollout_length
         self.checkpoint_dir = checkpoint_dir
+        # In persistent mode the game keeps running across episode boundaries;
+        # episodes are only bookkeeping windows. A hard cap forces a fresh
+        # boot if the agent has wandered for a very long time.
+        self.persist = persist
+        self.persist_max_steps = persist_max_steps
+        self._persist_game_steps = 0
+        # Set by collect_rollout: the first rollout must boot a fresh game even
+        # in persistent mode; later rollouts continue the running game.
+        self._first_rollout = True
 
         # Safeguard: rollout must be >= max_steps so episodes actually complete
         max_steps = getattr(env, "max_steps", 2048)
@@ -120,6 +131,9 @@ class PPOTrainer:
         self.episode_rewards: deque = deque(maxlen=100)
         self.episode_lengths: deque = deque(maxlen=100)
         self.episode_badges: deque = deque(maxlen=100)
+        self.episode_party: deque = deque(maxlen=100)
+        self.episode_levels: deque = deque(maxlen=100)
+        self.episode_maps: deque = deque(maxlen=100)
 
     def _select_action(
         self, screen: torch.Tensor, state: torch.Tensor, deterministic: bool = False
@@ -169,7 +183,13 @@ class PPOTrainer:
         buffer = RolloutBuffer()
         self.encoder.reset()
 
-        obs, _ = self.env.reset()
+        # Persistent mode: only the first rollout boots a fresh game; every
+        # later rollout continues the game where the previous one left off.
+        if self.persist and not self._first_rollout:
+            obs = self.env.soft_reset()
+        else:
+            obs, _ = self.env.reset()
+        self._first_rollout = False
         screen, state = self.encoder.encode(obs)
 
         episode_reward = 0.0
@@ -179,7 +199,10 @@ class PPOTrainer:
             action, log_prob, value = self._select_action(screen, state)
 
             next_obs, reward, terminated, truncated, info = self.env.step(action)
-            done = terminated or truncated
+            episode_ended = terminated or truncated
+            # In persistent mode a truncation is not terminal (the game keeps
+            # running), so it must not cut the advantage recursion.
+            done_for_gae = bool(terminated) if self.persist else bool(episode_ended)
 
             buffer.observations.append(
                 {
@@ -191,14 +214,14 @@ class PPOTrainer:
             buffer.rewards.append(reward)
             buffer.values.append(value)
             buffer.log_probs.append(log_prob)
-            buffer.dones.append(float(done))
+            buffer.dones.append(float(done_for_gae))
 
             obs = next_obs
             episode_reward += reward
             episode_length += 1
             self.global_step += 1
 
-            if done:
+            if episode_ended:
                 # Get final value estimate
                 with torch.no_grad():
                     final_screen, final_state = self.encoder.encode(obs)
@@ -212,6 +235,9 @@ class PPOTrainer:
                 self.episode_rewards.append(episode_reward)
                 self.episode_lengths.append(episode_length)
                 self.episode_badges.append(info.get("badges", 0))
+                self.episode_party.append(info.get("party_count", 0))
+                self.episode_levels.append(info.get("level", 0))
+                self.episode_maps.append(info.get("map_id", 0))
 
                 # Save best checkpoint based on badges first, then reward
                 episode_badges = info.get("badges", 0)
@@ -231,10 +257,27 @@ class PPOTrainer:
                             f"reward {episode_reward:.1f}"
                         )
 
-                # Reset for next episode
-                self.encoder.reset()
-                obs, _ = self.env.reset()
-                screen, state = self.encoder.encode(obs)
+                # Reset for next episode. In persistent mode the game keeps
+                # running (soft_reset) so progress in the world is not thrown
+                # away every max_steps decisions; a boot reset only happens on
+                # completion or after the hard cap.
+                self._persist_game_steps += episode_length
+                if (
+                    self.persist
+                    and not terminated
+                    and self._persist_game_steps < self.persist_max_steps
+                ):
+                    obs = self.env.soft_reset()
+                    screen, state = self.encoder.encode(obs)
+                else:
+                    # Hard reboot: mark the previous transition terminal so GAE
+                    # does not bootstrap value across the discontinuity.
+                    if self.persist and len(buffer.dones) > 0:
+                        buffer.dones[-1] = 1.0
+                    self._persist_game_steps = 0
+                    self.encoder.reset()
+                    obs, _ = self.env.reset()
+                    screen, state = self.encoder.encode(obs)
                 episode_reward = 0.0
                 episode_length = 0
             else:
@@ -416,6 +459,9 @@ class PPOTrainer:
         # Absolute rollout numbering so resumed runs continue where they left
         # off (checkpoints store the last completed rollout).
         base_rollout = getattr(self, "_resume_rollout", 0)
+        # global_step is restored on resume, so measure speed from this run's
+        # starting point instead of the lifetime total.
+        base_step = self.global_step
 
         for rollout_idx in range(1, num_rollouts + 1):
             self._current_rollout = base_rollout + rollout_idx
@@ -423,7 +469,7 @@ class PPOTrainer:
             metrics = self.update(buffer)
 
             elapsed = time.time() - start_time
-            sps = self.global_step / elapsed if elapsed > 0 else 0
+            sps = (self.global_step - base_step) / elapsed if elapsed > 0 else 0
 
             if rollout_idx % log_interval == 0:
                 avg_reward = (
@@ -434,6 +480,9 @@ class PPOTrainer:
                 )
                 avg_badges = np.mean(self.episode_badges) if self.episode_badges else 0
                 max_badges = max(self.episode_badges) if self.episode_badges else 0
+                max_party = max(self.episode_party) if self.episode_party else 0
+                max_level = max(self.episode_levels) if self.episode_levels else 0
+                max_map = max(self.episode_maps) if self.episode_maps else 0
 
                 print(
                     f"Rollout {self._current_rollout:04d}/{base_rollout + num_rollouts} | "
@@ -442,6 +491,7 @@ class PPOTrainer:
                     f"R: {avg_reward:8.1f} | "
                     f"Len: {avg_length:6.0f} | "
                     f"Badges: {avg_badges:.1f}/{max_badges} | "
+                    f"Party: {max_party} | Lvl: {max_level} | Map: {max_map} | "
                     f"P: {metrics['policy_loss']:.4f} | "
                     f"V: {metrics['value_loss']:.4f} | "
                     f"H: {metrics['entropy']:.3f} | "
@@ -467,6 +517,9 @@ class PPOTrainer:
                     "max_badges": int(max(self.episode_badges))
                     if self.episode_badges
                     else 0,
+                    "max_party": int(max_party),
+                    "max_level": int(max_level),
+                    "max_map": int(max_map),
                     "best_reward": self.best_reward,
                     "best_badges": self.best_badges,
                     "elapsed_s": elapsed,
@@ -474,6 +527,12 @@ class PPOTrainer:
                 }
                 with open(log_path, "w") as f:
                     json.dump(log, f, indent=2)
+                # Append-only history so the dashboard can plot real curves
+                # even though training_log.json only holds the latest entry.
+                with open(
+                    os.path.join(self.checkpoint_dir, "training_history.jsonl"), "a"
+                ) as f:
+                    f.write(json.dumps(log) + "\n")
 
         # Final save
         self.save_checkpoint("ppo_final.pt")
@@ -516,6 +575,23 @@ def main():
     parser.add_argument(
         "--headless", action="store_true", default=True, help="Run headless"
     )
+    parser.add_argument(
+        "--frame-skip",
+        type=int,
+        default=8,
+        help="Emulated frames per decision (higher = more game time per step)",
+    )
+    parser.add_argument(
+        "--persistent",
+        action="store_true",
+        help="Keep the game running across episodes instead of rebooting",
+    )
+    parser.add_argument(
+        "--persist-max-steps",
+        type=int,
+        default=400000,
+        help="Hard cap on game steps before a persistent run reboots",
+    )
     args = parser.parse_args()
 
     # Create environment
@@ -524,6 +600,8 @@ def main():
         headless=args.headless,
         state_path=args.state,
         max_steps=args.max_steps,
+        frame_skip=args.frame_skip,
+        persistent=args.persistent,
     )
 
     # Create model and encoder
@@ -545,6 +623,8 @@ def main():
         rollout_length=args.rollout_length,
         device=args.device,
         checkpoint_dir=args.checkpoint_dir,
+        persist=args.persistent,
+        persist_max_steps=args.persist_max_steps,
     )
 
     # Resume if requested
