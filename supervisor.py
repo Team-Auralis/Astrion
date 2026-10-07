@@ -128,16 +128,63 @@ def launch(run: dict, first: bool):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--gen", type=int, default=1, choices=[1, 2])
+    parser.add_argument(
+        "--red-only",
+        action="store_true",
+        help="Run only Pokemon Red lineages (6 seeds) and stop the rest.",
+    )
+    parser.add_argument(
+        "--end-time",
+        default=None,
+        help="HH:MM wall-clock stop: gracefully stops all children and exits.",
+    )
     args = parser.parse_args()
 
-    runs = GEN1 if args.gen == 1 else GEN2
+    if args.red_only:
+        rom = GEN1[0]["rom"]
+        runs = [
+            dict(name="red", rom=rom, ckpt="checkpoints/pokemon/batch1_red"),
+            dict(name="red_b", rom=rom, ckpt="checkpoints/pokemon/batch1_red_b"),
+            dict(name="red_c", rom=rom, ckpt="checkpoints/pokemon/batch1_red_c"),
+            dict(name="red_d", rom=rom, ckpt="checkpoints/pokemon/batch1_red_d"),
+            dict(name="red_e", rom=rom, ckpt="checkpoints/pokemon/batch1_red_e"),
+            dict(name="red_f", rom=rom, ckpt="checkpoints/pokemon/batch1_red_f"),
+        ]
+    else:
+        runs = GEN1 if args.gen == 1 else GEN2
     log(f"supervisor starting (gen {args.gen}: {[r['name'] for r in runs]})")
 
     procs = {r["name"]: launch(r, True) for r in runs}
     first_done = {r["name"]: True for r in runs}
 
+    end_dt = None
+    if args.end_time:
+        hh, mm = args.end_time.split(":")
+        end_dt = datetime.datetime.now().replace(
+            hour=int(hh), minute=int(mm), second=0, microsecond=0
+        )
+        log(f"wall-clock stop scheduled for {args.end_time}")
+
     while True:
         time.sleep(30)
+        if end_dt is not None and datetime.datetime.now() >= end_dt:
+            log(
+                "END-TIME reached; stopping all children (latest checkpoints already on disk)"
+            )
+            for r in runs:
+                p = procs[r["name"]]
+                if p.poll() is None:
+                    p.terminate()
+                    log(f"{r['name']}: terminated pid={p.pid}")
+            time.sleep(10)
+            for r in runs:
+                p = procs[r["name"]]
+                if p.poll() is None:
+                    p.kill()
+                    log(f"{r['name']}: killed pid={p.pid}")
+            log("supervisor exiting after stop time")
+            return
+
         for r in runs:
             p = procs[r["name"]]
             rc = p.poll()
