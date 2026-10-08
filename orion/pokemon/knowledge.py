@@ -49,6 +49,34 @@ def _load_map_names() -> Dict[int, str]:
     return names
 
 
+def _load_map_dims() -> Dict[int, Tuple[int, int]]:
+    """Parse `map_const NAME, W, H ; $ID` into an {id: (width, height)} table.
+
+    The map_const W/H are the map's size in 16x16 *blocks* (e.g. Pallet Town
+    is 10x9 blocks), whereas the player x/y we read from RAM are *tiles*. We
+    expose tile dimensions (2*W, 2*H) so a per-map visited grid indexes the
+    same coordinate space the environment actually observes.
+    """
+    dims: Dict[int, Tuple[int, int]] = {}
+    for path in _GEN1_SOURCES:
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    m = _MAP_CONST_RE.match(line)
+                    if m:
+                        dims[int(m.group(4), 16)] = (
+                            int(m.group(2)) * 2,
+                            int(m.group(3)) * 2,
+                        )
+        except OSError:
+            continue
+        if dims:
+            break
+    return dims
+
+
 # Minimum fallback so the module is usable without the disassembly.
 _FALLBACK_NAMES = {
     0x00: "PALLET_TOWN",
@@ -63,6 +91,12 @@ _FALLBACK_NAMES = {
 }
 
 MAP_NAMES: Dict[int, str] = _load_map_names() or dict(_FALLBACK_NAMES)
+
+# Per-map tile dimensions (width, height), keyed by Gen 1 map id. Parsed from
+# the pret map constants; converted from block to tile units (see
+# _load_map_dims). Missing maps fall back to MAP_DIM_FALLBACK.
+MAP_DIMS: Dict[int, Tuple[int, int]] = _load_map_dims()
+MAP_DIM_FALLBACK: Tuple[int, int] = (20, 20)
 
 # ---------------------------------------------------------------------------
 # Story-progress anchors. Values are a rough fraction (0..1) of the main
@@ -141,6 +175,15 @@ MAP_PROGRESS_BY_NAME: Dict[str, float] = {
 def map_name(map_id: int) -> Optional[str]:
     """Return the human-readable name for a Gen 1 map id, if known."""
     return MAP_NAMES.get(int(map_id))
+
+
+def map_dims(map_id: int) -> Tuple[int, int]:
+    """Return (width, height) in tiles for a Gen 1 map id.
+
+    Falls back to MAP_DIM_FALLBACK (20, 20) for maps not present in the
+    parsed disassembly table so callers always get a usable grid size.
+    """
+    return MAP_DIMS.get(int(map_id), MAP_DIM_FALLBACK)
 
 
 def map_progress_by_id(map_id: int) -> float:

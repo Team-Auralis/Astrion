@@ -52,13 +52,19 @@ class PokemonResNet(nn.Module):
     Dual-branch ResNet for Pokemon gameplay.
 
     Branch 1 (Screen): 80x72 grayscale -> CNN -> 256-dim feature vector
-    Branch 2 (State): 20-dim state features -> MLP -> 64-dim feature vector
+    Branch 2 (State): state_dim features -> MLP -> 64-dim feature vector
     Fusion: concat(256+64=320) -> ResNet blocks -> policy + value heads
     """
 
-    def __init__(self, num_buttons: int = NUM_BUTTONS, in_channels: int = 4):
+    def __init__(
+        self,
+        num_buttons: int = NUM_BUTTONS,
+        in_channels: int = 4,
+        state_dim: int = STATE_DIM,
+    ):
         super().__init__()
         self.num_buttons = num_buttons
+        self.state_dim = state_dim
 
         # --- Screen CNN branch ---
         self.screen_conv = nn.Sequential(
@@ -77,7 +83,7 @@ class PokemonResNet(nn.Module):
 
         # --- State MLP branch ---
         self.state_fc = nn.Sequential(
-            nn.Linear(STATE_DIM, 64),
+            nn.Linear(state_dim, 64),
             nn.ReLU(),
             nn.Linear(64, 64),
             nn.ReLU(),
@@ -133,7 +139,7 @@ class PokemonResNet(nn.Module):
         """
         Args:
             screen: (B, 1, 72, 80) or (B, 72, 80) grayscale screen
-            state: (B, 20) state feature vector (optional)
+            state: (B, state_dim) state feature vector (optional)
 
         Returns:
             policy_logits: (B, num_buttons)

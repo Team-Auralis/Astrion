@@ -15,7 +15,7 @@ from typing import Optional, Tuple, Dict, Any, List
 
 import numpy as np
 
-from orion.pokemon.knowledge import map_progress_by_id, map_name
+from orion.pokemon.knowledge import map_dims, map_progress_by_id, map_name
 
 # Game Boy screen dimensions
 SCREEN_WIDTH = 160
@@ -254,6 +254,17 @@ class PokemonEnv:
         # boundary), so it is not episode-cleared either.
         self._ep_tiles = set()  # (map, x, y) tiles touched this episode
         self._lifetime_tiles = set()  # (map, x, y) tiles ever seen (this env)
+
+        # Per-map coverage ("visited mask") bookkeeping (RESEARCH_FASTER_
+        # TRAINING.md 4.5, pokerl_mode only): a cheap RAM-derived spatial
+        # memory, no CNN. _map_tile_grid[map_key] is a boolean visited grid
+        # sized from knowledge.map_dims (tile units); _map_recent is the ring
+        # buffer of the 8 most recently visited maps, oldest->newest, as
+        # (map_key, coverage). Both persist for the life of THIS env instance
+        # (like _lifetime_tiles): coverage is memory, not an episode counter.
+        self._map_tile_grid: Dict[int, np.ndarray] = {}
+        self._map_recent: deque = deque(maxlen=8)
+        self._current_map_key = None
         self._ep_maps = set()  # map ids entered this episode
         self._ep_map_families = set()  # map-name families entered this episode
         self._ep_grass_paid = False  # tall_grass one-shot paid this episode (C1)
@@ -296,6 +307,108 @@ class PokemonEnv:
     def _map_name_for(self, features: np.ndarray) -> Optional[str]:
         """Human-readable name for the map in `features`."""
         return map_name(self._map_key(features))
+
+    # -- Per-map coverage / spatial memory (pokerl_mode only) ---------------
+    # RESEARCH_FASTER_TRAINING.md 4.5: cheap RAM-derived visited mask. A
+    # per-map visited grid keyed by map id plus a ring buffer of the most
+    # recently visited maps. No CNN, no image input.
+
+    def _update_map_coverage(self, features: np.ndarray) -> None:
+        """Mark the current tile visited in the per-map grid.
+
+        Called from _extract_state_features (so it runs on every observation,
+        i.e. each step and each reset). Updates only while the game is in a
+        controllable overworld state (the same _pokerl_controllable_world gate
+        the micro-tile reward path uses), so boot/title frames do not create or
+        mark a grid. At boot the map reads 0 (PALLET_TOWN, nameable) with x/y =
+        (0,0); _in_game_world alone would accept that, permanently seeding
+        Pallet's grid and ring before the agent can move (W1). Off-world
+        (including boot) also clears _current_map_key so the public
+        current_map_coverage property agrees with _coverage_features (0.0).
+        """
+        if not self.pokerl_mode:
+            return
+        try:
+            if not self._pokerl_controllable_world(features):
+                self._current_map_key = None
+                return
+            key = self._map_key(features)
+            x = int(round(float(features[6]) * 255))
+            y = int(round(float(features[7]) * 255))
+        except Exception:
+            return
+
+        grid = self._map_tile_grid.get(key)
+        if grid is None:
+            w, h = map_dims(key)
+            grid = np.zeros((h, w), dtype=bool)
+            self._map_tile_grid[key] = grid
+        h, w = grid.shape
+        if 0 <= x < w and 0 <= y < h:
+            grid[y, x] = True
+        self._current_map_key = key
+
+        # Move-to-end ring of the 8 most recently visited maps (distinct),
+        # refreshing the current map's coverage each step.
+        for i, (k, _c) in enumerate(self._map_recent):
+            if k == key:
+                del self._map_recent[i]
+                break
+        self._map_recent.append((key, self._current_map_coverage()))
+
+    def _current_map_coverage(self) -> float:
+        """Fraction of the current map's cells visited (0.0 if unknown)."""
+        key = self._current_map_key
+        grid = self._map_tile_grid.get(key) if key is not None else None
+        if grid is None or grid.size == 0:
+            return 0.0
+        return float(grid.sum()) / float(grid.size)
+
+    @property
+    def current_map_coverage(self) -> float:
+        """Coverage (visited/total) of the map the agent is currently on.
+
+        Returns 0.0 off-world (boot/title/intro, or an unnameable map): the
+        coverage-update gate clears _current_map_key when the game is not in a
+        controllable overworld state, so this property agrees with
+        _coverage_features (which zeros off-world) instead of reporting a
+        stale last value.
+        """
+        return self._current_map_coverage()
+
+    @property
+    def recent_map_coverage(self) -> List[Tuple[float, float]]:
+        """Ring buffer of the 8 most recently visited maps, oldest->newest.
+
+        Returns (map_id / 255.0, coverage) pairs, zero-padded at the front
+        (missing history is the oldest) so the list is always length 8.
+        """
+        pairs = [(k / self._map_key_scale, float(c)) for (k, c) in self._map_recent]
+        while len(pairs) < 8:
+            pairs.insert(0, (0.0, 0.0))
+        return pairs
+
+    def _coverage_features(self, features: np.ndarray) -> np.ndarray:
+        """10-dim per-map coverage tail for the pokerl observation.
+
+        Layout (appended at indices 20..29 of the state vector):
+          20    : current-map coverage (visited cells / total cells)
+          21    : recent-maps ring fill ratio (distinct maps seen / 8)
+          22..29: coverage of the 8 most recent maps, oldest->newest
+                  (zero-padded for missing history)
+        Off-world (unnameable map) this is all zeros, matching the existing
+        off-world zeroing convention.
+        """
+        out = np.zeros(10, dtype=np.float32)
+        if not self.pokerl_mode or not self._in_game_world(features):
+            return out
+        out[0] = self._current_map_coverage()
+        ring = list(self._map_recent)
+        out[1] = len(ring) / 8.0
+        covs = [float(c) for (_k, c) in ring]
+        covs = [0.0] * (8 - len(covs)) + covs
+        out[2:10] = covs
+        return out
 
     def _in_game_world(self, features: np.ndarray) -> bool:
         """True when the game is in a real world state (shaped rewards eligible).
@@ -400,8 +513,13 @@ class PokemonEnv:
 
     @property
     def state_feature_size(self) -> int:
-        """Size of the extracted state feature vector."""
-        return 20  # badges, party_count, party_hp, levels, map_id, etc.
+        """Size of the extracted state feature vector.
+
+        PokeRL mode appends 10 per-map coverage features (see
+        _coverage_features / RESEARCH_FASTER_TRAINING.md 4.5) for a 30-dim
+        vector; default mode keeps the original 20-dim vector byte-identical.
+        """
+        return 30 if self.pokerl_mode else 20
 
     @property
     def observation_space(self):
@@ -561,6 +679,14 @@ class PokemonEnv:
             features[10:16] = 0.0  # party levels (3) + party HP (3)
             features[16] = 0.0  # game-state byte
             features[17] = 0.0  # dialogue flag
+
+        # PokeRL per-map coverage tail (RESEARCH_FASTER_TRAINING.md 4.5):
+        # update the visited grid from the (gated) map/x/y, then append the
+        # coverage features. Kept inside the feature extractor so the grid is
+        # always current when the observation is read (every step / reset).
+        if self.pokerl_mode:
+            self._update_map_coverage(features)
+            features[20:30] = self._coverage_features(features)
 
         return features
 

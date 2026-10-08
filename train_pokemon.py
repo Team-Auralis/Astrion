@@ -24,7 +24,6 @@ from orion.pokemon.environment import PokemonEnv
 from orion.pokemon.network import (
     PokemonResNet,
     PokemonEncoder,
-    STATE_DIM,
     SCREEN_H,
     SCREEN_W,
 )
@@ -652,8 +651,11 @@ def main():
 
     # Create model and encoder. Use the env's actual action count so both the
     # default 8-button and --pokerl 6-button spaces produce a matching
-    # policy head.
-    model = PokemonResNet(num_buttons=env.action_space.n)
+    # policy head, and the env's state size so the pokerl 30-dim coverage
+    # observation (and the default 20-dim one) both feed the state MLP.
+    model = PokemonResNet(
+        num_buttons=env.action_space.n, state_dim=env.state_feature_size
+    )
     encoder = PokemonEncoder(frame_stack=4)
 
     # Create trainer
