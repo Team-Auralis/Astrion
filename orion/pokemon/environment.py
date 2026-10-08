@@ -34,6 +34,15 @@ NUM_ACTIONS = len(BUTTONS)
 POKERL_BUTTONS = ["a", "b", "up", "down", "left", "right"]
 MOVEMENT_BUTTONS = frozenset(("up", "down", "left", "right"))
 
+# Per-step cap on the combined anti-loop penalty (pokerl_mode only). A fully
+# stuck agent would otherwise stack all five layers (visit -0.05 + loop -0.2
+# + pattern -0.05 + no-change up to -0.20 + spam -0.02 = ~-0.52/step at a
+# 64-step identical streak) with no bound, bleeding ~-0.4..-0.5/step from the
+# episode reward. Clamping the *applied* penalty at -0.5/step bounds the
+# worst-case per-episode bleed while preserving each layer's signal (the info
+# keys still report the raw per-layer contributions for diagnostics).
+POKERL_ANTILOOP_CAP = -0.5
+
 
 # Pokemon Red/Blue/Yellow RAM addresses (Gen 1)
 # These are well-documented in the speedrunning/emulation community
@@ -650,6 +659,32 @@ class PokemonEnv:
         except Exception:
             tile, in_battle = None, 0
 
+        # W1: suppress anti-loop penalties during combat. Any battle keeps
+        # map/x/y (and in_battle) constant, so the position-visit, position-
+        # loop and no-change layers would all fire while the agent is
+        # legitimately fighting. Battles are already rewarded through the
+        # EXP/money win signals in _compute_reward and must not be double-
+        # penalized, so the whole block (spam/diversity included) is skipped
+        # while in_battle -- this also guarantees the no-change counter cannot
+        # escalate on a fight that legitimately takes >8 decisions.
+        if in_battle:
+            return 0.0, {}
+
+        # W2: gate anti-loop on being in the game world -- same _in_game_world
+        # signal _compute_reward uses for its not_in_world path. While booting
+        # (logo/title/clock/intro) the map/x/y RAM reads are garbage, so the
+        # visit/loop/no-change layers would charge a large fixed negative
+        # per-step baseline (~-0.2..-0.4) on every pre-world decision of a
+        # non-persistent episode. Bookkeeping is deliberately NOT updated off-
+        # world: an off-world tile key carries an unnameable map that can never
+        # collide with a real world tile, so skipping is equivalent to updating
+        # with garbage but keeps the position/action history scoped to actual
+        # world play. Penalties are 0 and no info keys are emitted (the
+        # merged reward_info already reports not_in_world from _compute_reward;
+        # no second convention is introduced).
+        if not self._in_game_world(features):
+            return 0.0, {}
+
         # Layer 1: position-visit penalty. A tile visited more than 3 times
         # in an episode is being camped; more than 5 is a hard stall. The
         # penalty is charged per step while the agent sits in the tile.
@@ -707,6 +742,14 @@ class PokemonEnv:
         if len(recent) >= 2 and recent[-1] != recent[-2]:
             penalty += 0.01
             info["diversity_bonus"] = 0.01
+
+        # W3: per-step cap. The five layers are additive by design, but a
+        # fully stuck agent stacks them ~-0.4..-0.5/step with no bound; clamp
+        # the applied penalty at POKERL_ANTILOOP_CAP (-0.5/step). The info
+        # keys keep their raw per-layer values so diagnostics still show what
+        # fired; only the reward applied to the episode is bounded.
+        if penalty < POKERL_ANTILOOP_CAP:
+            penalty = POKERL_ANTILOOP_CAP
 
         return penalty, info
 

@@ -9,6 +9,14 @@ bonus from RESEARCH_FASTER_TRAINING.md 4.1/4.2:
   penalties at ~0 while the diversity bonus accrues,
 - default mode (pokerl_mode=False) exposes none of the new info keys and
   the anti-loop hook is a byte-identical no-op.
+
+Plus the adversarial-review fixes (W1/W2/W3):
+- W1: during combat (in_battle=True) no position/loop/no-change penalties
+  fire, and the no-change counter cannot escalate on a long battle;
+- W2: off-world (not in the game world) steps produce 0 anti-loop
+  penalties and no info keys;
+- W3: the per-step cap (-0.5) bounds a fully stuck agent (64-step
+  identical streak), while uncapped reference steps are untouched.
 """
 
 import sys
@@ -28,10 +36,12 @@ NEW_INFO_KEYS = (
 )
 
 
-def in_world(x=5, y=5, in_battle=0):
-    """Synthetic in-world state vector (map 40 = OAKS_LAB, party 1, lvl 6)."""
+def in_world(x=5, y=5, in_battle=0, map_id=40):
+    """Synthetic state vector. map 40 (OAKS_LAB) is nameable -> in-world;
+    map 250 is not in the Gen 1 map knowledge tables -> off-world.
+    """
     s = np.zeros(20, dtype=np.float32)
-    s[4] = 40 / 255.0
+    s[4] = map_id / 255.0
     s[1] = 1 / 6.0
     s[3] = 6 / 100.0
     s[6] = x / 255.0
@@ -72,7 +82,8 @@ assert totals["visit_penalty"] <= -0.2, totals
 assert abs(totals["loop_penalty"] - (-1.0)) < 1e-6, totals
 assert totals["spam_penalty"] <= -0.1, totals
 assert totals["pattern_penalty"] <= -0.25, totals
-# Per-key sums must equal the actual penalty applied to the reward.
+# Per-key sums must equal the actual penalty applied to the reward (no cap
+# engaged: the 10-step loop peaks at -0.37/step, under POKERL_ANTILOOP_CAP).
 assert abs(sum(totals.values()) - total_pen) < 1e-6, (totals, total_pen)
 print(
     f"10-step loop: total penalty={total_pen:.3f}  per-key={ {k: round(v, 3) for k, v in totals.items()} }"
@@ -97,7 +108,55 @@ print(
     f"varied rollout: anti-loop penalties ~0, diversity_bonus={totals['diversity_bonus']:.2f}"
 )
 
-# 4) Real emulator step in pokerl_mode: integration smoke (no penalties on step 1).
+# 4) W1: during combat (in_battle=True) nothing fires. A 12-step battle keeps
+#    map/x/y constant -- without the W1 gate this would stack visit/loop/
+#    pattern/no-change/spam penalties and escalate the no-change counter.
+e.reset()
+battle_state = in_world(in_battle=1)
+total_pen = 0.0
+for i in range(12):
+    pen, pinfo = e._pokerl_antiloop(0, battle_state)
+    assert pen == 0.0, (i, pen)
+    assert pinfo == {}, (i, pinfo)
+    total_pen += pen
+assert abs(total_pen) < 1e-9, total_pen
+print("in-battle: 0.0 penalty and no info keys across 12 constant steps")
+
+# 5) W2: off-world steps (unnameable map = not in the game world) are never
+#    penalized, even on a long identical streak that would fire every layer
+#    if it were in-world.
+e.reset()
+off_world = in_world(map_id=250)  # 250 is not a known Gen 1 map id
+total_pen = 0.0
+for i in range(12):
+    pen, pinfo = e._pokerl_antiloop(0, off_world)
+    assert pen == 0.0, (i, pen)
+    assert pinfo == {}, (i, pinfo)
+    total_pen += pen
+assert abs(total_pen) < 1e-9, total_pen
+assert not e._in_game_world(off_world), "probe vector must be off-world"
+print("off-world: 0.0 penalty and no info keys across 12 constant steps")
+
+# 6) W3: per-step cap. A 64-step identical streak stacks all five layers
+#    (visit -0.05 + loop -0.2 + pattern -0.05 + no-change -0.20 + spam -0.02
+#    = -0.52 at step 64); the -0.5/step cap must clamp the applied penalty
+#    while leaving the uncapped reference step (8th) at its raw -0.37.
+e.reset()
+state = in_world()
+cap_hit = False
+for i in range(64):
+    pen, pinfo = e._pokerl_antiloop(0, state)
+    assert pen >= -0.5, (i, pen)
+    if i == 7:  # 8th step: visits+loop+pattern+no-change(level1)+spam
+        assert abs(pen - (-0.37)) < 1e-6, (i, pen)
+    if i == 63:  # 64th step: raw -0.52 must be clamped to exactly -0.5
+        assert pen == -0.5, (i, pen)
+        cap_hit = True
+assert cap_hit, "cap never engaged on a 64-step identical streak"
+print("per-step cap: engaged at -0.5/step on step 64; uncapped step 8 intact")
+
+# 7) Real emulator step in pokerl_mode: integration smoke (no penalties on
+#    step 1 -- the boot snapshot is off-world, so W2 must gate it out).
 obs, _ = e.reset()
 _, _, _, _, info = e.step(0)
 assert info["step_count"] == 1
