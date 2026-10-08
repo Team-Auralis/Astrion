@@ -594,6 +594,16 @@ def main():
     )
     parser.add_argument("--resume", default=None, help="Resume from checkpoint file")
     parser.add_argument("--state", default=None, help="Initial save state path")
+    parser.add_argument(
+        "--curriculum",
+        choices=("bedroom", "pallet", "rival"),
+        default=None,
+        help=(
+            "Gen 1 curriculum start: resolve states/red_<stage>.state into "
+            "--state (recorder: python record_intro_state.py <rom>; the "
+            "'rival' state must be recorded manually)"
+        ),
+    )
     parser.add_argument("--device", default="auto", help="Device (auto/cpu/cuda)")
     parser.add_argument(
         "--headless", action="store_true", default=True, help="Run headless"
@@ -622,6 +632,37 @@ def main():
     )
     args = parser.parse_args()
 
+    # ---- curriculum resolution (Gen 1) ----------------------------------
+    # --curriculum <stage> resolves states/red_<stage>.state into the
+    # effective --state. Never silently falls back: a missing state is an
+    # actionable error (the 'rival' state is manual-only by design).
+    if args.curriculum is not None:
+        if args.state is not None:
+            parser.error("--curriculum and --state are mutually exclusive")
+        state_file = os.path.join("states", f"red_{args.curriculum}.state")
+        if not os.path.isfile(state_file):
+            if args.curriculum == "rival":
+                print(
+                    f"[curriculum] ERROR: state file not found: {state_file}\n"
+                    "  The rival start must be recorded manually (no auto-scripting); "
+                    "play through to the in-lab rival encounter, then save the state "
+                    "and place it at states/red_rival.state.\n"
+                    "  Recorded stages: 'bedroom' and 'pallet' via "
+                    "`python record_intro_state.py <rom.gb>`.",
+                    flush=True,
+                )
+            else:
+                print(
+                    f"[curriculum] ERROR: state file not found: {state_file}\n"
+                    "  Record the Gen 1 curriculum states first:\n"
+                    "    python record_intro_state.py <rom.gb> "
+                    "[--out-dir states]",
+                    flush=True,
+                )
+            sys.exit(2)
+        args.state = state_file
+        print(f"[curriculum] stage '{args.curriculum}' -> {state_file}", flush=True)
+
     # Create environment (auto-detect Gen 2 by cartridge family in the ROM
     # file name; supervisor passes full paths like "Pokemon - Gold ... .gbc").
     from orion.pokemon.gen2_env import PokemonGen2Env
@@ -633,6 +674,14 @@ def main():
     env_cls = PokemonGen2Env if is_gen2 else PokemonEnv
     if is_gen2:
         print(f"[gen2] detected Gen 2 ROM ({os.path.basename(args.rom)})")
+        if args.curriculum is not None:
+            print(
+                "[curriculum] ERROR: --curriculum states are Gen 1 only "
+                "(recorded from Pokemon Red); refusing to load them into a "
+                "Gen 2 ROM.",
+                flush=True,
+            )
+            sys.exit(2)
 
     # Create environment. --pokerl is a Gen 1 experiment (PokeRL-style action
     # space: 6 buttons, tapped movement); PokemonGen2Env does not expose the

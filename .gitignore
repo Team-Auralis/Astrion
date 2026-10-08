@@ -44,3 +44,6 @@ tools/
 
 # Training logs / captures
 logs/
+
+# Recorded curriculum save states (large binaries, regenerated locally)
+states/*.state
