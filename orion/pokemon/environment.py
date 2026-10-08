@@ -43,6 +43,38 @@ MOVEMENT_BUTTONS = frozenset(("up", "down", "left", "right"))
 # keys still report the raw per-layer contributions for diagnostics).
 POKERL_ANTILOOP_CAP = -0.5
 
+# PokeRL hierarchical reward table (RESEARCH_FASTER_TRAINING.md 4.3), payable
+# only in pokerl_mode: micro (per-tile exploration / distance), meso (area and
+# event milestones: maps, regions, grass, battle start), macro (battle win,
+# catch). Default mode (pokerl_mode=False) is byte-identical -- the whole
+# _pokerl_rewards block is skipped and none of these weights are consulted.
+POKERL_REWARD_WEIGHTS = {
+    "new_tile": 1.0,  # micro: first time this (map, x, y) is touched this episode
+    "first_visit": 0.5,  # micro: tile never seen before in this env instance's life
+    "distance_progress": 0.2,  # micro: L1 distance-to-goal decrease (curriculum)
+    "new_map_entry": 5.0,  # meso: first entry into a map this episode
+    "map_transition": 10.0,  # meso: any map_id change
+    "unexplored_region": 2.0,  # meso: first map-name family this episode
+    "tall_grass": 20.0,  # meso: first tall-grass step this episode (one-shot)
+    "battle_start": 10.0,  # meso: in_battle rising edge
+    "battle_win": 50.0,  # macro: battle ends with EXP gained since it started
+    "pokemon_caught": 50.0,  # macro: party count rises (reuses info pokemon_caught)
+}
+
+# Tall-grass tile id in the Gen 1 overworld tilemap, mined from pret/pokered
+# (not guessed): the overworld tileset header declares its grass tile as $52
+# (data/tilesets/tileset_headers.asm, "tileset Overworld, ..., $52"), matching
+# wGrassTile -- the exact byte the game compares the tile under the player's
+# feet against when rolling wild encounters (engine/battle/wild_encounters.asm,
+# `hlcoord 9, 9`). $52 is the only id this milestone cares about; the
+# companion block-set edge tile $53 (gfx/blocksets/overworld.bst) is solid
+# (not walkable) and never appears under the feet, so it is not listed.
+# Viridian Forest ($20) and Indigo Plateau ($45) declare their own grass tiles
+# in their tileset headers and are deliberately excluded: the meso tall-grass
+# reward is the overworld "tall grass at the town edge" milestone, not the
+# forest floor.
+POKERL_GRASS_TILES = frozenset((0x52,))
+
 
 # Pokemon Red/Blue/Yellow RAM addresses (Gen 1)
 # These are well-documented in the speedrunning/emulation community
@@ -64,6 +96,12 @@ class Gen1RAM:
     PLAYER_X = 0xD362
     PLAYER_Y = 0xD361
     MAP_ID = 0xD35E
+
+    # Map buffer
+    TILE_MAP = 0xC4A0  # wTileMap (20x18 = 360 bytes); 0xC55D is the
+    # "feet" byte (row 9, col 9), the tile under the sprite that the game
+    # checks for wild-encounter grass (`hlcoord 9, 9` in TryDoWildEncounter)
+    W_OVERWORLD_MAP = 0xC6E8  # wOverworldMap (block buffer, 16x15 for Pallet)
 
     # Battle state
     IN_BATTLE = 0xD057  # non-zero = in battle
@@ -205,6 +243,34 @@ class PokemonEnv:
         self._no_change_count = 0  # consecutive decisions with no state change
         self._last_position = None  # last (map, x, y, in_battle)
 
+        # PokeRL hierarchical-reward bookkeeping (pokerl_mode only; see
+        # POKERL_REWARD_WEIGHTS and _pokerl_rewards). The _ep_* episode sets
+        # are cleared on every episode boundary (reset/soft_reset);
+        # _lifetime_tiles persists for the life of THIS env instance -- in a
+        # long-running fleet "first-ever visit" therefore spans every episode
+        # that this worker env plays, which is the intended meaning per
+        # RESEARCH_FASTER_TRAINING.md 4.3. The battle EXP snapshot tracks the
+        # game's battle state (which can legitimately span a soft_reset
+        # boundary), so it is not episode-cleared either.
+        self._ep_tiles = set()  # (map, x, y) tiles touched this episode
+        self._lifetime_tiles = set()  # (map, x, y) tiles ever seen (this env)
+        self._ep_maps = set()  # map ids entered this episode
+        self._ep_map_families = set()  # map-name families entered this episode
+        self._ep_grass_paid = False  # tall_grass one-shot paid this episode (C1)
+        self._battle_exp_at_start = None  # first-member EXP at battle start
+        # Curriculum goal for the distance-to-goal micro reward. NEVER
+        # hard-coded to a route: supplied by the operator through the config
+        # dict (reward_config["goal"] = (map_id, x, y)) or per-episode
+        # reset(options={"goal": ...}). None = the distance term is 0. The
+        # config goal is validated here (before _init_pyboy, so a malformed
+        # config fails fast without booting or leaking PyBoy); a reset that
+        # omits `goal` restores this default rather than leaking the previous
+        # override (W4).
+        self._default_goal = self._validate_goal(
+            self.reward_config.get("goal"), "reward_config['goal']"
+        )
+        self._goal = self._default_goal
+
         # Generation parameters. Gen 1 has 8 badges and map ids keyed 0..255;
         # Gen 2 overrides these (16 badges, (group,map) pairs).
         self.badge_max = 8
@@ -248,6 +314,49 @@ class PokemonEnv:
             # A hook failure should not silently kill shaped rewards in an
             # unknown generation; fall back to allowing them (old behavior).
             return True
+
+    def _pokerl_controllable_world(self, features: np.ndarray) -> bool:
+        """True when the game is in a controllable overworld state (W5).
+
+        Boot logos / title / clock set / intro read map id 0 (PALLET_TOWN, a
+        nameable map) with x/y = (0,0), so `_in_game_world` alone lets phantom
+        shaped rewards through. The intro sequence never reads a non-origin
+        player position before the first controllable map loads
+        (REDS_HOUSE_1F at (2,3)), and every real map keeps tile (0,0) inside
+        its collision border, so requiring a non-origin position rejects the
+        zeroed boot bootstrap cheaply -- reusing the existing map-reading
+        signal rather than inventing a new boot heuristic.
+        """
+        if not self._in_game_world(features):
+            return False
+        try:
+            x = int(round(float(features[6]) * 255))
+            y = int(round(float(features[7]) * 255))
+        except Exception:
+            return False
+        return not (x == 0 and y == 0)
+
+    @staticmethod
+    def _validate_goal(goal, key):
+        """Validate a curriculum goal, returning a normalized tuple or None.
+
+        A goal is either None (unset: the distance-to-goal term is 0) or a
+        (map_id, x, y) tuple/list of three integers. Anything else raises
+        ValueError naming the offending config key, so a typo fails loudly at
+        construction/reset instead of silently disabling the term (W4).
+        """
+        if goal is None:
+            return None
+        if (
+            not isinstance(goal, (tuple, list))
+            or len(goal) != 3
+            or not all(isinstance(v, (int, np.integer)) for v in goal)
+        ):
+            raise ValueError(
+                f"{key} must be None or a (map_id, x, y) tuple of 3 integers; "
+                f"got {goal!r}"
+            )
+        return (int(goal[0]), int(goal[1]), int(goal[2]))
 
     def _init_pyboy(self):
         import io
@@ -614,21 +723,247 @@ class PokemonEnv:
         except Exception:
             pass
 
+        # -- PokeRL hierarchical rewards (pokerl_mode only) -----------------
+        # RESEARCH_FASTER_TRAINING.md 4.3: dense micro (tiles / distance),
+        # meso (map entry / transition / region / tall grass / battle start)
+        # and macro (win / catch) rewards layered on top of the milestone
+        # shaping above; EXP stays as a sub-signal (the block above). All of
+        # it is gated on pokerl_mode so the default mode is byte-identical.
+        # The in-world gate at the top already returns early for off-world
+        # steps; the micro tile terms are additionally gated on being in a
+        # controllable overworld state (_pokerl_controllable_world) so the
+        # boot bootstrap (map 0, x/y = (0,0)) can no longer pay a phantom
+        # spawn-tile +1.5 before the intro (W5).
+        if self.pokerl_mode:
+            reward, info = self._pokerl_rewards(
+                old_features, new_features, reward, info
+            )
+
         return reward, info
 
     # -- PokeRL anti-loop / anti-spam (pokerl_mode only) -------------------
 
     def _clear_antiloop(self):
-        """Reset per-episode anti-loop / anti-spam bookkeeping.
+        """Reset per-episode PokeRL bookkeeping.
 
         Called from reset() and soft_reset() -- both are real episode
         boundaries (soft_reset starts each rollout in persistent mode).
+        Clears the anti-loop / anti-spam state and the hierarchical-reward
+        episode sets (_ep_tiles/_ep_maps/_ep_map_families) plus the one-shot
+        tall-grass flag (_ep_grass_paid). _lifetime_tiles and
+        _battle_exp_at_start are deliberately NOT cleared: the first spans the
+        env instance's life, and the battle snapshot tracks the game's battle
+        state which can legitimately span a soft_reset.
         """
         self._tile_visit_counts = {}
         self._position_history.clear()
         self._action_history.clear()
         self._no_change_count = 0
         self._last_position = None
+        self._ep_tiles = set()
+        self._ep_maps = set()
+        self._ep_map_families = set()
+        self._ep_grass_paid = False
+
+    def _seed_episode_start(self, features: np.ndarray) -> None:
+        """Seed the per-episode map/family sets with the episode's start map.
+
+        Called from reset()/soft_reset() (real episode boundaries) so the map
+        the agent is already standing on when an episode begins counts as
+        already entered: leaving and re-entering it pays the +10 transition
+        only, not the +5 first-entry / +2 unexplored-region terms (W3).
+        Deliberately separate from _clear_antiloop(): direct _clear_antiloop()
+        calls (diagnostics) keep empty-set semantics. No-op unless
+        pokerl_mode, so the default reward path is untouched.
+        """
+        if not self.pokerl_mode:
+            return
+        try:
+            start_map = self._map_key(features)
+        except Exception:
+            return
+        self._ep_maps.add(start_map)
+        self._ep_map_families.add(self._map_family_for(start_map))
+
+    # -- PokeRL hierarchical rewards (pokerl_mode only) --------------------
+
+    def _map_family_for(self, map_key: int) -> str:
+        """Return the 'region family' for a map id, derived from the map-name
+        string conventions in knowledge.py (pret disassembly). Maps that share
+        a family are one 'unexplored region' for the meso +2 reward: all
+        ROUTE_* maps are one family, all *_CITY, *_TOWN, *_GYM, *_LAB, ... are
+        their own families. Also true for the game's themed interiors
+        (towers, caves, tunnels, mansions). Unknown ids (garbage maps) get a
+        unique UNKNOWN_<id> family so they can never collide with a real one.
+        """
+        name = map_name(map_key)
+        if name is None:
+            return "UNKNOWN_%d" % int(map_key)
+        for needle, family in (
+            ("ROUTE_", "ROUTE"),
+            ("_CITY", "CITY"),
+            ("_TOWN", "TOWN"),
+            ("_GYM", "GYM"),
+            ("_LAB", "LAB"),
+            ("_HOUSE", "HOUSE"),
+            ("TOWER", "TOWER"),
+            ("_GATE", "GATE"),
+            ("FOREST", "FOREST"),
+            ("CAVE", "CAVE"),
+            ("TUNNEL", "TUNNEL"),
+            ("MANSION", "MANSION"),
+            ("PLATEAU", "PLATEAU"),
+        ):
+            if name.startswith(needle) or needle in name:
+                return family
+        return name
+
+    def _pokerl_standing_on_grass(self, features: np.ndarray) -> bool:
+        """True when the player's feet tile is tall grass (POKERL_GRASS_TILES).
+
+        Reads the same RAM byte the game itself checks for wild encounters:
+        wTileMap row 9, col 9 (0xC55D, the tile under the player's sprite;
+        `hlcoord 9, 9` in TryDoWildEncounter). This is game-authoritative --
+        unlike the VRAM map buffer, it reflects the real tile under the feet,
+        not a camera-clamped approximation. Only $52 is in
+        POKERL_GRASS_TILES: the overworld tileset's wGrassTile, the id the
+        game compares against for wild encounters and the one that appears
+        under the player's feet on real overworld grass. Forest ($20) and
+        plateau ($45) declare their own grass tiles and are deliberately
+        excluded: the meso tall-grass reward is the overworld 'tall grass at
+        the town edge' milestone, not the forest floor. False when the RAM
+        read fails (e.g. during battle, when the overworld tilemap is hidden).
+        """
+        try:
+            feet = self._read_ram(self._A(Gen1RAM.TILE_MAP) + 9 * 20 + 9)
+            return int(feet) in POKERL_GRASS_TILES
+        except Exception:
+            return False
+
+    def _pokerl_rewards(
+        self,
+        old_features: np.ndarray,
+        new_features: np.ndarray,
+        reward: float,
+        info: Dict[str, float],
+    ) -> Tuple[float, Dict[str, float]]:
+        """Apply the PokeRL hierarchical rewards (RESEARCH_FASTER_TRAINING.md
+        4.3) on top of the existing shaped reward. Only called from
+        _compute_reward when pokerl_mode is on; the in-world gate has already
+        returned for off-world steps. Every fired term reports its contribution
+        through info (same convention as _pokerl_antiloop), so the sum of the
+        new keys equals the reward delta added here.
+        """
+        w = POKERL_REWARD_WEIGHTS
+        old_map = self._map_key(old_features)
+        new_map = self._map_key(new_features)
+        nx = int(round(new_features[6] * 255))
+        ny = int(round(new_features[7] * 255))
+
+        # --- micro: new tile / first-ever visit ---------------------------
+        # New tile +1.0 the first time (map,x,y) is touched this episode, then
+        # +0.5 extra the first time it is ever seen by this env instance.
+        # Gated on a controllable overworld state (W5): at boot the map reads
+        # 0 (PALLET_TOWN, nameable) with x/y = (0,0), which would otherwise
+        # pay the phantom spawn tile (0,0,0) +1.5 on the first pre-world step.
+        if self._pokerl_controllable_world(new_features):
+            try:
+                tile = (new_map, nx, ny)
+                if tile not in self._ep_tiles:
+                    self._ep_tiles.add(tile)
+                    reward += w["new_tile"]
+                    info["new_tile"] = w["new_tile"]
+                    if tile not in self._lifetime_tiles:
+                        self._lifetime_tiles.add(tile)
+                        reward += w["first_visit"]
+                        info["first_visit"] = w["first_visit"]
+            except Exception:
+                pass
+
+        # --- micro: distance-to-goal --------------------------------------
+        # +0.2 * (previous L1 distance - current L1 distance), i.e. positive
+        # when moving closer to the configured goal. Only meaningful on the
+        # goal's own map (per-map x/y tile coords are not comparable across
+        # maps), and only when a goal is configured -- never hard-coded.
+        if self._goal is not None:
+            gmap, gx, gy = self._goal
+            if old_map == gmap and new_map == gmap:
+                ox = int(round(old_features[6] * 255))
+                oy = int(round(old_features[7] * 255))
+                prev_d = abs(ox - gx) + abs(oy - gy)
+                cur_d = abs(nx - gx) + abs(ny - gy)
+                progress = prev_d - cur_d
+                if progress:
+                    gained = w["distance_progress"] * progress
+                    reward += gained
+                    info["distance_progress"] = round(gained, 4)
+
+        # --- meso: map transition / first entry / unexplored region -------
+        # Any map_id change = +10; first entry into a map this episode = +5
+        # (so first entry totals +15); first map-name family this episode = +2.
+        if new_map != old_map:
+            reward += w["map_transition"]
+            info["map_transition"] = w["map_transition"]
+            if new_map not in self._ep_maps:
+                self._ep_maps.add(new_map)
+                reward += w["new_map_entry"]
+                info["new_map_entry"] = w["new_map_entry"]
+                family = self._map_family_for(new_map)
+                if family not in self._ep_map_families:
+                    self._ep_map_families.add(family)
+                    reward += w["unexplored_region"]
+                    info["unexplored_region"] = w["unexplored_region"]
+
+        # --- meso: tall grass (one-shot) ----------------------------------
+        # +20 the first step this episode whose feet tile (the same RAM byte
+        # the game checks for wild encounters) is tall grass, then 0 for the
+        # rest of the episode: per RESEARCH_FASTER_TRAINING.md 4.3 the meso
+        # milestones are reached once, so standing on grass must not pay per
+        # step. Later grass steps still report tall_grass (0.0) so the sum of
+        # the info keys always equals the reward added here (C1). Suppressed
+        # during battle: battles are priced by their own start/win terms and
+        # the battle screen hides the overworld tilemap anyway.
+        new_battle = int(new_features[5] > 0)
+        if new_battle == 0 and self._pokerl_standing_on_grass(new_features):
+            if not self._ep_grass_paid:
+                self._ep_grass_paid = True
+                reward += w["tall_grass"]
+                info["tall_grass"] = w["tall_grass"]
+            else:
+                info["tall_grass"] = 0.0
+
+        # --- meso/macro: battle start / win -------------------------------
+        # Start (rising edge) +10 and snapshot first-member EXP. End (falling
+        # edge) +50 only when EXP rose since the snapshot -- the Gen 1 signal
+        # that the battle was actually won (EXP only comes from wins).
+        old_battle = int(old_features[5] > 0)
+        new_exp = float(new_features[9]) * 1000000.0
+        if new_battle and not old_battle:
+            reward += w["battle_start"]
+            info["battle_start"] = w["battle_start"]
+            self._battle_exp_at_start = new_exp
+        elif not new_battle and old_battle:
+            won = (
+                self._battle_exp_at_start is not None
+                and new_exp > self._battle_exp_at_start
+            )
+            self._battle_exp_at_start = None
+            if won:
+                reward += w["battle_win"]
+                info["battle_win"] = w["battle_win"]
+        elif not new_battle:
+            # Steady out-of-battle: keep no stale snapshot around.
+            self._battle_exp_at_start = None
+
+        # --- macro: catch (+50 when the party count rises) ----------------
+        # Shares the existing info["pokemon_caught"] key (party delta) set by
+        # the party-growth block above; only the extra reward is pokerl-only.
+        old_party = int(old_features[1] * 6)
+        new_party = int(new_features[1] * 6)
+        if new_party > old_party:
+            reward += w["pokemon_caught"] * (new_party - old_party)
+
+        return reward, info
 
     def _pokerl_antiloop(
         self, action: int, features: np.ndarray
@@ -670,19 +1005,21 @@ class PokemonEnv:
         if in_battle:
             return 0.0, {}
 
-        # W2: gate anti-loop on being in the game world -- same _in_game_world
-        # signal _compute_reward uses for its not_in_world path. While booting
-        # (logo/title/clock/intro) the map/x/y RAM reads are garbage, so the
-        # visit/loop/no-change layers would charge a large fixed negative
-        # per-step baseline (~-0.2..-0.4) on every pre-world decision of a
-        # non-persistent episode. Bookkeeping is deliberately NOT updated off-
-        # world: an off-world tile key carries an unnameable map that can never
-        # collide with a real world tile, so skipping is equivalent to updating
-        # with garbage but keeps the position/action history scoped to actual
-        # world play. Penalties are 0 and no info keys are emitted (the
-        # merged reward_info already reports not_in_world from _compute_reward;
-        # no second convention is introduced).
-        if not self._in_game_world(features):
+        # W2/W5: gate anti-loop on being in a controllable overworld state --
+        # the same map-reading signal _compute_reward uses, plus the x/y !=
+        # (0,0) boot check. During boot/title/clock/intro the map reads 0
+        # (PALLET_TOWN, nameable) with x/y = (0,0), so _in_game_world alone
+        # would let the visit/loop/no-change layers charge a large fixed
+        # negative per-step baseline (~-0.2..-0.4) on every pre-world decision
+        # of a non-persistent episode. Bookkeeping is deliberately NOT updated
+        # before the world is controllable: such a tile key would carry an
+        # unnameable/garbage map that can never collide with a real world
+        # tile, so skipping is equivalent to updating with garbage but keeps
+        # the position/action history scoped to actual world play. Penalties
+        # are 0 and no info keys are emitted (the merged reward_info still
+        # reports not_in_world from _compute_reward; no second convention is
+        # introduced).
+        if not self._pokerl_controllable_world(features):
             return 0.0, {}
 
         # Layer 1: position-visit penalty. A tile visited more than 3 times
@@ -781,10 +1118,20 @@ class PokemonEnv:
         self._prev_money_raw = self._read_money()
         self._max_map_progress = 0.0
         self._total_reward = 0.0
+        # Curriculum goal override (pokerl_mode distance-to-goal): a step or
+        # call-site can point the episode at a specific (map_id, x, y) via
+        # options; otherwise the config-dict goal from __init__ stands.
+        if options and "goal" in options:
+            self._goal = self._validate_goal(options["goal"], "options['goal']")
+        else:
+            # No per-episode goal: restore the config default so a goal set by
+            # an earlier reset does not leak into this episode (W4).
+            self._goal = self._default_goal
         self._clear_antiloop()
 
         obs = self._get_obs()
         self._prev_state = obs
+        self._seed_episode_start(obs["state"])
 
         return obs, {"step_count": 0}
 
@@ -801,6 +1148,7 @@ class PokemonEnv:
         self._clear_antiloop()
         obs = self._get_obs()
         self._prev_state = obs
+        self._seed_episode_start(obs["state"])
         return obs
 
     def step(self, action: int) -> Tuple[Dict, float, bool, bool, Dict]:
