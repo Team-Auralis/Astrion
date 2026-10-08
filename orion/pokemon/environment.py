@@ -24,6 +24,15 @@ SCREEN_HEIGHT = 144
 BUTTONS = ["a", "b", "start", "select", "up", "down", "left", "right"]
 NUM_ACTIONS = len(BUTTONS)
 
+# PokeRL-style action space (RESEARCH_FASTER_TRAINING.md 4.2): Start/Select
+# are pure menu spam that produce no state change, so they are dropped and
+# movement buttons are tapped (press+release) so a held direction cannot
+# re-engage its toggle. Kept separate from BUTTONS/NUM_ACTIONS so the
+# default 8-action path (mock/evaluate/play and the supervisor fleet) is
+# unchanged.
+POKERL_BUTTONS = ["a", "b", "up", "down", "left", "right"]
+MOVEMENT_BUTTONS = frozenset(("up", "down", "left", "right"))
+
 
 # Pokemon Red/Blue/Yellow RAM addresses (Gen 1)
 # These are well-documented in the speedrunning/emulation community
@@ -110,6 +119,7 @@ class PokemonEnv:
         reward_config: Optional[Dict[str, float]] = None,
         frame_skip: int = 8,
         persistent: bool = False,
+        pokerl_mode: bool = False,
     ):
         self.rom_path = rom_path
         self.headless = headless
@@ -124,6 +134,12 @@ class PokemonEnv:
         # can actually travel across the whole game rather than replaying the
         # intro every episode.
         self.persistent = persistent
+        # PokeRL-style input hygiene: drop Start/Select from the decision
+        # space and tap movement buttons (see POKERL_BUTTONS/MOVEMENT_BUTTONS).
+        # `pokerl_mode` only changes THIS instance; module-level BUTTONS and
+        # NUM_ACTIONS stay 8 so default consumers are unaffected.
+        self.pokerl_mode = pokerl_mode
+        self._action_buttons = list(POKERL_BUTTONS) if pokerl_mode else list(BUTTONS)
 
         if not os.path.exists(rom_path):
             raise FileNotFoundError(
@@ -281,7 +297,7 @@ class PokemonEnv:
     def action_space(self):
         import gymnasium as gym
 
-        return gym.spaces.Discrete(NUM_ACTIONS)
+        return gym.spaces.Discrete(len(self._action_buttons))
 
     def _read_ram(self, addr: int) -> int:
         return self._pyboy.memory[addr]
@@ -630,14 +646,27 @@ class PokemonEnv:
         return obs
 
     def step(self, action: int) -> Tuple[Dict, float, bool, bool, Dict]:
-        assert 0 <= action < NUM_ACTIONS, f"Invalid action {action}"
+        assert 0 <= action < len(self._action_buttons), f"Invalid action {action}"
 
-        button = BUTTONS[action]
+        button = self._action_buttons[action]
 
         # Press then release the button, spending `frame_skip` frames total.
         # More frames per decision = more game time travelled per policy step.
-        hold = max(1, self.frame_skip // 2)
-        release = max(1, self.frame_skip - hold)
+        #
+        # In pokerl_mode, movement buttons are tapped: hold them only 1-2
+        # frames then idle the rest of frame_skip. Holding a direction for
+        # frame_skip//2 frames re-engages the on-screen toggle each step,
+        # which causes held-direction jitter; a tap moves exactly one tile per
+        # decision. Non-movement buttons (a/b) keep the default press behavior.
+        if self.pokerl_mode and button in MOVEMENT_BUTTONS:
+            # Reserve at least 1 released frame so consecutive identical taps
+            # are not read by the game as a continuous hold (PyBoy samples
+            # input at frame boundaries). frame_skip=1 is unavoidably degenerate.
+            hold = max(1, min(2, self.frame_skip - 1))
+            release = max(0, self.frame_skip - hold)
+        else:
+            hold = max(1, self.frame_skip // 2)
+            release = max(1, self.frame_skip - hold)
         self._pyboy.button_press(button)
         for _ in range(hold):
             self._pyboy.tick()

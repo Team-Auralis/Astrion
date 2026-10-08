@@ -20,7 +20,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Categorical
 
-from orion.pokemon.environment import PokemonEnv, NUM_ACTIONS, BUTTONS
+from orion.pokemon.environment import PokemonEnv
 from orion.pokemon.network import (
     PokemonResNet,
     PokemonEncoder,
@@ -616,6 +616,11 @@ def main():
         default=400000,
         help="Hard cap on game steps before a persistent run reboots",
     )
+    parser.add_argument(
+        "--pokerl",
+        action="store_true",
+        help="PokeRL-style input hygiene: drop Start/Select, tap movement buttons",
+    )
     args = parser.parse_args()
 
     # Create environment (auto-detect Gen 2 by cartridge family in the ROM
@@ -630,7 +635,11 @@ def main():
     if is_gen2:
         print(f"[gen2] detected Gen 2 ROM ({os.path.basename(args.rom)})")
 
-    # Create environment
+    # Create environment. --pokerl is a Gen 1 experiment (PokeRL-style action
+    # space: 6 buttons, tapped movement); PokemonGen2Env does not expose the
+    # flag yet, so it is only forwarded for Gen 1.
+    if args.pokerl and is_gen2:
+        print("[warn] --pokerl only applies to Gen 1 ROMs; ignoring it")
     env = env_cls(
         rom_path=args.rom,
         headless=args.headless,
@@ -638,10 +647,13 @@ def main():
         max_steps=args.max_steps,
         frame_skip=args.frame_skip,
         persistent=args.persistent,
+        **({"pokerl_mode": True} if args.pokerl and not is_gen2 else {}),
     )
 
-    # Create model and encoder
-    model = PokemonResNet(num_buttons=NUM_ACTIONS)
+    # Create model and encoder. Use the env's actual action count so both the
+    # default 8-button and --pokerl 6-button spaces produce a matching
+    # policy head.
+    model = PokemonResNet(num_buttons=env.action_space.n)
     encoder = PokemonEncoder(frame_stack=4)
 
     # Create trainer
