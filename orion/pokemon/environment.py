@@ -10,6 +10,7 @@ Wraps PyBoy emulator into a standard Gym interface with:
 
 import os
 import hashlib
+from collections import deque
 from typing import Optional, Tuple, Dict, Any, List
 
 import numpy as np
@@ -185,6 +186,15 @@ class PokemonEnv:
         self._visited_tiles = set()  # (map_id, x, y) visited this game
         self._prev_money_raw = 0
         self._max_map_progress = 0.0  # deepest story position reached
+
+        # PokeRL-style anti-loop / anti-spam bookkeeping (used only in
+        # pokerl_mode; see _pokerl_antiloop / RESEARCH_FASTER_TRAINING.md
+        # 4.1/4.2). Cleared on every episode boundary (reset/soft_reset).
+        self._tile_visit_counts = {}  # (map, x, y) -> visits this episode
+        self._position_history = deque(maxlen=32)  # recent (map, x, y)
+        self._action_history = deque(maxlen=8)  # recent action indices
+        self._no_change_count = 0  # consecutive decisions with no state change
+        self._last_position = None  # last (map, x, y, in_battle)
 
         # Generation parameters. Gen 1 has 8 badges and map ids keyed 0..255;
         # Gen 2 overrides these (16 badges, (group,map) pairs).
@@ -597,6 +607,109 @@ class PokemonEnv:
 
         return reward, info
 
+    # -- PokeRL anti-loop / anti-spam (pokerl_mode only) -------------------
+
+    def _clear_antiloop(self):
+        """Reset per-episode anti-loop / anti-spam bookkeeping.
+
+        Called from reset() and soft_reset() -- both are real episode
+        boundaries (soft_reset starts each rollout in persistent mode).
+        """
+        self._tile_visit_counts = {}
+        self._position_history.clear()
+        self._action_history.clear()
+        self._no_change_count = 0
+        self._last_position = None
+
+    def _pokerl_antiloop(
+        self, action: int, features: np.ndarray
+    ) -> Tuple[float, Dict[str, float]]:
+        """Apply PokeRL-style anti-loop + anti-spam penalties.
+
+        Ported from PokeRL (RESEARCH_FASTER_TRAINING.md 4.1/4.2): three
+        additive anti-loop layers -- position-visit, position-loop, and
+        repeated-action / no-state-change -- plus an anti-spam streak
+        penalty and a small diversity bonus for varying actions. Updates
+        the per-episode bookkeeping and returns (penalty, info) for the
+        current step. Returns (0.0, {}) outside pokerl_mode so the default
+        reward path is byte-identical.
+        """
+        if not self.pokerl_mode:
+            return 0.0, {}
+
+        penalty = 0.0
+        info: Dict[str, float] = {}
+
+        try:
+            tile = (
+                self._map_key(features),
+                int(round(features[6] * 255)),
+                int(round(features[7] * 255)),
+            )
+            in_battle = int(features[5] > 0) if len(features) > 5 else 0
+        except Exception:
+            tile, in_battle = None, 0
+
+        # Layer 1: position-visit penalty. A tile visited more than 3 times
+        # in an episode is being camped; more than 5 is a hard stall. The
+        # penalty is charged per step while the agent sits in the tile.
+        if tile is not None:
+            self._tile_visit_counts[tile] = self._tile_visit_counts.get(tile, 0) + 1
+            visits = self._tile_visit_counts[tile]
+            if visits > 5:
+                penalty -= 0.05
+                info["visit_penalty"] = -0.05
+            elif visits > 3:
+                penalty -= 0.01
+                info["visit_penalty"] = -0.01
+
+        # Layer 2: position-loop detection. The current tile appearing >= 6
+        # times in the recent 32-position window means the agent is orbiting
+        # a single spot rather than exploring.
+        if tile is not None:
+            self._position_history.append(tile)
+            if self._position_history.count(tile) >= 6:
+                penalty -= 0.2
+                info["loop_penalty"] = -0.2
+
+        # Layer 3: repeated action / no state change. Identical last-8
+        # actions is a degenerate policy; so is a run of decisions where
+        # map/x/y/in_battle never changes. The no-change penalty escalates
+        # at every doubling of the streak: 8 -> -0.05, 16 -> -0.10,
+        # 32 -> -0.15, ... (per step while the streak holds).
+        self._action_history.append(action)
+        recent = list(self._action_history)
+        if len(recent) >= 8 and all(a == action for a in recent):
+            penalty -= 0.05
+            info["pattern_penalty"] = info.get("pattern_penalty", 0.0) - 0.05
+
+        if tile is not None:
+            sig = (tile[0], tile[1], tile[2], in_battle)
+        else:
+            sig = None
+        if sig is not None and sig == self._last_position:
+            self._no_change_count += 1
+        else:
+            self._no_change_count = 1
+            self._last_position = sig
+        if self._no_change_count >= 8:
+            level = self._no_change_count.bit_length() - 3  # 8->1, 16->2, ...
+            penalty -= 0.05 * level
+            info["pattern_penalty"] = info.get("pattern_penalty", 0.0) - 0.05 * level
+
+        # Anti-spam streak (same action 5x in a row) + diversity bonus
+        # (a different action from the previous step is rewarded). The
+        # reward sign matters: these cancel the lock-in pressure that
+        # pushes a policy to repeat one button forever.
+        if len(recent) >= 5 and all(a == action for a in recent[-5:]):
+            penalty -= 0.02
+            info["spam_penalty"] = -0.02
+        if len(recent) >= 2 and recent[-1] != recent[-2]:
+            penalty += 0.01
+            info["diversity_bonus"] = 0.01
+
+        return penalty, info
+
     def reset(self, seed=None, options=None) -> Tuple[Dict, Dict]:
         import io
 
@@ -625,6 +738,7 @@ class PokemonEnv:
         self._prev_money_raw = self._read_money()
         self._max_map_progress = 0.0
         self._total_reward = 0.0
+        self._clear_antiloop()
 
         obs = self._get_obs()
         self._prev_state = obs
@@ -641,6 +755,7 @@ class PokemonEnv:
         """
         self._step_count = 0
         self._total_reward = 0.0
+        self._clear_antiloop()
         obs = self._get_obs()
         self._prev_state = obs
         return obs
@@ -678,6 +793,12 @@ class PokemonEnv:
 
         obs = self._get_obs()
         reward, reward_info = self._compute_reward(self._prev_state, obs)
+        if self.pokerl_mode:
+            # Anti-loop / anti-spam penalties are additive on top of the
+            # shaped reward and report through the same info dict.
+            anti_penalty, anti_info = self._pokerl_antiloop(action, obs["state"])
+            reward += anti_penalty
+            reward_info.update(anti_info)
         self._total_reward += reward
         self._prev_state = obs
 
