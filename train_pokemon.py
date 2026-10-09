@@ -23,6 +23,7 @@ from torch.distributions import Categorical
 from orion.pokemon.environment import PokemonEnv
 from orion.pokemon.network import (
     PokemonResNet,
+    PokemonRecurrentNet,
     PokemonEncoder,
     SCREEN_H,
     SCREEN_W,
@@ -41,6 +42,15 @@ class RolloutBuffer:
         self.dones: List[bool] = []
         self.returns: List[float] = []
         self.advantages: List[float] = []
+        # Per-transition LSTM hidden state entering each step (recurrent mode)
+        self.hidden_states: List = []
+        # Per-transition flag recording whether the recurrent hidden state
+        # entering this step was reset to fresh zeros (first step, episode end,
+        # persistent-mode truncation, or hard reboot). Recurrent BPTT segments
+        # must break on these boundaries even when the GAE `done` flag stays 0
+        # (a persistent-mode max_steps truncation resets hx without marking the
+        # transition terminal).
+        self.hidden_resets: List[float] = []
 
     def clear(self):
         self.__init__()
@@ -69,6 +79,8 @@ class PPOTrainer:
         checkpoint_dir: str = "checkpoints/pokemon",
         persist: bool = False,
         persist_max_steps: int = 400000,
+        recurrent: bool = False,
+        bptt_horizon: int = 16,
     ):
         self.env = env
         self.encoder = encoder
@@ -91,6 +103,8 @@ class PPOTrainer:
         # Set by collect_rollout: the first rollout must boot a fresh game even
         # in persistent mode; later rollouts continue the running game.
         self._first_rollout = True
+        self.recurrent = recurrent
+        self.bptt_horizon = bptt_horizon
 
         # Safeguard: rollout must be >= max_steps so episodes actually complete
         max_steps = getattr(env, "max_steps", 2048)
@@ -156,13 +170,26 @@ class PPOTrainer:
             pass
 
     def _select_action(
-        self, screen: torch.Tensor, state: torch.Tensor, deterministic: bool = False
-    ) -> Tuple[int, float, float]:
+        self,
+        screen: torch.Tensor,
+        state: torch.Tensor,
+        hx: tuple = None,
+        deterministic: bool = False,
+    ):
         """Select action using the policy network."""
         with torch.no_grad():
             screen = screen.unsqueeze(0).to(self.device)
             state = state.unsqueeze(0).to(self.device)
-            policy_logits, value = self.model(screen, state)
+            out = self.model(screen, state, hx)
+            # Recurrent nets return ((logits,value), hx_new); FF nets return (logits,value)
+            if isinstance(out, tuple) and len(out) == 2 and isinstance(out[0], tuple):
+                (policy_logits, value), hx_new = out
+            elif isinstance(out, tuple) and len(out) == 2:
+                policy_logits, value = out
+                hx_new = hx
+            else:
+                policy_logits, value = out
+                hx_new = hx
 
             probs = Categorical(logits=policy_logits)
             if deterministic:
@@ -172,7 +199,7 @@ class PPOTrainer:
 
             log_prob = probs.log_prob(action)
 
-        return action.item(), log_prob.item(), value.item()
+        return action.item(), log_prob.item(), value.item(), hx_new
 
     def _compute_gae(
         self,
@@ -198,7 +225,7 @@ class PPOTrainer:
         returns = [adv + val for adv, val in zip(advantages, values)]
         return advantages, returns
 
-    def collect_rollout(self) -> RolloutBuffer:
+    def collect_rollout(self):
         """Collect experience for one rollout."""
         buffer = RolloutBuffer()
         self.encoder.reset()
@@ -214,9 +241,11 @@ class PPOTrainer:
 
         episode_reward = 0.0
         episode_length = 0
+        hx = None
 
         for step in range(self.rollout_length):
-            action, log_prob, value = self._select_action(screen, state)
+            res = self._select_action(screen, state, hx)
+            action, log_prob, value, hx_new = res
 
             next_obs, reward, terminated, truncated, info = self.env.step(action)
             episode_ended = terminated or truncated
@@ -235,8 +264,20 @@ class PPOTrainer:
             buffer.values.append(value)
             buffer.log_probs.append(log_prob)
             buffer.dones.append(float(done_for_gae))
+            # Store the hidden state entering this step (recurrent BPTT) and
+            # whether it is a fresh-reset boundary. hx is None at the first step
+            # and right after every episode end; in persistent mode a max_steps
+            # truncation resets hx while done_for_gae stays 0, so BPTT
+            # segmentation needs this marker separate from `dones`.
+            if self.recurrent:
+                if hx is not None:
+                    buffer.hidden_states.append((hx[0].cpu(), hx[1].cpu()))
+                else:
+                    buffer.hidden_states.append(None)
+                buffer.hidden_resets.append(float(hx is None))
 
             obs = next_obs
+            hx = hx_new
             episode_reward += reward
             episode_length += 1
             self.global_step += 1
@@ -250,8 +291,20 @@ class PPOTrainer:
                     final_screen, final_state = self.encoder.encode(obs)
                     s = final_screen.unsqueeze(0).to(self.device)
                     st = final_state.unsqueeze(0).to(self.device)
-                    _, last_value = self.model(s, st)
-                    last_value = last_value.item() if not terminated else 0.0
+                    out = self.model(s, st, hx)
+                    if (
+                        isinstance(out, tuple)
+                        and len(out) == 2
+                        and isinstance(out[0], tuple)
+                    ):
+                        (policy_logits, value), _ = out
+                        last_value = value.item() if not terminated else 0.0
+                    elif isinstance(out, tuple) and len(out) == 2:
+                        _, last_value = out
+                        last_value = last_value.item() if not terminated else 0.0
+                    else:
+                        _, last_value = out
+                        last_value = last_value.item() if not terminated else 0.0
 
                 # Record episode stats
                 self.episode_count += 1
@@ -292,6 +345,7 @@ class PPOTrainer:
                 ):
                     obs = self.env.soft_reset()
                     screen, state = self.encoder.encode(obs)
+                    hx = None
                 else:
                     # Hard reboot: mark the previous transition terminal so GAE
                     # does not bootstrap value across the discontinuity.
@@ -301,6 +355,7 @@ class PPOTrainer:
                     self.encoder.reset()
                     obs, _ = self.env.reset()
                     screen, state = self.encoder.encode(obs)
+                    hx = None
                 episode_reward = 0.0
                 episode_length = 0
             else:
@@ -309,7 +364,17 @@ class PPOTrainer:
                 with torch.no_grad():
                     s = screen.unsqueeze(0).to(self.device)
                     st = state.unsqueeze(0).to(self.device)
-                    _, last_value = self.model(s, st)
+                    out = self.model(s, st, hx)
+                    if (
+                        isinstance(out, tuple)
+                        and len(out) == 2
+                        and isinstance(out[0], tuple)
+                    ):
+                        (_, last_value), _ = out
+                    elif isinstance(out, tuple) and len(out) == 2:
+                        _, last_value = out
+                    else:
+                        _, last_value = out
                     last_value = last_value.item()
 
         # Compute advantages
@@ -323,6 +388,8 @@ class PPOTrainer:
 
     def update(self, buffer: RolloutBuffer) -> Dict[str, float]:
         """PPO update over the collected rollout."""
+        if self.recurrent:
+            return self._update_recurrent(buffer)
         obs_screens = torch.stack(
             [torch.from_numpy(o["screen"]).float() for o in buffer.observations]
         ).to(self.device)
@@ -421,6 +488,166 @@ class PPOTrainer:
 
         self.scheduler.step()
 
+        n = max(n_updates, 1)
+        return {
+            "policy_loss": total_policy_loss / n,
+            "value_loss": total_value_loss / n,
+            "entropy": total_entropy / n,
+            "lr": self.scheduler.get_last_lr()[0],
+        }
+
+    def _update_recurrent(self, buffer: RolloutBuffer) -> Dict[str, float]:
+        """PPO update for recurrent policies with truncated BPTT.
+
+        The rollout is processed sequentially (no random shuffling) in ordered
+        segments of `bptt_horizon`. Segments are cut at hidden-state reset
+        boundaries (episode ends, persistent-mode truncations, reboots) so the
+        LSTM is never fed a stale hidden state across a point where collection
+        used fresh zeros. Each segment is run step-by-step carrying `hx` so
+        gradients flow through the LSTM over the horizon (truncated BPTT).
+        """
+        dataset_size = len(buffer)
+        hidden_states = getattr(buffer, "hidden_states", [None] * dataset_size)
+        # Hidden-state reset boundaries: transitions whose entering hidden state
+        # was reset to fresh zeros during collection. These must break BPTT
+        # segments even when the GAE `done` flag is 0 (persistent-mode
+        # truncation resets hx without marking the transition terminal).
+        hidden_resets = getattr(buffer, "hidden_resets", [0.0] * dataset_size)
+
+        # Normalize advantages
+        adv = np.asarray(buffer.advantages, dtype=np.float32)
+        adv = (adv - adv.mean()) / (adv.std() + 1e-8)
+
+        total_policy_loss = 0.0
+        total_value_loss = 0.0
+        total_entropy = 0.0
+        n_updates = 0
+
+        horizon = max(1, self.bptt_horizon)
+
+        for epoch in range(self.ppo_epochs):
+            start = 0
+            while start < dataset_size:
+                end = min(start + horizon, dataset_size)
+                # Cut the segment at the next hidden-state reset (which covers
+                # episode boundaries and reboots). A reset at t means collection
+                # entered step t with fresh zeros, so the segment must start
+                # there; the GAE `done` check is kept as a belt-and-braces guard
+                # for buffers created before `hidden_resets` existed.
+                seg_end = end
+                for t in range(start + 1, end):
+                    reset = t < len(hidden_resets) and hidden_resets[t] >= 0.5
+                    if reset or buffer.dones[t - 1] >= 1.0:
+                        seg_end = t
+                        break
+                if seg_end <= start:
+                    seg_end = start + 1
+
+                # Initial hidden state for this segment (None => fresh episode)
+                hx0 = hidden_states[start] if start < len(hidden_states) else None
+                if hx0 is not None:
+                    hx0 = (hx0[0].to(self.device), hx0[1].to(self.device))
+
+                # Run the segment step-by-step so gradients flow through the LSTM
+                policy_losses = []
+                value_losses = []
+                # Raw per-step entropy (for reporting) and entropy weighted by
+                # the (possibly adaptive) coefficient (for the loss term).
+                entropies = []
+                weighted_entropies = []
+                hx = hx0
+                for t in range(start, seg_end):
+                    screen = (
+                        torch.from_numpy(buffer.observations[t]["screen"])
+                        .float()
+                        .unsqueeze(0)
+                        .to(self.device)
+                    )
+                    state = (
+                        torch.from_numpy(buffer.observations[t]["state"])
+                        .float()
+                        .unsqueeze(0)
+                        .to(self.device)
+                    )
+                    out, hx = self.model(screen, state, hx)
+                    (policy_logits, values) = out
+                    values = values.squeeze(-1)
+
+                    action = torch.tensor(
+                        [buffer.actions[t]], dtype=torch.long, device=self.device
+                    )
+                    old_log_prob = torch.tensor(
+                        [buffer.log_probs[t]], dtype=torch.float32, device=self.device
+                    )
+                    advantage = torch.tensor(
+                        [adv[t]], dtype=torch.float32, device=self.device
+                    )
+                    ret = torch.tensor(
+                        [buffer.returns[t]], dtype=torch.float32, device=self.device
+                    )
+                    old_value = torch.tensor(
+                        [buffer.values[t]], dtype=torch.float32, device=self.device
+                    )
+
+                    dist = Categorical(logits=policy_logits)
+                    new_log_prob = dist.log_prob(action)
+                    entropy = dist.entropy().mean()
+
+                    ratio = torch.exp(new_log_prob - old_log_prob)
+                    surr1 = ratio * advantage
+                    surr2 = (
+                        torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon)
+                        * advantage
+                    )
+                    policy_loss = -torch.min(surr1, surr2).mean()
+
+                    value_clipped = old_value + torch.clamp(
+                        values - old_value, -self.clip_epsilon, self.clip_epsilon
+                    )
+                    value_loss = (
+                        0.5
+                        * torch.max(
+                            (values - ret) ** 2, (value_clipped - ret) ** 2
+                        ).mean()
+                    )
+
+                    entropy_coef = self.entropy_coef
+                    if entropy.item() < self.min_entropy:
+                        entropy_coef = self.entropy_coef * 5.0
+
+                    policy_losses.append(policy_loss)
+                    value_losses.append(value_loss)
+                    entropies.append(entropy)
+                    weighted_entropies.append(entropy * entropy_coef)
+                    # Do NOT detach here: gradients must flow through hx across
+                    # the whole segment. BPTT is truncated at segment boundaries
+                    # because the next segment starts from the (graph-free)
+                    # stored hidden state.
+
+                mean_policy_loss = torch.stack(policy_losses).mean()
+                mean_value_loss = torch.stack(value_losses).mean()
+                # Report the raw policy entropy (same scale as the feed-forward
+                # path); the adaptive coefficient only enters the loss term.
+                mean_entropy = torch.stack(entropies).mean()
+                loss = (
+                    mean_policy_loss
+                    + self.value_coef * mean_value_loss
+                    - torch.stack(weighted_entropies).mean()
+                )
+
+                self.optimizer.zero_grad()
+                loss.backward()
+                nn.utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
+                self.optimizer.step()
+
+                total_policy_loss += mean_policy_loss.item()
+                total_value_loss += mean_value_loss.item()
+                total_entropy += mean_entropy.item()
+                n_updates += 1
+
+                start = seg_end
+
+        self.scheduler.step()
         n = max(n_updates, 1)
         return {
             "policy_loss": total_policy_loss / n,
@@ -575,7 +802,12 @@ def main():
     )
     parser.add_argument("--batch-size", type=int, default=64, help="PPO minibatch size")
     parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
-    parser.add_argument("--gamma", type=float, default=0.99, help="Discount factor")
+    parser.add_argument(
+        "--gamma",
+        type=float,
+        default=None,
+        help="Discount factor (default: 0.99, or 0.998 with --recurrent)",
+    )
     parser.add_argument(
         "--entropy-coef", type=float, default=0.02, help="Entropy bonus coefficient"
     )
@@ -630,7 +862,24 @@ def main():
         action="store_true",
         help="PokeRL-style input hygiene: drop Start/Select, tap movement buttons",
     )
+    parser.add_argument(
+        "--recurrent",
+        action="store_true",
+        help="Use recurrent LSTM policy",
+    )
+    parser.add_argument(
+        "--bptt-horizon",
+        type=int,
+        default=16,
+        help="BPTT horizon for recurrent PPO",
+    )
     args = parser.parse_args()
+
+    # Recurrent PPO benefits from a longer horizon (winning stacks use
+    # gamma=0.998); feed-forward keeps the original 0.99 default. An explicit
+    # --gamma always wins.
+    if args.gamma is None:
+        args.gamma = 0.998 if args.recurrent else 0.99
 
     # ---- curriculum resolution (Gen 1) ----------------------------------
     # --curriculum <stage> resolves states/red_<stage>.state into the
@@ -702,12 +951,18 @@ def main():
     # default 8-button and --pokerl 6-button spaces produce a matching
     # policy head, and the env's state size so the pokerl 30-dim coverage
     # observation (and the default 20-dim one) both feed the state MLP.
-    model = PokemonResNet(
-        num_buttons=env.action_space.n, state_dim=env.state_feature_size
-    )
+    if args.recurrent:
+        model = PokemonRecurrentNet(
+            num_buttons=env.action_space.n, state_dim=env.state_feature_size
+        )
+    else:
+        model = PokemonResNet(
+            num_buttons=env.action_space.n, state_dim=env.state_feature_size
+        )
     encoder = PokemonEncoder(frame_stack=4)
 
     # Create trainer
+    # For recurrent runs, honor args.gamma (default 0.99 for FF; allow passing 0.998)
     trainer = PPOTrainer(
         env=env,
         model=model,
@@ -724,6 +979,8 @@ def main():
         checkpoint_dir=args.checkpoint_dir,
         persist=args.persistent,
         persist_max_steps=args.persist_max_steps,
+        recurrent=args.recurrent,
+        bptt_horizon=args.bptt_horizon,
     )
 
     # Resume if requested

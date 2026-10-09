@@ -135,11 +135,13 @@ class PokemonResNet(nn.Module):
         self,
         screen: torch.Tensor,
         state: torch.Tensor = None,
+        hx: torch.Tensor = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
             screen: (B, 1, 72, 80) or (B, 72, 80) grayscale screen
             state: (B, state_dim) state feature vector (optional)
+            hx: ignored for feed-forward (kept for API compatibility)
 
         Returns:
             policy_logits: (B, num_buttons)
@@ -186,6 +188,79 @@ class PokemonResNet(nn.Module):
 
     def parameter_count(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+
+class PokemonRecurrentNet(PokemonResNet):
+    """
+    Recurrent variant of PokemonResNet with LSTM head.
+
+    Adds nn.LSTM(256, 256, batch_first=True) after fusion. Forward accepts
+    optional hx=(h0, c0) and returns ((logits, value), hx_new).
+    """
+
+    def __init__(
+        self,
+        num_buttons: int = NUM_BUTTONS,
+        in_channels: int = 4,
+        state_dim: int = STATE_DIM,
+    ):
+        super().__init__(
+            num_buttons=num_buttons, in_channels=in_channels, state_dim=state_dim
+        )
+        # Hidden size matches the fusion output / head input dim (256)
+        self.lstm = nn.LSTM(256, 256, batch_first=True)
+
+    def forward(
+        self,
+        screen: torch.Tensor,
+        state: torch.Tensor = None,
+        hx: tuple = None,
+    ):
+        if screen.dim() == 3:
+            screen = screen.unsqueeze(1)
+        if (
+            screen.dim() == 4
+            and screen.size(1) == 1
+            and self.screen_conv[0].in_channels > 1
+        ):
+            screen = screen.repeat(1, self.screen_conv[0].in_channels, 1, 1)
+        screen = screen.float() / 255.0
+
+        # Screen branch
+        x = self.screen_conv(screen)
+        x = self.screen_res1(x)
+        x = self.screen_res2(x)
+        x = self.screen_res3(x)
+        x = self.screen_pool(x)
+        x = x.view(x.size(0), -1)
+        screen_feat = F.relu(self.screen_fc(x))
+
+        # State branch
+        if state is not None:
+            state_feat = self.state_fc(state.float())
+        else:
+            state_feat = torch.zeros(screen.size(0), 64, device=screen.device)
+
+        # Fusion
+        fused = torch.cat([screen_feat, state_feat], dim=1)
+        fused = F.relu(self.fusion_fc(fused))
+        fused = fused + self.res1(fused)
+        fused = fused + self.res2(fused)
+        fused = fused + self.res3(fused)
+
+        # LSTM: batch_first=True, input (B, T, H) or (B, H) - treat as seq len 1
+        if fused.dim() == 2:
+            lstm_in = fused.unsqueeze(1)  # (B, 1, 256)
+        else:
+            lstm_in = fused
+        lstm_out, hx_new = self.lstm(lstm_in, hx)
+        lstm_feat = lstm_out.squeeze(1) if lstm_out.size(1) == 1 else lstm_out[:, -1]
+
+        # Heads
+        policy_logits = self.policy_head(lstm_feat)
+        value = self.value_head(lstm_feat)
+
+        return (policy_logits, value), hx_new
 
 
 class PokemonEncoder:
