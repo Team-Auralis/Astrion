@@ -7,6 +7,13 @@ keeps training alive across terminal / server restarts.
 Usage:
     python supervisor.py            # Gen 1 batch (red/blue/yellow)
     python supervisor.py --gen 2    # Gen 2 batch (gold/silver/crystal)
+    python supervisor.py --red-only --m1 --session-hours 4   # daily M1 session
+
+The daily M1 session runs the 6 Red lineages with the M1 bundle (PokeRL env +
+Pallet curriculum + recurrent PPO) into the fresh `batch1_m1_red*` checkpoint
+dirs, then stops cleanly after `--session-hours`. Re-running the same command
+resumes each lineage from its newest M1 checkpoint. Requires
+`states/red_pallet.state` (see `record_intro_state.py`).
 """
 
 import argparse
@@ -255,13 +262,20 @@ def main():
     parser.add_argument(
         "--m1",
         action="store_true",
-        help="Run the 6 M1 Red lineages (PokeRL + Pallet curriculum) in fresh dirs.",
+        help=(
+            "Run the 6 M1 Red lineages (PokeRL + Pallet curriculum + recurrent "
+            "PPO) into fresh batch1_m1_red* dirs; the older batch1_red* fleet is "
+            "preserved. Needs states/red_pallet.state."
+        ),
     )
     parser.add_argument(
         "--session-hours",
         type=float,
         default=None,
-        help="Stop the fleet this many hours from now (overrides --end-time).",
+        help=(
+            "Stop the fleet cleanly this many hours from now (must be > 0; "
+            "overrides --end-time/end_time.txt)."
+        ),
     )
     args = parser.parse_args()
 

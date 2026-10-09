@@ -119,6 +119,37 @@ python train_pokemon.py --rom roms/pokemon_red.gb \
     --pokerl --curriculum pallet
 ```
 
+### Daily M1 training session (3-4h/day)
+
+The daily ritual is a single supervisor command:
+
+```bash
+python supervisor.py --red-only --m1 --session-hours 4
+```
+
+- **`--m1`** runs the 6 Red lineages with the M1 bundle
+  (`--pokerl --curriculum pallet --recurrent --bptt-horizon 16`; gamma defaults
+  to 0.998 under the recurrent policy) into **fresh** checkpoint dirs
+  `checkpoints/pokemon/batch1_m1_red*`. The older `batch1_red*` fleet is
+  preserved and unaffected.
+  - **Why fresh dirs:** strict checkpoint loading means the old
+    8-action / 20-dim feed-forward checkpoints are incompatible with the M1
+    action space (6 buttons), state dim (30) and LSTM, so M1 starts from
+    scratch rather than resuming them.
+- **`--session-hours N`** stops all children cleanly after N hours (must be
+  > 0). It overrides `--end-time` / `end_time.txt` for that run. Checkpoints are
+  written periodically (every 10 rollouts), so a stop loses at most a few
+  rollouts of progress.
+- **Resume:** the next day, run the **same** command; each lineage auto-resumes
+  from its newest M1 checkpoint (`ppo_latest.pt`) and continues where it left
+  off.
+- **Prerequisite:** `states/red_pallet.state` must exist — create it once with
+  `python record_intro_state.py "<rom.gb>"`. The supervisor preflights this and
+  exits non-zero with a clear message if it is missing.
+
+> All M1 flags are opt-in (defaults off), so existing non-M1 fleets are
+> unaffected.
+
 ### What M1 adds (and where it is probed)
 
 - **Anti-loop + anti-spam** — three position/pattern layers, streak penalties,
