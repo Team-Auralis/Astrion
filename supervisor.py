@@ -46,6 +46,18 @@ COMMON = [
     "100000",
 ]
 
+# Extra training flags for the curated "m1" run: PokéRL objective, a Pallet
+# Town curriculum, and a recurrent policy (which already defaults gamma to
+# 0.998 upstream, so we intentionally do not hard-code --gamma here).
+M1_TRAIN_ARGS = [
+    "--pokerl",
+    "--curriculum",
+    "pallet",
+    "--recurrent",
+    "--bptt-horizon",
+    "16",
+]
+
 GEN1 = [
     dict(
         name="red",
@@ -83,6 +95,19 @@ GEN2 = [
 ]
 
 
+def m1_runs() -> list:
+    """Fresh 6-lineage Red fleet for the M1 (PokeRL + Pallet curriculum) runs."""
+    rom = GEN1[0]["rom"]
+    return [
+        dict(name="red", rom=rom, ckpt="checkpoints/pokemon/batch1_m1_red"),
+        dict(name="red_b", rom=rom, ckpt="checkpoints/pokemon/batch1_m1_red_b"),
+        dict(name="red_c", rom=rom, ckpt="checkpoints/pokemon/batch1_m1_red_c"),
+        dict(name="red_d", rom=rom, ckpt="checkpoints/pokemon/batch1_m1_red_d"),
+        dict(name="red_e", rom=rom, ckpt="checkpoints/pokemon/batch1_m1_red_e"),
+        dict(name="red_f", rom=rom, ckpt="checkpoints/pokemon/batch1_m1_red_f"),
+    ]
+
+
 def log(msg: str) -> None:
     line = f"[{datetime.datetime.now():%Y-%m-%d %H:%M:%S}] {msg}"
     print(line, flush=True)
@@ -114,6 +139,15 @@ def parse_end_time(val: str):
         return dt
     except (ValueError, AttributeError):
         return None
+
+
+def compute_session_deadline(hours, now=None):
+    """Wall-clock stop time `hours` from now, or None when unset/zero."""
+    if not hours:
+        return None
+    if now is None:
+        now = datetime.datetime.now()
+    return now + datetime.timedelta(hours=hours)
 
 
 _END_TIME_CACHE = {"content": None, "dt": None}
@@ -170,19 +204,31 @@ def write_fleet_report(runs):
         log(f"could not write fleet report: {e}")
 
 
-def launch(run: dict, first: bool):
-    os.makedirs(os.path.join(ROOT, run["ckpt"]), exist_ok=True)
-    args = [
+def build_child_args(run: dict, m1: bool = False) -> list:
+    """Pure argv assembly for a training child process."""
+    return [
         PY,
         "-u",
         "train_pokemon.py",
         "--rom",
         run["rom"],
         *COMMON,
+        *(M1_TRAIN_ARGS if m1 else []),
         "--checkpoint-dir",
         run["ckpt"],
     ]
+
+
+def m1_preflight_ok(root: str = ROOT) -> bool:
+    """True when the intro state needed by the m1 Pallet curriculum exists."""
+    return os.path.isfile(os.path.join(root, "states", "red_pallet.state"))
+
+
+def launch(run: dict, first: bool, m1: bool = False):
+    os.makedirs(os.path.join(ROOT, run["ckpt"]), exist_ok=True)
+    args = build_child_args(run, m1)
     r = resume_for(run["ckpt"], first)
+
     if r:
         args += ["--resume", r]
         log(f"{run['name']}: resuming from {os.path.relpath(r, ROOT)}")
@@ -206,9 +252,25 @@ def main():
         default=None,
         help="HH:MM wall-clock stop: gracefully stops all children and exits.",
     )
+    parser.add_argument(
+        "--m1",
+        action="store_true",
+        help="Run the 6 M1 Red lineages (PokeRL + Pallet curriculum) in fresh dirs.",
+    )
+    parser.add_argument(
+        "--session-hours",
+        type=float,
+        default=None,
+        help="Stop the fleet this many hours from now (overrides --end-time).",
+    )
     args = parser.parse_args()
 
-    if args.red_only:
+    if args.session_hours is not None and args.session_hours <= 0:
+        parser.error("--session-hours must be > 0")
+
+    if args.m1:
+        runs = m1_runs()
+    elif args.red_only:
         rom = GEN1[0]["rom"]
         runs = [
             dict(name="red", rom=rom, ckpt="checkpoints/pokemon/batch1_red"),
@@ -222,20 +284,41 @@ def main():
         runs = GEN1 if args.gen == 1 else GEN2
     log(f"supervisor starting (gen {args.gen}: {[r['name'] for r in runs]})")
 
-    procs = {r["name"]: launch(r, True) for r in runs}
+    if args.m1 and not m1_preflight_ok():
+        log(
+            "ERROR: M1 run needs states/red_pallet.state; record it first with "
+            "`python record_intro_state.py <rom.gb>`"
+        )
+        sys.exit(2)
+
+    session_deadline = compute_session_deadline(args.session_hours)
+    if session_deadline is not None:
+        log(
+            f"session stop scheduled for {session_deadline:%Y-%m-%d %H:%M} "
+            f"({args.session_hours:g}h)"
+        )
+
+    procs = {r["name"]: launch(r, True, args.m1) for r in runs}
     first_done = {r["name"]: True for r in runs}
 
-    end_dt = read_end_time_file()
-    if end_dt is None and args.end_time:
-        end_dt = parse_end_time(args.end_time)
-    if end_dt is not None:
+    end_dt = session_deadline
+    if end_dt is None:
+        end_dt = read_end_time_file()
+        if end_dt is None and args.end_time:
+            end_dt = parse_end_time(args.end_time)
+    if end_dt is not None and session_deadline is None:
         log(f"wall-clock stop scheduled for {end_dt:%H:%M}")
 
     while True:
         time.sleep(30)
-        end_dt = read_end_time_file()
-        if end_dt is None and args.end_time:
-            end_dt = parse_end_time(args.end_time)
+        end_dt = (
+            session_deadline
+            if session_deadline is not None
+            else (
+                read_end_time_file()
+                or (parse_end_time(args.end_time) if args.end_time else None)
+            )
+        )
         if end_dt is not None and datetime.datetime.now() >= end_dt:
             log(
                 "END-TIME reached; stopping all children (latest checkpoints already on disk)"
@@ -262,7 +345,7 @@ def main():
                 continue
             log(f"{r['name']}: exited rc={rc}; restarting")
             first_done[r["name"]] = False
-            procs[r["name"]] = launch(r, first_done[r["name"]])
+            procs[r["name"]] = launch(r, first_done[r["name"]], args.m1)
 
 
 if __name__ == "__main__":
