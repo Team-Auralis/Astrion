@@ -70,6 +70,79 @@ python evaluate_pokemon.py \
     --episodes 20
 ```
 
+## M1 Training Knobs (PokeRL env + curriculum + recurrent PPO)
+
+The M1 bundle (from `RESEARCH_FASTER_TRAINING.md` §7) adds opt-in training
+knobs. **All of them default OFF, so the supervisor fleet and existing runs are
+unchanged / byte-identical.** Turning any of them on is a *new run* that
+changes the action space, the state-vector size and/or the model, so
+**checkpoints are not portable across modes**: an old checkpoint will not load
+under `--pokerl` or `--recurrent`.
+
+| Flag | Effect | Default |
+|------|--------|---------|
+| `--pokerl` | PokeRL input hygiene: 6-button action space `a,b,up,down,left,right` (no start/select) and tapped movement (one tile per decision). State vector grows 20 → 30 (adds coverage slots). | off (8 buttons, 20-dim) |
+| `--curriculum {bedroom,pallet,rival}` | Resolve `states/red_<stage>.state` into `--state` to skip the forced intro (mutually exclusive with `--state`). |
+| `--recurrent` | Use `PokemonRecurrentNet` (LSTM policy, truncated BPTT). |
+| `--bptt-horizon` | BPTT segment length for recurrent PPO. | `16` |
+| `--gamma` | Discount factor. Defaults to **0.998 with `--recurrent`**, else `0.99`; an explicit `--gamma` always wins. |
+
+**Defaults (all flags off):** the supervisor fleet and every existing run are
+unaffected and byte-identical — the same 8-button action space, 20-dim state,
+and `PokemonResNet` policy as before.
+
+> **Compatibility:** `--pokerl` changes the action space (8 → 6) and state dim
+> (20 → 30); `--recurrent` changes the model (adds an LSTM). Old checkpoints do
+> **not** load under either flag. Start fresh runs with new checkpoint dirs.
+
+### Prerequisites: curriculum savestates
+
+The curriculum starts are recorded once (they are gitignored, ~164 KB each):
+
+```bash
+python record_intro_state.py roms/pokemon_red.gb   # writes states/red_bedroom.state + states/red_pallet.state
+```
+
+`bedroom` and `pallet` are auto-recorded; `rival` must be saved manually (play
+to the in-lab rival encounter and place it at `states/red_rival.state`).
+
+### Recommended M1 launch
+
+```bash
+# Full M1 (curriculum + PokeRL env + recurrent PPO):
+python train_pokemon.py --rom roms/pokemon_red.gb \
+    --pokerl --curriculum pallet --recurrent --bptt-horizon 16 --gamma 0.998
+
+# Fallback (if LSTM overhead is too high on the laptop): drop --recurrent,
+# keeping the PokeRL env + curriculum fast path:
+python train_pokemon.py --rom roms/pokemon_red.gb \
+    --pokerl --curriculum pallet
+```
+
+### What M1 adds (and where it is probed)
+
+- **Anti-loop + anti-spam** — three position/pattern layers, streak penalties,
+  a small diversity bonus, all `--pokerl`-only (`orion/pokemon/environment.py`).
+- **Dense hierarchical rewards** — micro (tile/first-visit/distance), meso
+  (map entry/transition/region/tall grass/battle start), macro (battle
+  win/catch); EXP stays a sub-signal.
+- **Per-map coverage observation** — the state vector grows 20 → 30 under
+  `--pokerl` (current + recent-map coverage slots).
+- **Savestate curriculum** — `--curriculum` boots past the forced intro from
+  `states/*.state` (`record_intro_state.py`).
+- **Recurrent PPO** — `PokemonRecurrentNet` LSTM head with `--bptt-horizon` and
+  the γ≈0.998 default.
+
+Probes (each prints `PROBE OK` and exits 0):
+
+```
+python dbg_probe_m1.py          # consolidated M1 bundle (this section)
+python dbg_probe_antiloop.py    # anti-loop / anti-spam magnitudes
+python dbg_probe_pokerl.py      # hierarchical rewards
+python dbg_probe_coverage.py    # coverage observation / state_dim 30
+python dbg_probe_exp.py         # EXP sub-signal
+```
+
 ## Reward Shaping
 
 The environment provides milestone-based rewards:

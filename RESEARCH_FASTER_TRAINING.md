@@ -122,15 +122,18 @@ Implications:
 
 ---
 
-## 7. Recommended Next Steps (if user approves)
+## 7. Recommended Next Steps
 
-**M1 (one night of engineering, ~2-4 h):** PokeRL-style env fixes in `orion/pokemon/environment.py` + `train_pokemon.py`:
-1. Anti-loop×3 + anti-spam + remove Start/Select + double-press movement
-2. Dense hierarchical rewards (tiles/grass/battle/events) with EXP as sub-signal
-3. Per-map visited-mask observation added to `_extract_state_features`
-4. Oak's-intro savestate skip (answers design-doc §8 Q1: yes)
-5. Recurrent PPO (LSTM head, BPTT h≈16, γ≈0.998)
-6. Curriculum: house-exit → Pallet → rival-battle savestate start points
+**M1 — IMPLEMENTED (env + trainer changes landed; no training run yet):** PokeRL-style env fixes in `orion/pokemon/environment.py` + `train_pokemon.py`. Every item is opt-in and defaults OFF, so the existing supervisor fleet / runs are unaffected (byte-identical). Flags and landing commits:
+
+1. **Anti-loop ×3 + anti-spam + remove Start/Select + double-press/tap movement** — `--pokerl` (6-button space `a,b,up,down,left,right`, tapped movement). Commits `dc940ad` (action hygiene) and `a9a5d3d` (three anti-loop layers + anti-spam), with the review fixes in `38016e3` (W1 combat / W2 off-world / W3 per-step cap).
+2. **Dense hierarchical rewards (micro/meso/macro)** with EXP as sub-signal — auto-enabled by `--pokerl`. Commit `f98419e`.
+3. **Per-map coverage observation** (cheap RAM visited-mask; `state_feature_size` 20 → 30 under `--pokerl`, no CNN) — commit `c106557`. (The CNN/72×80 version stays in M2.)
+4. **Oak's-intro savestate skip** (answers design-doc §8 Q1: yes) — `--curriculum {bedroom,pallet,rival}` resolves `states/red_<stage>.state`; recorder `record_intro_state.py`. Commit `1e45e36`. Prereq: `python record_intro_state.py <rom.gb>`.
+5. **Recurrent PPO** (LSTM head, BPTT horizon) — `--recurrent --bptt-horizon 16`; γ defaults to 0.998 when recurrent (else 0.99). Commit `b4a396e`.
+6. **Curriculum start points** — house-exit (`bedroom`) and Pallet (`pallet`) auto-recorded; `rival` is a manual save (see item 4).
+
+Consolidated verification probe: `python dbg_probe_m1.py` (plus `dbg_probe_antiloop.py`, `dbg_probe_pokerl.py`, `dbg_probe_coverage.py`); all print `PROBE OK`. Test suite: `python -m pytest test_pokemon_pipeline.py -v` → 5 passed. **No M1 training run has been executed yet**, so there are no result numbers to report.
 
 **M2 (only if M1 shows the plateau breaking):** 72×80 screen + visited mask observation with CNN; push env count 6 → 12-24 (CPU-bound PyBoy; watch RAM).
 
