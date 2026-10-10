@@ -1,0 +1,72 @@
+{
+  "total_games": 168,
+  "white_wins": 88,
+  "white_win_pct": 52.38,
+  "black_wins": 66,
+  "black_win_pct": 39.29,
+  "draws": 14,
+  "draw_pct": 8.33,
+  "white_performance_pool": 56.55,
+  "matchup_breakdown": {
+    "ORION_Policy_Only vs Stockfish_1320": {
+      "white_wins": 8,
+      "black_wins": 8,
+      "draws": 0,
+      "total": 16
+    },
+    "ORION_Policy_Only vs Stockfish_1500": {
+      "white_wins": 8,
+      "black_wins": 8,
+      "draws": 0,
+      "total": 16
+    },
+    "ORION_Complete_Engine vs ORION_Policy_Only": {
+      "white_wins": 8,
+      "black_wins": 7,
+      "draws": 1,
+      "total": 16
+    },
+    "ORION_Complete_Engine vs Stockfish_1320": {
+      "white_wins": 16,
+      "black_wins": 6,
+      "draws": 2,
+      "total": 24
+    },
+    "ORION_Complete_Engine vs Stockfish_1500": {
+      "white_wins": 13,
+      "black_wins": 9,
+      "draws": 2,
+      "total": 24
+    },
+    "ORION_Complete_Engine vs Stockfish_1700": {
+      "white_wins": 10,
+      "black_wins": 3,
+      "draws": 3,
+      "total": 16
+    },
+    "BBC_1.1 vs ORION_Complete_Engine": {
+      "white_wins": 5,
+      "black_wins": 9,
+      "draws": 2,
+      "total": 16
+    },
+    "ORION_Complete_Engine vs Stockfish_1900": {
+      "white_wins": 6,
+      "black_wins": 6,
+      "draws": 4,
+      "total": 16
+    },
+    "Stockfish_1320 vs Stockfish_1500": {
+      "white_wins": 7,
+      "black_wins": 5,
+      "draws": 0,
+      "total": 12
+    },
+    "BBC_1.1 vs Stockfish_1500": {
+      "white_wins": 7,
+      "black_wins": 5,
+      "draws": 0,
+      "total": 12
+    }
+  }
+}

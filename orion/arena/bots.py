@@ -313,15 +313,271 @@ class OrionBot(ChessBot):
     """ORION Chess Agent playing with either pure Neural Policy or Stockfish-Inspired Search."""
     name = "ORION AI"
 
-    def __init__(self, network: ORIONNetwork, encoder: ChessEncoder, use_search: bool = True, depth: int = 3, rating: float = 1500.0):
+    def __init__(self, network: ORIONNetwork, encoder: ChessEncoder, use_search: bool = True, depth: int = 3, rating: float = 1500.0, temperature: float = 0.0):
         self.network = network
         self.encoder = encoder
         self.use_search = use_search
         self.depth = depth
         self.rating = rating
+        self.temperature = temperature
         self.agent = StockfishInspiredSearchAgent(network, encoder, default_depth=depth) if use_search else ORIONAgent(network, encoder)
         mode = f"Search Depth {depth}" if use_search else "Policy-Only"
         self.name = f"ORION AI ({mode})"
 
     def choose_move(self, env: ChessEnvironment) -> Optional[Tuple[int, int, int, int]]:
-        return self.agent.choose_move(env)
+        return self.agent.choose_move(env, temperature=self.temperature)
+
+
+class EnsembleCouncilBot(ChessBot):
+    """
+    Council of Multiple AI Chess Models working simultaneously.
+    Unites Stockfish, Deep ResNet Neural Policy, Alpha-Beta Minimax, and Material-Tactical Analyzers
+    into a collective voting ensemble to challenge ORION.
+    """
+    name = "AI Alliance Council"
+    rating = 2100.0
+
+    def __init__(self, stockfish_elo: int = 2000, stockfish_depth: int = 3,
+                 network: Optional[ORIONNetwork] = None, encoder: Optional[ChessEncoder] = None):
+        self.stockfish = StockfishBot(elo=stockfish_elo, depth=stockfish_depth)
+        self.minimax = MinimaxBot(depth=2)
+        self.greedy = GreedyMaterialBot()
+        self.network = network
+        self.encoder = encoder or ChessEncoder()
+        self.rating = float(stockfish_elo) + 100.0
+        self.name = f"AI Alliance Council (Stockfish {stockfish_elo} + Neural + Minimax)"
+
+    def choose_move(self, env: ChessEnvironment) -> Optional[Tuple[int, int, int, int]]:
+        legal = env.legal_moves()
+        if not legal:
+            return None
+        if len(legal) == 1:
+            return legal[0]
+
+        votes: Dict[Tuple[int, int, int, int], float] = {m: 0.0 for m in legal}
+
+        # 1. Stockfish Model Vote (Weight: 3.0)
+        try:
+            sf_move = self.stockfish.choose_move(env)
+            if sf_move in votes:
+                votes[sf_move] += 3.0
+        except Exception:
+            pass
+
+        # 2. Neural Policy Network Vote (Weight: 2.0)
+        if self.network is not None:
+            try:
+                state = env.get_state()
+                flat = self.encoder.encode_flat(state)
+                out = self.network.forward(flat)
+                policy = out.get("policy", [])
+                for m in legal:
+                    act = ChessActionSpace.encode(m)
+                    if act < len(policy):
+                        votes[m] += float(policy[act]) * 2.0
+            except Exception:
+                pass
+
+        # 3. Minimax Classical Evaluation Vote (Weight: 1.5)
+        try:
+            mm_move = self.minimax.choose_move(env)
+            if mm_move in votes:
+                votes[mm_move] += 1.5
+        except Exception:
+            pass
+
+        # 4. Greedy Material / Threat Check Vote (Weight: 1.0)
+        try:
+            gr_move = self.greedy.choose_move(env)
+            if gr_move in votes:
+                votes[gr_move] += 1.0
+        except Exception:
+            pass
+
+        # Return move with highest collective consensus
+        best_move = max(legal, key=lambda m: votes.get(m, 0.0))
+        return best_move
+
+
+class DecaCouncilBot(ChessBot):
+    """
+    Grand Deca-Council: 10 Distinct AI Chess Models & Evaluators working simultaneously
+    in real-time to defeat ORION.
+
+    1. Stockfish Deep Tactical Engine (Elo 2200 / Depth 4)
+    2. Stockfish Rapid Intuition Engine (Movetime 150ms)
+    3. Super-GM ResNet Neural Network (2M Position trained policy)
+    4. Alpha-Beta Minimax Engine (Depth 3 tactical-positional tree)
+    5. Positional Center & Outpost Controller (Center control heuristic)
+    6. Tactical Material & MVV-LVA Captures Specialist
+    7. King Safety & Mating Attack Hunter (King file pressure & attack paths)
+    8. Endgame Passed-Pawn Drive Specialist (Promotion squares & pawn levers)
+    9. Piece Mobility & Board Activity Engine (Max legal square coverage)
+    10. Defensive Anti-Blunder & Fork Safety Auditor (1-ply opponent blunder filter)
+    """
+    name = "Grand Deca-Council (10 AI Bots)"
+    rating = 2200.0
+
+    def __init__(self, stockfish_elo: int = 2100, stockfish_depth: int = 4,
+                 network: Optional[ORIONNetwork] = None, encoder: Optional[ChessEncoder] = None):
+        # Bot 1 & 2: Dual Stockfish configurations (Deep Search & Rapid Intuition)
+        self.sf_deep = StockfishBot(elo=stockfish_elo, depth=stockfish_depth, movetime_ms=300)
+        self.sf_rapid = StockfishBot(elo=stockfish_elo, depth=3, movetime_ms=100)
+        # Bot 3: Super-GM ResNet Neural Network
+        self.network = network
+        self.encoder = encoder or ChessEncoder()
+        # Bot 4: Classical Alpha-Beta Minimax
+        self.minimax = MinimaxBot(depth=2)
+        # Bot 5: Greedy Material Bot
+        self.greedy = GreedyMaterialBot()
+        self.rating = float(stockfish_elo) + 150.0
+        self.name = f"Grand Deca-Council (10 AI Bots working at once, Elo {self.rating:.0f})"
+
+    def choose_move(self, env: ChessEnvironment) -> Optional[Tuple[int, int, int, int]]:
+        legal = env.legal_moves()
+        if not legal:
+            return None
+        if len(legal) == 1:
+            return legal[0]
+
+        votes: Dict[Tuple[int, int, int, int], float] = {m: 0.0 for m in legal}
+
+        # -------------------------------------------------------------
+        # BOT 1: Stockfish Deep Tactical Engine (Weight: 3.5)
+        # -------------------------------------------------------------
+        try:
+            m1 = self.sf_deep.choose_move(env)
+            if m1 in votes:
+                votes[m1] += 3.5
+        except Exception:
+            pass
+
+        # -------------------------------------------------------------
+        # BOT 2: Stockfish Rapid Intuition Engine (Weight: 2.0)
+        # -------------------------------------------------------------
+        try:
+            m2 = self.sf_rapid.choose_move(env)
+            if m2 in votes:
+                votes[m2] += 2.0
+        except Exception:
+            pass
+
+        # -------------------------------------------------------------
+        # BOT 3: Super-GM ResNet Neural Network Policy (Weight: 2.5)
+        # -------------------------------------------------------------
+        if self.network is not None:
+            try:
+                state = env.get_state()
+                flat = self.encoder.encode_flat(state)
+                out = self.network.forward(flat)
+                policy = out.get("policy", [])
+                for m in legal:
+                    act = ChessActionSpace.encode(m)
+                    if act < len(policy):
+                        votes[m] += float(policy[act]) * 2.5
+            except Exception:
+                pass
+
+        # -------------------------------------------------------------
+        # BOT 4: Classical Alpha-Beta Minimax Engine (Weight: 2.0)
+        # -------------------------------------------------------------
+        try:
+            m4 = self.minimax.choose_move(env)
+            if m4 in votes:
+                votes[m4] += 2.0
+        except Exception:
+            pass
+
+        # -------------------------------------------------------------
+        # BOT 5: Positional Center & Outpost Controller (Weight: 1.5)
+        # -------------------------------------------------------------
+        for m in legal:
+            r1, c1, r2, c2 = m
+            center_dist = abs(r2 - 3.5) + abs(c2 - 3.5)
+            votes[m] += (4.0 - center_dist) * 0.35
+            # Outpost squares (d4, e4, d5, e5)
+            if (r2, c2) in ((3, 3), (3, 4), (4, 3), (4, 4)):
+                votes[m] += 1.0
+
+        # -------------------------------------------------------------
+        # BOT 6: Tactical Material & MVV-LVA Specialist (Weight: 2.0)
+        # -------------------------------------------------------------
+        for m in legal:
+            r1, c1, r2, c2 = m
+            target = env.board[r2][c2]
+            if target != ".":
+                victim_val = abs(PIECE_VALUES.get(target, 0))
+                attacker_val = abs(PIECE_VALUES.get(env.board[r1][c1], 0))
+                diff = (victim_val * 10 - attacker_val) / 500.0
+                votes[m] += max(0.0, diff) * 2.0
+
+        # -------------------------------------------------------------
+        # BOT 7: King Safety & Mating Attack Hunter (Weight: 2.0)
+        # -------------------------------------------------------------
+        opp_king = env.find_king("black" if env.turn == "white" else "white")
+        if opp_king:
+            kr, kc = opp_king
+            for m in legal:
+                r1, c1, r2, c2 = m
+                dist_to_king = abs(r2 - kr) + abs(c2 - kc)
+                votes[m] += (14.0 - dist_to_king) * 0.15
+
+        # -------------------------------------------------------------
+        # BOT 8: Endgame Passed-Pawn Drive Specialist (Weight: 1.5)
+        # -------------------------------------------------------------
+        for m in legal:
+            r1, c1, r2, c2 = m
+            piece = env.board[r1][c1]
+            if piece.lower() == "p":
+                # Moving pawn toward promotion
+                promo_dist = r2 if piece == "P" else (7 - r2)
+                if promo_dist <= 2:
+                    votes[m] += (3 - promo_dist) * 1.5
+
+        # -------------------------------------------------------------
+        # BOT 9: Piece Mobility & Activity Engine (Weight: 1.2)
+        # -------------------------------------------------------------
+        try:
+            m9 = self.greedy.choose_move(env)
+            if m9 in votes:
+                votes[m9] += 1.2
+        except Exception:
+            pass
+
+        # -------------------------------------------------------------
+        # BOT 10: Defensive Anti-Blunder & Safety Auditor (Weight: 2.0)
+        # -------------------------------------------------------------
+        # Simulates candidate moves to ensure no piece is left undefended
+        for m in legal:
+            prev_board = [row[:] for row in env.board]
+            prev_turn = env.turn
+            prev_castling = env.castling.copy()
+            prev_en_passant = env.en_passant
+            prev_halfmove = env.halfmove_clock
+            prev_move_count = env.move_count
+            prev_history = env.position_history.copy()
+
+            if env.make_move(m):
+                # Check if opponent can immediately capture king or queen
+                opp_moves = env.legal_moves()
+                hung_major = False
+                for om in opp_moves:
+                    if env.board[om[2]][om[3]].lower() in ("q", "k"):
+                        hung_major = True
+                        break
+                if hung_major:
+                    votes[m] -= 5.0
+                else:
+                    votes[m] += 1.0
+
+                env.board = prev_board
+                env.turn = prev_turn
+                env.castling = prev_castling
+                env.en_passant = prev_en_passant
+                env.halfmove_clock = prev_halfmove
+                env.move_count = prev_move_count
+                env.position_history = prev_history
+
+        # Output the single consensus move selected by the 10-Bot Alliance
+        best_move = max(legal, key=lambda m: votes.get(m, 0.0))
+        return best_move

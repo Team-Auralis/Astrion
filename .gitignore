@@ -47,3 +47,13 @@ logs/
 
 # Recorded curriculum save states (large binaries, regenerated locally)
 states/*.state
+
+# CCRL archive and raw databases
+CCRL-4040.[2463682].pgn.7z
+*.7z
+matches/
+dbg/
+
+# External engine clones/repos & NNUE weights
+elo_test/bbc_repo/
+*.nnue

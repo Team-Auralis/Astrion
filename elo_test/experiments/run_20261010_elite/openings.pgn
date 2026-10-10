@@ -1,0 +1,242 @@
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Ruy Lopez"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "2"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Italian Game"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "3"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Four Knights"]
+
+1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "4"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Scotch Game"]
+
+1. e4 e5 2. Nf3 Nc6 3. d4 exd4 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "5"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Petrov Defense"]
+
+1. e4 e5 2. Nf3 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "6"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Sicilian Open"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "7"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Sicilian Classical"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "8"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "French Winawer"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Bb4 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "9"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "French Classical"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "10"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Caro-Kann Advance"]
+
+1. e4 c6 2. d4 d5 3. e5 Bf5 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "11"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Caro-Kann Classical"]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "12"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Pirc Defense"]
+
+1. e4 d6 2. d4 Nf6 3. Nc3 g6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "13"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Queen's Gambit Declined"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "14"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Queen's Gambit Accepted"]
+
+1. d4 d5 2. c4 dxc4 3. Nf3 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "15"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Slav Defense"]
+
+1. d4 d5 2. c4 c6 3. Nf3 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "16"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "King's Indian Defense"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "17"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Nimzo-Indian Defense"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "18"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Queen's Indian Defense"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 b6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "19"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Grunfeld Defense"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 d5 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "20"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "English Opening"]
+
+1. c4 e5 2. Nc3 Nf6 3. Nf3 Nc6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "21"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "Reti Opening"]
+
+1. Nf3 d5 2. c4 c6 3. g3 Nf6 *
+
+[Event "Opening Suite"]
+[Site "Orion Validation"]
+[Date "2026.10.10"]
+[Round "22"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[Opening "King's English"]
+
+1. c4 c5 2. Nc3 Nc6 *
+

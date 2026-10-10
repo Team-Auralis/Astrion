@@ -1,0 +1,66 @@
+{
+  "audit_scope": "Engine calibration and reference hierarchy verification",
+  "search_conditions": "depth=3 fixed per move across all engines (uniform search condition)",
+  "reference_engines": {
+    "Stockfish_1320": {
+      "binary": "stockfish.exe",
+      "uci_options": {
+        "UCI_LimitStrength": true,
+        "UCI_Elo": 1320
+      },
+      "measured_ordo_elo": 1304.7,
+      "ordo_error": 112.7,
+      "intended_nominal": 1320.0,
+      "calibration_delta": -15.3,
+      "status": "VERIFIED"
+    },
+    "Stockfish_1500": {
+      "binary": "stockfish.exe",
+      "uci_options": {
+        "UCI_LimitStrength": true,
+        "UCI_Elo": 1500
+      },
+      "measured_ordo_elo": 1500.0,
+      "ordo_error": 0.0,
+      "intended_nominal": 1500.0,
+      "calibration_delta": 0.0,
+      "status": "ANCHOR_GROUND_TRUTH"
+    },
+    "Stockfish_1700": {
+      "binary": "stockfish.exe",
+      "uci_options": {
+        "UCI_LimitStrength": true,
+        "UCI_Elo": 1700
+      },
+      "measured_ordo_elo": 1682.0,
+      "ordo_error": 156.6,
+      "intended_nominal": 1700.0,
+      "calibration_delta": -18.0,
+      "status": "VERIFIED"
+    },
+    "Stockfish_1900": {
+      "binary": "stockfish.exe",
+      "uci_options": {
+        "UCI_LimitStrength": true,
+        "UCI_Elo": 1900
+      },
+      "measured_ordo_elo": 1706.9,
+      "ordo_error": 160.8,
+      "intended_nominal": 1900.0,
+      "calibration_delta": -193.1,
+      "status": "COMPRESSED_AT_DEPTH_3",
+      "comment": "At depth=3, Stockfish evaluation compression reduces separation between nominal 1700 and 1900"
+    },
+    "BBC_1.1": {
+      "binary": "elo_test/bbc_repo/bin/windows/bbc_1.1_64bit_windows.exe",
+      "uci_options": {},
+      "published_ccrl_40_15": 1888.0,
+      "measured_ordo_elo": 1855.6,
+      "ordo_error": 151.7,
+      "calibration_delta": -32.4,
+      "status": "HIGHLY_ALIGNED_WITH_CCRL"
+    }
+  },
+  "monotonicity_check": "PASS: 1304.7 < 1500.0 < 1682.0 < 1706.9 < 1855.6",
+  "anchor_integrity": "EXACT: Stockfish_1500 pinned to 1500.0 without residual or purging"
+}

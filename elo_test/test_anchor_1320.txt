@@ -1,0 +1,10 @@
+
+   # PLAYER                   :  RATING  POINTS  PLAYED   (%)
+   1 ORION_Complete_Engine    :  1527.9    49.5      64    77
+   2 Stockfish_1500           :  1394.8    24.0      40    60
+   3 Stockfish_1320           :  1320.0    22.0      40    55
+   4 ORION_Policy_Only        :   550.5     0.5      48     1
+
+White advantage = 134.88
+Draw rate (equal opponents) = 10.96 %
+

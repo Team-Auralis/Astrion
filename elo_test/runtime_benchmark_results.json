@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-10-10 20:37:19",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "cuda_available": true,
+    "cpu": 12,
+    "system_ram_gb": 7.74
+  },
+  "engines": {
+    "policy_only": {
+      "engine_name": "ORION_Policy_Only",
+      "startup_time_sec": 3.814,
+      "ram_usage_mb": 30.5,
+      "average_move_latency_sec": 0.027,
+      "min_latency_sec": 0.004,
+      "max_latency_sec": 0.114,
+      "positions_tested": 5
+    },
+    "complete_engine": {
+      "engine_name": "ORION_Complete_Engine",
+      "startup_time_sec": 1.983,
+      "ram_usage_mb": 157.4,
+      "average_move_latency_sec": 1.008,
+      "min_latency_sec": 0.144,
+      "max_latency_sec": 2.014,
+      "positions_tested": 5
+    }
+  }
+}

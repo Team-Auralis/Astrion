@@ -1,0 +1,798 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1/2-1/2"]
+[ECO "C68"]
+[GameDuration "00:02:35"]
+[GameEndTime "2026-10-10T20:53:28.133 India Standard Time"]
+[GameStartTime "2026-10-10T20:50:52.802 India Standard Time"]
+[Opening "Ruy Lopez"]
+[PlyCount "240"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Exchange variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bb5 {book} a6 {book} 4. Bxc6
+dxc6 {-1.41/3 0.002s} 5. Nxe5 Qg5 {+0.19/3 0.002s} 6. Nxc6 {1.9s}
+bxc6 {+8.11/3 0.001s} 7. Qf3 {0.93s} Bd6 {+4.47/3 0.001s} 8. h4 {1.8s}
+Qg6 {+5.10/3 0.002s} 9. h5 {2.5s} Qe6 {+4.21/3 0.001s} 10. Nc3 {1.5s}
+Nh6 {+4.86/3 0.001s} 11. O-O {2.0s} Bb7 {+6.48/3 0.001s} 12. d4 {1.2s}
+O-O {+3.42/3 0.001s} 13. e5 {0.80s} Bb4 {+3.61/3 0.002s} 14. a3 {1.3s}
+Be7 {+4.37/3 0.001s} 15. Bxh6 {1.1s} Qxh6 {+3.42/3 0.001s} 16. Ne4 {1.3s}
+Rab8 {+5.93/3 0.001s} 17. Nc5 {1.3s} Rfd8 {+3.63/3 0.001s} 18. Nb3 {2.3s}
+Qe6 {0.00/2 0.005s} 19. Qf4 {2.1s} c5 {+6.00/3 0.003s} 20. h6 {2.6s}
+cxd4 {+6.94/3 0.003s} 21. hxg7 {0.60s} c5 {+9.21/3 0.003s} 22. Qg3 {2.7s}
+Qc6 {+7.30/3 0.003s} 23. f3 {1.6s} Qb6 {+7.59/3 0.002s} 24. a4 {3.2s}
+c4 {+7.68/3 0.002s} 25. a5 {0.63s} Qh6 {+7.29/3 0.001s} 26. Nd2 {3.1s}
+Qxd2 {+9.96/3 0.002s} 27. Rfc1 {3.3s} Bd5 {+10.12/3 0.001s} 28. Rab1 {2.9s}
+c3 {+10.99/3 0.001s} 29. bxc3 {1.3s} d3 {+10.81/3 0.002s} 30. cxd3 {1.3s}
+Rbc8 {+9.42/3 0.008s} 31. c4 {3.1s} Bc6 {+9.31/3 0.003s} 32. Rd1 {4.5s}
+Bc5+ {+9.73/3 0.003s} 33. Kf1 {3.1s} Qc3 {+7.89/3 0.002s} 34. f4 {1.9s}
+Qc2 {+8.90/2 0.002s} 35. Ke1 {3.9s} Re8 {+10.60/3 0.004s} 36. Rdc1 {4.1s}
+Qxg2 {+8.84/3 0.002s} 37. Qxg2 {0.88s} Bxg2 {+7.76/3 0.002s} 38. Rc2 {0.93s}
+Ba8 {+8.00/3 0.002s} 39. d4 {1.2s} Be7 {+8.16/3 0.001s} 40. d5 {1.3s}
+Bh4+ {+8.26/3 0.006s} 41. Kd2 {2.1s} Be7 {+6.17/3 0.002s} 42. d6 {1.4s}
+Bh4 {+5.03/3 0.002s} 43. e6 {3.6s} Red8 {+6.25/3 0.003s} 44. exf7+ {3.6s}
+Kxf7 {+7.03/3 0.001s} 45. Rg1 {3.7s} Rxd6+ {+6.90/3 0.002s} 46. Kc1 {6.1s}
+Rg6 {+8.40/3 0.002s} 47. Rxg6 {1.1s} hxg6 {+7.50/3 0.003s} 48. Rh2 {1.0s}
+Bd8 {0.00/2 0.003s} 49. Rh7 {2.0s} Rxc4+ {+7.06/3 0.003s} 50. Kd2 {1.6s}
+Rd4+ {+7.07/3 0.002s} 51. Ke3 {3.0s} Rb4 {+4.91/3 0.002s} 52. Kd3 {0.80s}
+Be4+ {+7.49/3 0.002s} 53. Kc3 {2.6s} Rb8 {+7.95/3 0.001s} 54. Kc4 {1.2s}
+Bb1 {+7.06/3 0.006s} 55. Kd5 {2.2s} Ba2+ {+7.20/3 0.007s} 56. Kd6 {2.6s}
+Be7+ {+6.38/3 0.004s} 57. Kc6 {0.72s} Rc8+ {+6.86/3 0.004s} 58. Kb6 {3.2s}
+Bd8+ {+7.26/3 0.004s} 59. Kxa6 {1.4s} Bc4+ {+6.71/3 0.002s} 60. Kb7 {2.2s}
+Rc5 {+5.44/3 0.002s} 61. a6 {0.63s} Ba5 {+4.89/3 0.003s} 62. a7 {0.89s}
+Bd5+ {+4.40/3 0.001s} 63. Ka6 {1.4s} Bc7 {+4.83/3 0.003s} 64. g8=Q+ {1.3s}
+Kxg8 {+4.52/3 0.001s} 65. Rxc7 {1.9s} Rc6+ {+6.52/3 0.004s} 66. Kb7 {1.6s}
+Rf6+ {+2.24/3 0.003s} 67. Kc8 {0.62s} Ba8 {+2.07/3 0.002s} 68. Kd8 {1.2s}
+Rxf4 {+1.78/3 0.002s} 69. Rd7 {0.75s} Bh1 {0.00/2 0.003s} 70. Kc7 {1.1s}
+Rf7 {+3.02/3 0.003s} 71. Rxf7 Kxf7 {+4.09/3 0.001s} 72. Kd7 Bd5 {0.00/2 0.002s}
+73. Kd6 Ba8 {+3.58/3 0.002s} 74. Kd7 g5 {+4.66/3 0.001s} 75. Kd6
+Kg6 {+4.47/3 0.001s} 76. Ke5 Kh5 {+3.87/3 0.001s} 77. Kf5 Bf3 {+4.03/3 0.001s}
+78. Kf6 g4 {+4.41/3 0.001s} 79. Ke5 g3 {+4.48/3 0.001s} 80. Kf4
+g2 {+1.38/3 0.002s} 81. Kxf3 g1=Q {+2.93/3 0.001s} 82. Ke4 {0.60s}
+Qg8 {+5.05/3 0.005s} 83. Kd3 {0.82s} Qa8 {+4.81/3 0.002s} 84. Kc4
+Kg5 {+5.70/3 0.003s} 85. Kc3 {0.64s} Kf4 {+6.05/3 0.002s} 86. Kc4 {0.62s}
+Kg4 {+5.63/3 0.003s} 87. Kc3 {0.63s} Kh5 {+5.92/3 0.002s} 88. Kc4
+Kg5 {+5.15/3 0.001s} 89. Kc3 Kf4 {+5.74/3 0.001s} 90. Kc4 Kf3 {+6.49/3 0.001s}
+91. Kd3 {0.54s} Kg2 {+5.70/3 0.002s} 92. Kc3 Kf1 {+5.43/3 0.001s}
+93. Kc4 {0.67s} Ke2 {0.00/2 0.002s} 94. Kc3 Kf3 {+5.71/3 0.002s} 95. Kc4
+Ke3 {+5.41/3 0.001s} 96. Kc3 Kf3 {+5.54/3 0.001s} 97. Kc4 Ke3 {+5.61/3 0.001s}
+98. Kc3 Ke2 {+5.61/3 0.001s} 99. Kc4 Kd2 {+5.70/3 0.001s} 100. Kd4
+Qxa7+ {+5.81/3 0.001s} 101. Kc4 {0.97s} Qg1 {+7.48/3 0.001s} 102. Kd5
+Qf2 {0.00/2 0.002s} 103. Kc4 {0.55s} Qb6 {+7.48/3 0.001s} 104. Kd5
+Kd3 {+6.56/3 0.001s} 105. Ke5 Kc3 {0.00/2 0.001s} 106. Kd5 Kd3 {+6.79/3 0.001s}
+107. Ke5 Qb2+ {+6.30/3 0.001s} 108. Kf5 {1.1s} Qb8 {+5.14/3 0.001s} 109. Ke6
+Qf4 {+6.61/3 0.001s} 110. Kd5 Qf2 {0.00/2 0.001s} 111. Ke5 Qd2 {0.00/2 0.003s}
+112. Kf5 Qd1 {+5.16/3 0.002s} 113. Ke5 Qf1 {+6.82/3 0.001s} 114. Ke6
+Qf4 {+5.64/3 0.002s} 115. Kd5 Qf8 {+6.07/3 0.002s} 116. Ke5 Qc8 {0.00/2 0.002s}
+117. Kd5 Qc4+ {+5.77/3 0.001s} 118. Ke5 {0.76s} Qa4 {0.00/2 0.001s} 119. Ke6
+Qg4+ {+5.26/3 0.003s} 120. Ke7 {1.0s}
+Qc4 {+5.37/3 0.001s, Draw by adjudication: maximal game length} 1/2-1/2
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "0-1"]
+[ECO "C68"]
+[GameDuration "00:00:12"]
+[GameEndTime "2026-10-10T20:51:05.643 India Standard Time"]
+[GameStartTime "2026-10-10T20:50:52.939 India Standard Time"]
+[Opening "Ruy Lopez"]
+[PlyCount "27"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Exchange variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bb5 {book} a6 {book}
+4. Bxc6 {+1.05/3 0.004s} dxc6 5. Nxe5 {+0.10/3 0.003s} Qd4 {1.3s}
+6. f4 {-0.40/3 0.002s} Qxe4+ {1.5s} 7. Qe2 {-1.34/3 0s} Qxc2 {1.9s}
+8. Ng6+ {-2.28/3 0.004s} Ne7 {2.0s} 9. Na3 {-3.57/3 0.002s} Qxg6 {0.83s}
+10. d3 {-8.93/3 0.003s} Bg4 {1.7s} 11. Qxg4 {-7.55/3 0.005s} Qxg4 {0.82s}
+12. Nb5 {-9.83/2 0.001s} axb5 {1.1s} 13. Bd2 {-11.46/3 0.001s} Qxg2 {1.1s}
+14. Rf1 {-10.81/3 0.001s, Black wins by adjudication} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "2"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "C50"]
+[GameDuration "00:01:15"]
+[GameEndTime "2026-10-10T20:52:21.481 India Standard Time"]
+[GameStartTime "2026-10-10T20:51:05.672 India Standard Time"]
+[Opening "Giuoco Pianissimo"]
+[PlyCount "76"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bc4 {book} Bc5 {book} 4. d3
+h6 {-0.17/3 0.002s} 5. Be3 {2.7s} Qe7 {-0.30/3 0.002s} 6. Bxc5 {2.0s}
+Qxc5 {-0.60/3 0.001s} 7. Nc3 {1.7s} Nf6 {-0.28/3 0.005s} 8. O-O {3.5s}
+O-O {-0.22/3 0.005s} 9. Na4 {4.5s} Qa5 {+0.59/3 0.002s} 10. Nc3 {1.8s}
+d6 {-0.22/3 0.004s} 11. Nd5 {3.5s} Kh8 {+0.10/3 0.003s} 12. Nxf6 {0.87s}
+gxf6 {-2.71/3 0.002s} 13. Qc1 {1.9s} Kg7 {-1.13/3 0.002s} 14. Qd1 {4.4s}
+f5 {0.00/2 0.003s} 15. Bd5 {4.4s} Ne7 {+0.14/3 0.002s} 16. Bb3 {2.8s}
+Qb6 {-0.32/3 0.006s} 17. Nd2 {3.1s} f4 {+0.10/3 0.004s} 18. Nc4 {1.6s}
+Qc6 {-0.10/3 0.004s} 19. Na5 {3.4s} Qe8 {+0.06/3 0.003s} 20. Nc4 {1.3s}
+Ng6 {+0.56/3 0.002s} 21. Qh5 {1.5s} Kh7 {+0.73/3 0.003s} 22. Rad1 {2.9s}
+b5 {+0.78/3 0.003s} 23. Nd2 {1.5s} Rg8 {+0.68/3 0.002s} 24. Bd5 {1.7s}
+c6 {+1.14/3 0.003s} 25. Bb3 {1.4s} Qe7 {+1.97/3 0.002s} 26. d4 {1.7s}
+Nh4 {+1.87/3 0.003s} 27. g3 {3.2s} Rg7 {+1.35/3 0.003s} 28. dxe5 {3.9s}
+Bg4 {+2.56/3 0.004s} 29. exd6 {2.6s} Qxd6 {-0.60/3 0.006s} 30. Qxh4 {0.97s}
+Rd8 {-2.24/3 0.003s} 31. e5 {1.3s} fxg3 {-4.76/3 0.003s} 32. exd6 {1.0s}
+gxh2+ {-7.53/3 0.003s} 33. Kxh2 {1.6s} Bf3 {-6.41/3 0.002s} 34. Nxf3 {1.3s}
+b4 {-10.73/3 0.002s} 35. Qxd8 {0.79s} Rg2+ {-10.53/3 0.002s} 36. Kxg2 {1.9s}
+Kg7 {-13.12/3 0.002s} 37. d7 {0.62s} c5 {-15.77/3 0.002s} 38. Qe8 {1.3s}
+f6 {-21.67/3 0.001s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "2"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "0-1"]
+[ECO "C50"]
+[GameDuration "00:00:52"]
+[GameEndTime "2026-10-10T20:53:13.938 India Standard Time"]
+[GameStartTime "2026-10-10T20:52:21.517 India Standard Time"]
+[Opening "Giuoco Piano"]
+[PlyCount "61"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bc4 {book} Bc5 {book}
+4. O-O {+0.46/3 0.006s} Nf6 {1.4s} 5. d3 {+0.25/3 0.001s} d5 {2.0s}
+6. exd5 {+0.43/3 0.002s} Nxd5 {1.8s} 7. Ng5 {+0.88/3 0.003s} Bf5 {4.7s}
+8. Nxf7 {+2.56/3 0.007s} Kxf7 {1.1s} 9. Qf3 {+1.46/3 0.002s} Ke6 {2.6s}
+10. Be3 {+1.73/3 0.003s} Nd4 {1.4s} 11. Qd1 {-2.16/3 0.002s} b5 {6.5s}
+12. Bxd4 {-2.56/3 0.005s} Bxd4 {1.0s} 13. Bxb5 {-3.91/3 0.003s} Bxb2 {0.72s}
+14. Bc4 {-4.42/3 0.003s} Bxa1 {1.2s} 15. Na3 {-4.72/3 0.002s} Qe7 {2.3s}
+16. Bxd5+ {-3.34/3 0.003s} Kxd5 {1.2s} 17. Nb5 {-4.56/3 0.007s} a6 {2.0s}
+18. c3 {-3.16/3 0.004s} Ke6 {1.4s} 19. Qb3+ {-3.06/3 0.002s} Kf6 {1.6s}
+20. Qc4 {-6.73/3 0.004s} axb5 {1.1s} 21. Qb3 {-7.94/3 0.002s} Be6 {1.1s}
+22. Qxb5 {-7.65/3 0.003s} Bxc3 {0.92s} 23. Qc6 {-7.31/3 0.004s} Ra3 {2.2s}
+24. d4 {-5.84/3 0.002s} exd4 {0.71s} 25. f4 {-6.00/3 0.003s} Ra5 {2.4s}
+26. g4 {-6.22/3 0.002s} Qd7 {4.2s} 27. g5+ {-7.78/3 0.004s} Kf7 {3.0s}
+28. Qxd7+ {-9.17/3 0.001s} Bxd7 {1.3s} 29. Rf3 {-7.98/3 0.001s} Rha8 {1.1s}
+30. Kg2 {-8.01/3 0.002s} Rxa2+ {1.0s}
+31. Kg1 {-10.17/3 0.001s, Black wins by adjudication} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "3"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "C47"]
+[GameDuration "00:00:35"]
+[GameEndTime "2026-10-10T20:53:49.790 India Standard Time"]
+[GameStartTime "2026-10-10T20:53:13.986 India Standard Time"]
+[Opening "Four knights"]
+[PlyCount "48"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Scotch, 4...exd4"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Nc3 {book} Nf6 {book}
+4. d4 {2.1s} exd4 {-0.29/3 0.002s} 5. Nxd4 {0.82s} Bc5 {-0.13/3 0.003s}
+6. Be3 {1.8s} Bb6 {-0.38/3 0.002s} 7. Nxc6 {1.1s} bxc6 {-0.34/3 0.001s}
+8. Bxb6 {2.2s} cxb6 {-1.12/3 0.001s} 9. e5 {1.4s} O-O {-0.21/3 0.003s} 10. exf6
+d5 {-4.36/3 0.003s} 11. fxg7 {0.78s} Qe7+ {-3.02/3 0.002s} 12. Qe2 {3.8s}
+Re8 {-6.48/3 0.003s} 13. Nxd5 {1.1s} Qd8 {-2.43/3 0.003s} 14. Nf6+ {2.2s}
+Kxg7 {-8.51/3 0s} 15. Nxe8+ {0.81s} Kf8 {-7.98/3 0.001s} 16. Rd1 {1.0s}
+Bd7 {-5.24/3 0.002s} 17. Nd6 {0.91s} Qf6 {-8.28/3 0.001s} 18. Ne4 {0.50s}
+Qh4 {-6.32/3 0.002s} 19. Rxd7 {2.0s} Re8 {-6.29/3 0.001s} 20. Rxf7+ {1.1s}
+Kxf7 {-11.18/3 0.001s} 21. Nd6+ {1.4s} Kg7 {-12.02/3 0.001s} 22. Qxe8 {1.2s}
+Qb4+ {-9.68/3 0.002s} 23. Ke2 {2.3s} Qg4+ {-9.16/3 0.003s} 24. Ke3 {6.4s}
+Qg5+ {-11.15/3 0.004s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "3"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "0-1"]
+[ECO "C47"]
+[GameDuration "00:00:40"]
+[GameEndTime "2026-10-10T20:54:08.791 India Standard Time"]
+[GameStartTime "2026-10-10T20:53:28.229 India Standard Time"]
+[Opening "Four knights"]
+[PlyCount "53"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Scotch variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Nc3 {book} Nf6 {book}
+4. d4 {+0.29/3 0.003s} Bb4 {3.4s} 5. Bg5 {+0.48/3 0.005s} Bxc3+ {2.0s}
+6. bxc3 {+0.19/3 0.001s} d6 {1.1s} 7. Bb5 {+0.42/3 0.002s} Bd7 {2.9s}
+8. Qe2 {0.00/2 0.007s} O-O {2.3s} 9. a4 {0.00/2 0.003s} h6 {3.4s}
+10. Bc1 {-0.20/3 0.002s} a6 {4.3s} 11. Bxc6 {-0.41/3 0.002s} Bxc6 {0.79s}
+12. O-O {-0.63/3 0.001s} exd4 {1.8s} 13. cxd4 {-2.14/3 0.001s} Nxe4 {0.71s}
+14. c4 {-1.57/3 0.005s} Re8 {4.1s} 15. Qd3 {-1.37/3 0.003s} Qd7 {2.3s}
+16. d5 {-1.74/3 0.003s} Bxa4 {1.0s} 17. Re1 {-1.12/3 0.002s} Nc5 {1.6s}
+18. Qa3 {-3.88/3 0.002s} Rxe1+ {1.6s} 19. Nxe1 {-4.99/3 0s} Bb3 {1.8s}
+20. Be3 {-5.00/3 0.003s} Bxc4 21. Rc1 {-5.98/3 0.003s} Bxd5 {1.1s}
+22. Bxc5 {-6.52/3 0.002s} dxc5 {0.66s} 23. Qxa6 {-7.22/3 0.001s} Rxa6
+24. g3 {-7.59/3 0.002s} c4 {0.57s} 25. f3 {-8.58/3 0.001s} Ra2 {1.1s}
+26. Rd1 {-8.81/3 0.002s} c3 {0.86s}
+27. Kh1 {-9.04/3 0.002s, Black wins by adjudication} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "4"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "C45"]
+[GameDuration "00:01:12"]
+[GameEndTime "2026-10-10T20:55:02.029 India Standard Time"]
+[GameStartTime "2026-10-10T20:53:49.808 India Standard Time"]
+[Opening "Scotch game"]
+[PlyCount "71"]
+[TimeControl "inf"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. d4 {book} exd4 {book}
+4. Nxd4 {0.97s} d5 {-0.14/3 0.001s} 5. Nxc6 bxc6 {-0.35/3 0.004s} 6. exd5 {1.6s}
+cxd5 {-0.48/3 0.007s} 7. Bb5+ {1.4s} Ke7 {-2.18/3 0.001s} 8. Bc6 {1.0s}
+Rb8 {-4.39/3 0.001s} 9. Qxd5 {1.6s} Qxd5 {-2.47/3 0.003s} 10. Bxd5
+Ke8 {-1.36/3 0.003s} 11. Ke2 {3.2s} Ba6+ {+0.21/3 0.002s} 12. Kf3 {4.4s}
+Ne7 {-0.69/3 0.002s} 13. Re1 {1.7s} h5 {-1.12/3 0.001s} 14. Nc3 {2.2s}
+Bc8 {-1.44/3 0.002s} 15. Bb3 {4.9s} h4 {-1.58/3 0.003s} 16. Be3 {4.8s}
+Bb7+ {-1.81/3 0.002s} 17. Kf4 {6.4s} Bxg2 {-0.66/3 0.007s} 18. Rad1 {5.7s}
+Rxb3 {0.00/3 0.005s} 19. axb3 {0.93s} Rh5 {-0.48/3 0.002s} 20. Bxa7 {1.4s}
+Rf5+ {-1.30/3 0.002s} 21. Ke3 {4.5s} g5 {0.00/2 0.002s} 22. Kd3 {2.8s}
+Rf3+ {-1.62/3 0.002s} 23. Be3 {6.9s} Nf5 {-1.96/3 0.002s} 24. Nd5 {1.4s}
+Kd7 {-0.89/3 0.002s} 25. Kc4 {2.9s} c6 {0.00/2 0.005s} 26. Nb6+ {3.2s}
+Kc7 {-4.41/3 0.001s} 27. Rd7+ {0.62s} Kb8 {-3.85/3 0.002s} 28. Rd8+ {0.89s}
+Kb7 {-3.85/3 0.001s} 29. Rxf8 Bf1+ {-3.82/3 0.002s} 30. Kc5 {1.5s}
+Rxe3 {-4.50/3 0.002s} 31. Rxf7+ {0.55s} Re7 {-8.32/3 0.001s} 32. Rfxe7+ {0.52s}
+Ka6 {-6.42/3 0s} 33. R7e5 {0.97s} Kb7 {-8.32/3 0.003s} 34. Rxf5
+Bd3 {0.00/2 0.002s} 35. Rf7+ Kb8 {-M2/3 0s} 36. Re8# {White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "4"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "0-1"]
+[ECO "C45"]
+[GameDuration "00:00:14"]
+[GameEndTime "2026-10-10T20:54:22.911 India Standard Time"]
+[GameStartTime "2026-10-10T20:54:08.809 India Standard Time"]
+[Opening "Scotch game"]
+[PlyCount "27"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. d4 {book} exd4 {book}
+4. Nxd4 {+0.40/3 0.002s} Nxd4 {0.96s} 5. Be3 {-0.27/3 0.002s} Ne6 {1.1s}
+6. f4 {-5.61/3 0.001s} Bc5 {1.7s} 7. Qf3 {-5.33/3 0.002s} Bxe3 {1.2s}
+8. h4 {-5.66/3 0.001s} Bxf4 {0.54s} 9. Qh5 {0.00/2 0.001s} Bg3+ {1.9s}
+10. Kd2 {-10.18/3 0.001s} Nf6 {4.1s} 11. Rh3 {-10.15/3 0.002s} Nxh5 {1.4s}
+12. Kd3 {-10.28/3 0.002s} Nhf4+ {0.82s} 13. Kd2 {-13.24/3 0.001s} Nxh3
+14. h5 {-16.70/3 0.001s, Black wins by adjudication} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "5"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "C42"]
+[GameDuration "00:00:32"]
+[GameEndTime "2026-10-10T20:54:54.981 India Standard Time"]
+[GameStartTime "2026-10-10T20:54:22.920 India Standard Time"]
+[Opening "Petrov's defense"]
+[PlyCount "58"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nf6 {book} 3. Nxe5 Bc5 {-0.17/3 0.001s}
+4. d4 {1.8s} Bb6 {-1.78/3 0.002s} 5. Nc3 {2.1s} Nc6 {-2.43/3 0.003s}
+6. Nxc6 {1.5s} dxc6 {-1.77/3 0.001s} 7. e5 {3.7s} Qxd4 {-1.36/3 0.004s}
+8. Qxd4 {0.53s} Bxd4 {-6.29/3 0.004s} 9. exf6 {0.53s} O-O {-5.48/3 0.002s}
+10. Ne4 {1.0s} Bxb2 {-5.28/3 0.002s} 11. Bxb2 Bf5 {-6.18/3 0.001s} 12. fxg7
+Rfb8 {-5.13/3 0.002s} 13. Nc5 {0.88s} Re8+ {-6.71/3 0.001s} 14. Kd2 {4.9s}
+Rad8+ {-7.49/3 0.002s} 15. Nd3 {2.7s} c5 {-5.59/3 0.001s} 16. Re1 {2.1s}
+c4 {-5.42/3 0.001s} 17. Rxe8+ {0.86s} Rxe8 {-6.90/3 0s} 18. Nf4 {1.1s}
+Re4 {-6.30/3 0.002s} 19. Nd5 {0.77s} c6 {0.00/2 0.001s} 20. f3 {2.1s}
+cxd5 {-6.31/3 0.004s} 21. fxe4 c3+ {-6.22/3 0.004s} 22. Bxc3 {1.0s}
+dxe4 {-7.09/3 0.001s} 23. Ke3 Bd7 {-6.54/3 0.001s} 24. Kxe4 {0.68s}
+Bf5+ {-4.66/3 0.002s} 25. Kxf5 a6 {-7.13/3 0.001s} 26. Bd3 b6 {-7.53/3 0.001s}
+27. Bxa6 h6 {-9.15/3 0.001s} 28. Bc4 h5 {-9.61/3 0s} 29. Kf6 {0.52s}
+Kh7 {-15.16/3 0.001s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "5"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "0-1"]
+[ECO "C42"]
+[GameDuration "00:00:27"]
+[GameEndTime "2026-10-10T20:55:22.455 India Standard Time"]
+[GameStartTime "2026-10-10T20:54:54.997 India Standard Time"]
+[Opening "Petrov"]
+[PlyCount "39"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Damiano variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nf6 {book} 3. Nxe5 {+0.40/3 0.002s}
+Nxe4 {1.1s} 4. Qf3 {+0.48/3 0.007s} Ng5 {2.2s} 5. Qe3 {+0.18/3 0.003s}
+Be7 {2.4s} 6. f4 {-0.48/3 0.006s} Ne6 {1.9s} 7. Nc3 {-0.54/3 0.005s} d6 {2.0s}
+8. Nc4 {-1.62/3 0.003s} d5 {2.8s} 9. Na3 {-2.64/3 0.002s} Bxa3 {1.2s}
+10. Bb5+ {-4.91/3 0.002s} c6 {2.8s} 11. bxa3 {-5.46/3 0.006s} cxb5 {0.80s}
+12. Nxb5 {-5.78/3 0.002s} d4 {2.2s} 13. Qe5 {-5.53/3 0.001s} Nc6 {2.1s}
+14. Nd6+ {-6.59/3 0.003s} Kf8 {2.5s} 15. a4 {-5.02/3 0.003s} Nxe5 {0.52s}
+16. Kf1 {-7.29/3 0.002s} Qxd6 {0.52s} 17. Ba3 {-7.65/3 0.002s} Qxa3 {0.55s}
+18. Re1 {-13.24/3 0.001s} d3 {0.94s} 19. fxe5 {-13.95/3 0.003s} dxc2 {0.78s}
+20. h3 {-14.74/3 0.002s, Black wins by adjudication} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "6"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "B90"]
+[GameDuration "00:00:36"]
+[GameEndTime "2026-10-10T20:55:38.454 India Standard Time"]
+[GameStartTime "2026-10-10T20:55:02.030 India Standard Time"]
+[Opening "Sicilian"]
+[PlyCount "40"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Najdorf"]
+
+1. e4 {book} c5 {book} 2. Nf3 {book} d6 {book} 3. d4 {book} cxd4 {book}
+4. Nxd4 {book} Nf6 {book} 5. Nc3 {0.81s} a6 {-0.28/3 0.002s} 6. Bd2 {1.6s}
+e5 {+0.14/3 0.002s} 7. Nf5 {0.73s} Nxe4 {+0.91/3 0.001s} 8. Nxg7+ {0.97s}
+Ke7 {-0.67/3 0.001s} 9. Nxe4 {1.3s} Bxg7 {-2.64/3 0.002s} 10. Bb4 {2.1s}
+Re8 {-3.71/3 0.004s} 11. Bxd6+ {3.7s} Ke6 {-6.27/3 0.003s} 12. Qg4+ {3.3s}
+f5 {-4.41/3 0.001s} 13. Bc4+ {3.2s} Kd7 {-7.91/3 0s} 14. Qxf5+ {2.0s}
+Kc6 {-5.77/3 0.001s} 15. Qxh7 {2.9s} Qa5+ {-6.70/3 0.006s} 16. b4 {7.5s}
+Qa3 {-8.27/3 0.002s} 17. b5+ {1.3s} axb5 {-11.23/3 0.001s} 18. Bxb5+ {0.93s}
+Kd5 {-10.21/3 0.001s} 19. c4+ {1.7s} Ke6 {-10.95/3 0.001s} 20. Qg6+ {2.2s}
+Bf6 {-M2/3 0.001s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "6"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "1-0"]
+[ECO "B54"]
+[GameDuration "00:02:36"]
+[GameEndTime "2026-10-10T20:57:58.634 India Standard Time"]
+[GameStartTime "2026-10-10T20:55:22.482 India Standard Time"]
+[Opening "Sicilian"]
+[PlyCount "99"]
+[TimeControl "inf"]
+
+1. e4 {book} c5 {book} 2. Nf3 {book} d6 {book} 3. d4 {book} cxd4 {book}
+4. Nxd4 {book} Nf6 {book} 5. Bb5+ {+0.40/3 0.005s} Nbd7 {1.9s}
+6. O-O {+0.16/3 0.005s} e5 {1.3s} 7. Ne2 {+0.15/3 0.002s} Nxe4 {1.1s}
+8. Nec3 {-0.22/3 0.004s} Qh4 {2.4s} 9. a4 {0.00/2 0.003s} Be7 {3.7s}
+10. Nd5 {+1.54/3 0.003s} O-O {3.3s} 11. g3 {+7.26/3 0.004s} Nxg3 {1.3s}
+12. fxg3 {+8.82/3 0.002s} Qh3 {1.1s} 13. Be3 {+10.12/3 0.003s} Bd8 {2.9s}
+14. a5 {+6.65/3 0.003s} a6 {3.5s} 15. Bc4 {+6.41/3 0.001s} e4 {2.5s}
+16. Nbc3 {+7.16/3 0.003s} Ne5 {2.9s} 17. Be2 {+5.28/3 0.002s} Ng4 {6.3s}
+18. Rf2 {+6.64/3 0.009s} Be6 {2.5s} 19. Bxg4 {+6.14/3 0.003s} Bxg4 {1.0s}
+20. Qd4 {+6.98/3 0.002s} f5 {4.2s} 21. Raf1 {+7.40/3 0.003s} Bxa5 {6.5s}
+22. b4 {+6.40/3 0.005s} Bd8 {3.9s} 23. Nf4 {+7.02/3 0.003s} Qh6 {1.8s}
+24. Qc4+ {+6.21/3 0.003s} Rf7 {3.3s} 25. h4 {+4.50/3 0.005s} Bh3 {1.7s}
+26. Rd1 {+6.24/3 0.002s} Bg4 {4.9s} 27. Rd4 {+4.32/3 0.007s} Bb6 {4.5s}
+28. Ncd5 {+5.43/3 0.003s} Bxd4 {0.66s} 29. Bxd4 {+5.47/3 0.003s} Re8 {1.7s}
+30. Qa2 {+5.21/3 0.002s} Bf3 {2.2s} 31. Ne3 {+3.78/3 0.003s} Kf8 {3.3s}
+32. Qd5 {+4.13/3 0.007s} Bg4 {5.7s} 33. b5 {+4.72/3 0.004s} axb5 {7.8s}
+34. Bc3 {+3.35/3 0.004s} Kg8 {5.2s} 35. Qxb5 {+5.20/3 0.002s} Ra8 {2.2s}
+36. Qb4 {+4.16/3 0.006s} Re8 {6.7s} 37. Kh2 {+6.32/3 0.003s} Bf3 {4.1s}
+38. Rd2 {+7.77/3 0.004s} Rd8 {3.8s} 39. Qa5 {+7.41/3 0.002s} Rc8 {2.2s}
+40. Bb2 {+5.55/3 0.003s} Bg4 {5.5s} 41. Qa2 {+4.23/3 0.006s} Re8 {5.8s}
+42. Qb3 {+3.19/2 0.003s} g5 {8.3s} 43. Qb5 {+2.53/3 0.004s} Ref8 {1.7s}
+44. Nfg2 {+1.68/3 0.004s} Bf3 {6.4s} 45. Qc4 {+1.55/3 0.004s} f4 {3.2s}
+46. gxf4 {+2.08/3 0.006s} b5 {4.6s} 47. Nf5 {+2.82/3 0.004s} Qxh4+ {1.4s}
+48. Ngxh4 {+6.29/3 0.001s} Rd8 {3.4s} 49. Nh6+ {+M3/3 0.004s} Kf8
+50. Qxf7# {+M1/3 0.003s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "7"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "B32"]
+[GameDuration "00:01:04"]
+[GameEndTime "2026-10-10T20:56:42.519 India Standard Time"]
+[GameStartTime "2026-10-10T20:55:38.484 India Standard Time"]
+[Opening "Sicilian"]
+[PlyCount "65"]
+[TimeControl "inf"]
+[Variation "Labourdonnais-Loewenthal variation"]
+
+1. e4 {book} c5 {book} 2. Nf3 {book} Nc6 {book} 3. d4 {book} cxd4 {book}
+4. Nxd4 {1.1s} e5 {-0.23/3 0.004s} 5. Nxc6 {0.61s} dxc6 {-0.21/3 0.001s}
+6. Qh5 {1.4s} Qe7 {+0.21/3 0.003s} 7. Nc3 {0.97s} g6 {0.00/2 0.003s}
+8. Qf3 {0.71s} Be6 {-0.04/3 0.001s} 9. Be3 {2.6s} Bh6 {+0.01/3 0.003s}
+10. Ke2 {3.0s} f5 {+2.52/3 0.004s} 11. exf5 {2.8s} gxf5 {+0.64/3 0.003s}
+12. Qh5+ {1.9s} Bf7 {+0.44/3 0.001s} 13. Qxf5 {1.7s} Bxe3 {+0.81/3 0.003s}
+14. Kxe3 {1.2s} Nf6 {+1.73/3 0.003s} 15. f4 {2.7s} Qc5+ {+4.08/3 0.005s}
+16. Ke2 {8.0s} Nd7 {0.00/2 0.009s} 17. Rd1 {5.7s} Qc4+ {-0.53/3 0.008s}
+18. Kf3 {7.4s} Be6 {-0.55/3 0.003s} 19. Bxc4 {1.3s} Bxf5 {-3.27/3 0.003s}
+20. Bd3 {2.5s} Be6 {-2.33/3 0.006s} 21. f5 {1.4s} Bd5+ {-2.65/3 0.003s}
+22. Be4 {6.5s} h5 {-4.37/3 0.004s} 23. Nxd5 {0.57s} Rd8 {-5.81/3 0.003s}
+24. Nc7+ {1.2s} Ke7 {-6.14/3 0.001s} 25. Ne6 {1.4s} Rhf8 {0.00/2 0.002s}
+26. Nxf8 {0.80s} Nf6 {-8.36/3 0.002s} 27. Ng6+ {0.76s} Ke8 {-10.35/3 0s}
+28. Nxe5 {0.70s} Rxd1 {-7.71/3 0.002s} 29. Rxd1 {0.62s} Kf8 {-6.02/3 0.001s}
+30. Rd6 {1.6s} Nxe4 {-7.11/3 0.005s} 31. Kxe4 {1.1s} b6 {-8.41/3 0.002s}
+32. f6 {0.69s} b5 {-8.53/3 0.001s} 33. Rd8# {White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "7"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "1/2-1/2"]
+[ECO "B32"]
+[GameDuration "00:02:25"]
+[GameEndTime "2026-10-10T20:59:07.898 India Standard Time"]
+[GameStartTime "2026-10-10T20:56:42.521 India Standard Time"]
+[Opening "Sicilian defense"]
+[PlyCount "142"]
+[TimeControl "inf"]
+
+1. e4 {book} c5 {book} 2. Nf3 {book} Nc6 {book} 3. d4 {book} cxd4 {book}
+4. Nxd4 {+0.02/3 0.010s} Nxd4 {0.91s} 5. Qxd4 {+0.46/3 0.003s} Nf6 {1.1s}
+6. e5 {+3.23/3 0.001s} Nh5 {1.0s} 7. g4 {+5.02/3 0.002s} d6 {1.2s}
+8. gxh5 {+6.39/3 0.003s} Qa5+ {1.7s} 9. Nc3 {+6.02/3 0.001s} dxe5 {0.80s}
+10. Qe4 {+7.43/3 0.001s} e6 {2.0s} 11. h6 {+8.52/3 0.002s} gxh6 {1.9s}
+12. Rg1 {+7.60/3 0.002s} f5 {4.6s} 13. Qc4 {+8.02/3 0.001s} Bd7 {1.9s}
+14. a3 {+7.77/3 0.003s} Rc8 {4.2s} 15. Qb3 {+5.33/3 0.005s} Rc7 {2.5s}
+16. Bd2 {+6.49/3 0.003s} Qc5 {7.5s} 17. Rg3 {+7.30/3 0.003s} f4 {3.2s}
+18. Rh3 {+7.00/3 0.002s} a6 {4.2s} 19. Rd3 {+7.59/3 0.006s} Be7 {3.5s}
+20. O-O-O {+6.68/3 0.004s} Qxf2 {1.6s} 21. Be1 {0.00/2 0.002s} Qxf1 {1.4s}
+22. Bh4 {+3.65/3 0.004s} Qxd3 {0.94s} 23. Rxd3 {+1.84/3 0.003s} Bxh4 {0.73s}
+24. Kb1 {+3.09/3 0.002s} Kf7 {1.9s} 25. Rh3 {+3.10/3 0.002s} Be1 {0.79s}
+26. Ne4 {+3.88/3 0.001s} Ke8 {4.7s} 27. Nd6+ {+6.80/3 0.002s} Ke7 {4.0s}
+28. Qb6 {+6.59/3 0.002s} Rc6 {0.81s} 29. Qg1 {+1.46/3 0.003s} Kxd6 {1.5s}
+30. Rd3+ {+3.20/3 0.003s} Kc7 {2.9s} 31. Qxe1 {+3.22/3 0.004s} Rc5 {1.9s}
+32. b4 {+3.65/3 0.005s} Rd5 {1.2s} 33. Rxd5 {+7.42/3 0.005s} e4 {0.97s}
+34. Rd1 {+8.47/3 0.002s} e3 {0.90s} 35. Qc3+ {+10.16/3 0.003s} Bc6 {2.6s}
+36. Qg7+ {+8.34/3 0.003s} Kb6 {2.1s} 37. Qd4+ {+9.29/3 0.002s} Kb5 {2.2s}
+38. Qe5+ {+M3/3 0.006s} Bd5 {2.5s} 39. Rd3 {+8.62/3 0.003s} Rf8 {1.8s}
+40. Rc3 {+8.71/3 0.003s} Ka4 {1.9s} 41. b5 {+5.98/3 0.002s} Kxb5 {1.1s}
+42. a4+ {+7.70/3 0.002s} Kxa4 {3.0s} 43. Qd6 {+7.40/3 0.002s} e2 {0.74s}
+44. Qe5 {+4.95/3 0.001s} f3 {1.6s} 45. Kb2 {+3.42/3 0.005s} f2 {0.91s}
+46. Qd4+ {+2.91/3 0.003s} Bc4 {3.6s} 47. Qd7+ {+6.82/3 0.003s} Ka5 {6.0s}
+48. Qc7+ {+1.61/3 0.003s} b6 {4.5s} 49. Qe5+ {+4.43/3 0.001s} b5 {4.1s}
+50. Qc7+ {+1.47/3 0.002s} Ka4 {2.3s} 51. Rxc4+ {+M3/3 0.002s} bxc4 {0.75s}
+52. Qxc4+ {+1.54/3 0.001s} Ka5 53. Qc5+ {+0.36/3 0.004s} Ka4
+54. Qc6+ {+0.49/3 0.003s} Ka5 {2.3s} 55. Qc5+ {+0.79/3 0.006s} Ka4
+56. Qc4+ {0.00/3 0.004s} Ka5 57. Ka3 {+0.24/3 0.001s} Rf3+ {2.2s}
+58. c3 {+0.13/3 0.001s} Kb6 {1.4s} 59. Qd4+ {-0.01/3 0.002s} Kb5 {3.7s}
+60. Kb3 {-0.01/3 0.002s} e1=Q {0.72s} 61. Qc4+ {-1.32/3 0.002s} Kb6 {2.8s}
+62. Qd4+ {-2.25/3 0.002s} Kc6 {2.5s} 63. Qc4+ {-2.35/3 0.003s} Kb7 {3.3s}
+64. Qb4+ {-4.24/3 0.003s} Ka8 {1.2s} 65. Qc4 {-7.52/3 0.004s} f1=Q {1.2s}
+66. Qc6+ {-0.46/3 0.003s} Kb8 {2.1s} 67. Qe8+ {-3.25/3 0.001s} Kc7 {4.7s}
+68. Qe7+ {-3.64/3 0.003s} Kc6 {2.6s} 69. Qe8+ {-6.16/3 0.005s} Kc7 {1.4s}
+70. Qe7+ {-6.85/3 0.003s} Kc6 71. Qe8+ {-7.49/3 0.002s}
+Kc7 {Draw by 3-fold repetition} 1/2-1/2
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "8"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "C15"]
+[GameDuration "00:00:25"]
+[GameEndTime "2026-10-10T20:58:24.338 India Standard Time"]
+[GameStartTime "2026-10-10T20:57:58.701 India Standard Time"]
+[Opening "French"]
+[PlyCount "46"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Winawer (Nimzowitsch) variation"]
+
+1. e4 {book} e6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} Bb4 {book}
+4. Qg4 {1.9s} dxe4 {-0.41/3 0.009s} 5. Qxg7 {0.95s} Qf6 {-0.90/3 0.002s}
+6. Qxf6 {1.5s} Bxc3+ {-0.42/3 0.001s} 7. bxc3 {0.69s} Nxf6 {-0.77/3 0.001s}
+8. Ne2 {0.53s} Nbd7 {-0.72/3 0.001s} 9. c4 {0.53s} Rg8 {-0.61/3 0.001s}
+10. Bf4 {0.92s} Nb6 {-0.59/3 0.002s} 11. Bxc7 {1.6s} Ke7 {-1.90/3 0.001s}
+12. Bxb6 {1.5s} Bd7 {-0.43/3 0.002s} 13. Bc5+ {0.95s} Kd8 {-6.85/3 0s}
+14. Kd2 {2.2s} Rg5 {-5.02/3 0.005s} 15. h4 {3.6s} Rxc5 {-5.59/3 0.004s} 16. dxc5
+Rc8 {-6.33/3 0.002s} 17. Rb1 {0.84s} e3+ {-6.20/3 0.001s} 18. Kxe3 {2.5s}
+Nd5+ {-6.32/3 0.002s} 19. cxd5 {1.1s} Ke8 {-7.45/3 0.002s} 20. c6 {0.91s}
+Bxc6 {-8.86/3 0.002s} 21. dxc6 {0.61s} b6 {-9.11/3 0.002s} 22. Ke4 {1.0s}
+Rc7 {-8.16/3 0.001s} 23. Nd4 {0.94s}
+f5+ {-8.39/3 0.001s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "8"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "1-0"]
+[ECO "C16"]
+[GameDuration "00:01:16"]
+[GameEndTime "2026-10-10T20:59:40.606 India Standard Time"]
+[GameStartTime "2026-10-10T20:58:24.367 India Standard Time"]
+[Opening "French"]
+[PlyCount "51"]
+[TimeControl "inf"]
+[Variation "Winawer, Advance variation"]
+
+1. e4 {book} e6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} Bb4 {book}
+4. e5 {+0.60/3 0.002s} Nc6 {0.94s} 5. Nf3 {+0.84/3 0.002s} Bxc3+ {0.81s}
+6. bxc3 {+1.17/3 0s} Nge7 {0.73s} 7. Bd3 {+1.45/3 0.002s} O-O {0.85s}
+8. Rb1 {+2.27/3 0.004s} Nf5 {1.3s} 9. Ng5 {0.00/2 0.002s} Re8 {5.8s}
+10. O-O {+6.57/3 0.002s} h6 {6.5s} 11. Qg4 {+2.80/3 0.004s} hxg5 {1.0s}
+12. Qh5 {+0.80/3 0.003s} f6 {2.5s} 13. g4 {+1.61/3 0.002s} Nfe7 {3.7s}
+14. f4 {+3.96/3 0.002s} gxf4 {4.1s} 15. Qh7+ {+5.18/3 0.002s} Kf8 {4.5s}
+16. exf6 {+5.18/3 0.009s} gxf6 {0.99s} 17. Qh8+ {+5.64/3 0.002s} Kf7 {2.6s}
+18. Qh7+ {+5.64/3 0.002s} Kf8 19. Rxf4 {+5.05/3 0.002s} f5 {3.1s}
+20. Ba3 {+5.37/3 0.005s} e5 {3.3s} 21. dxe5 {+5.14/3 0.004s} Bd7 {15s}
+22. gxf5 {+11.68/3 0.005s} Rb8 {6.0s} 23. f6 {+M3/3 0.005s} Bf5 {4.3s}
+24. Rxf5 {+M1/3 0.010s} a6 {3.2s} 25. c4 {+M1/3 0.003s} Rc8 {4.0s}
+26. fxe7# {+M1/3 0.001s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "9"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "C11"]
+[GameDuration "00:01:09"]
+[GameEndTime "2026-10-10T21:00:17.183 India Standard Time"]
+[GameStartTime "2026-10-10T20:59:07.900 India Standard Time"]
+[Opening "French"]
+[PlyCount "62"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Steinitz variation"]
+
+1. e4 {book} e6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} Nf6 {book}
+4. e5 {0.76s} Nfd7 {-0.65/3 0.004s} 5. Nf3 {0.69s} Be7 {-0.39/3 0.005s}
+6. Be3 {0.77s} h6 {+0.02/3 0.004s} 7. Bd3 {1.3s} a6 {+0.02/3 0.003s}
+8. Ke2 {1.5s} c5 {+0.71/3 0.004s} 9. dxc5 {5.5s} O-O {+1.17/3 0.003s}
+10. b4 {2.4s} Qc7 {+1.77/3 0.003s} 11. Bf4 {3.6s} b6 {+1.21/3 0.004s}
+12. a4 {8.6s} Nc6 {+2.87/3 0.005s} 13. cxb6 {1.7s} Nxb6 {+1.44/3 0.004s}
+14. a5 {2.3s} Nb8 {+1.43/3 0.002s} 15. axb6 {0.75s} Qxc3 {-2.87/3 0.001s}
+16. Bd2 {5.5s} Qc6 {-1.28/3 0.002s} 17. Be3 {2.2s} Qb7 {-0.89/3 0.002s}
+18. b5 {2.7s} d4 {-1.29/3 0.002s} 19. Bxd4 {3.1s} axb5 {-1.84/3 0.002s}
+20. Ra7 {1.6s} Nc6 {-1.61/3 0.003s} 21. Rxb7 {0.75s} Nxd4+ {-5.52/3 0.003s}
+22. Kf1 {1.9s} Bc5 {-5.04/3 0.003s} 23. Re7 {2.8s} Rd8 {0.00/2 0.004s}
+24. b7 {1.8s} Bxb7 {-7.56/3 0.004s} 25. Rxb7 {1.4s} Nxc2 {-4.59/3 0.001s}
+26. Qxc2 {2.3s} Ra1+ {-6.12/3 0.003s} 27. Ke2 {5.7s} Ra2 {-7.38/3 0.004s}
+28. Qxa2 {1.1s} Rc8 {-10.00/3 0.002s} 29. Bxb5 {2.6s} Rd8 {-9.62/3 0.004s}
+30. Qc4 {2.7s} g6 {-11.57/3 0.004s} 31. Qxc5 {0.58s}
+Rd2+ {-11.02/3 0.004s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "9"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "1-0"]
+[ECO "C11"]
+[GameDuration "00:00:27"]
+[GameEndTime "2026-10-10T21:00:08.204 India Standard Time"]
+[GameStartTime "2026-10-10T20:59:40.624 India Standard Time"]
+[Opening "French"]
+[PlyCount "41"]
+[TimeControl "inf"]
+[Variation "Steinitz variation"]
+
+1. e4 {book} e6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} Nf6 {book}
+4. e5 {+0.70/3 0.003s} Ne4 {0.59s} 5. Nf3 {+1.43/3 0.001s} Nxc3 {0.91s}
+6. bxc3 {+0.07/3 0.003s} Nc6 {0.84s} 7. h4 {+0.71/3 0.003s} Be7 {1.3s}
+8. Rh3 {+1.04/3 0.001s} O-O {1.2s} 9. Rb1 {+1.73/3 0.002s} f6 {1.5s}
+10. Bb5 {+1.36/3 0.001s} fxe5 {1.3s} 11. Rg3 {+0.62/3 0.002s} Bxh4 {2.6s}
+12. Nxh4 {-0.40/3 0.001s} Qxh4 {0.99s} 13. Be3 {-0.83/3 0.003s} exd4 {2.0s}
+14. cxd4 {-1.30/3 0.004s} Qf6 {4.9s} 15. Bd3 {+0.06/3 0.004s} e5 {2.3s}
+16. Qh5 {-0.63/3 0.006s} Nxd4 {4.0s} 17. Bxh7+ {+6.49/3 0.003s} Kh8
+18. Bd3+ {+M3/3 0.003s} Kg8 {2.9s} 19. Bh7+ {+9.38/3 0.002s} Kh8
+20. Bg6+ {+M3/3 0.003s} Kg8 21. Qh7# {+M1/3 0.001s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "10"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "B12"]
+[GameDuration "00:00:17"]
+[GameEndTime "2026-10-10T21:00:25.580 India Standard Time"]
+[GameStartTime "2026-10-10T21:00:08.235 India Standard Time"]
+[Opening "Caro-Kann"]
+[PlyCount "30"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Advance variation"]
+
+1. e4 {book} c6 {book} 2. d4 {book} d5 {book} 3. e5 {book} Bf5 {book}
+4. Nc3 {0.99s} e6 {-0.23/3 0.003s} 5. Nf3 {0.96s} Be7 {-0.37/2 0.001s}
+6. Bd3 {2.0s} Bg4 {-0.39/3 0.004s} 7. h3 {1.0s} Bxf3 {-0.67/3 0.004s}
+8. Qxf3 {0.99s} Nd7 {-0.59/3 0.003s} 9. Qg3 {2.4s} Bh4 {-0.96/3 0.004s}
+10. Qxg7 {1.0s} Ndf6 {-6.75/3 0.004s} 11. Qxh8 {0.98s} Kd7 {-8.22/3 0.003s}
+12. exf6 {1.5s} Qf8 {-9.56/3 0.001s} 13. Qxh7 {3.0s} Nxf6 {-8.25/3 0.002s}
+14. Qxh4 {1.1s} Qb4 {-9.47/3 0.003s} 15. Qxf6 {1.2s}
+Re8 {-12.98/3 0.006s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "10"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "1-0"]
+[ECO "B12"]
+[GameDuration "00:00:47"]
+[GameEndTime "2026-10-10T21:01:04.898 India Standard Time"]
+[GameStartTime "2026-10-10T21:00:17.227 India Standard Time"]
+[Opening "Caro-Kann"]
+[PlyCount "63"]
+[TimeControl "inf"]
+[Variation "Advance variation"]
+
+1. e4 {book} c6 {book} 2. d4 {book} d5 {book} 3. e5 {book} Bf5 {book}
+4. g4 {+0.61/3 0.005s} Be4 {0.98s} 5. Nf3 {+0.62/3 0.002s} Bxf3 {1.6s}
+6. Qxf3 {+0.90/3 0.001s} Qb6 {1.8s} 7. Qe3 {+1.34/3 0.004s} Nh6 {1.4s}
+8. c3 {+1.37/3 0.002s} Nd7 {1.4s} 9. h3 {+1.34/3 0.002s} O-O-O {2.4s}
+10. a4 {+1.77/3 0.007s} a5 {2.7s} 11. b4 {+1.59/3 0.003s} axb4 {0.95s}
+12. a5 {+2.96/3 0.002s} Qc7 {0.79s} 13. a6 {+2.72/3 0.003s} bxa6 {1.9s}
+14. Bxa6+ {+5.47/3 0.002s} Kb8 {0.92s} 15. cxb4 {+5.55/3 0.002s} e6 {0.91s}
+16. Bd2 {+5.39/3 0.001s} Be7 {1.3s} 17. O-O {+5.64/3 0.002s} Nb6 {1.8s}
+18. Rc1 {+6.74/3 0.004s} Rd7 {2.5s} 19. Ra2 {+10.21/3 0.005s} Re8 {1.9s}
+20. Qa3 {+6.69/3 0.004s} f5 {1.8s} 21. g5 {+7.11/3 0.003s} Nf7 {1.9s}
+22. g6 {+6.88/3 0.003s} hxg6 {0.92s} 23. Rac2 {+5.40/3 0.003s} Nc4 {1.1s}
+24. Qb3 {+3.17/3 0.002s} Nfxe5 {1.4s} 25. Ra2 {+4.10/3 0.002s} Nxd2 {2.4s}
+26. Nxd2 {+4.54/3 0.002s} Nc4 {1.2s} 27. b5 {+3.90/3 0.002s} Nxd2 {3.2s}
+28. Rxd2 {+2.52/3 0.004s} Rdd8 {3.7s} 29. bxc6+ {+4.16/3 0.003s} Ka7 {1.9s}
+30. Bf1 {+6.00/3 0.003s} Bg5 {2.2s} 31. Ra2+ {+M3/3 0.004s} Qa5
+32. Rxa5# {+M1/3 0.004s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "11"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "B15"]
+[GameDuration "00:01:27"]
+[GameEndTime "2026-10-10T21:01:53.118 India Standard Time"]
+[GameStartTime "2026-10-10T21:00:25.604 India Standard Time"]
+[Opening "Caro-Kann"]
+[PlyCount "90"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+[Variation "Tartakower (Nimzowitsch) variation"]
+
+1. e4 {book} c6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} dxe4 {book}
+4. Nxe4 {0.96s} Nf6 {-0.25/3 0.006s} 5. Nxf6+ {0.51s} exf6 {-0.23/3 0.001s}
+6. Nf3 {0.71s} Bb4+ {-0.14/3 0.002s} 7. Bd2 {3.6s} Qe7+ {-0.15/3 0.003s}
+8. Be2 {4.4s} Bf5 {-0.23/3 0.002s} 9. Nh4 {4.0s} Bxd2+ {-0.42/3 0.004s}
+10. Kxd2 {2.7s} Bd7 {+0.52/3 0.007s} 11. Nf3 {1.8s} Be6 {+0.73/3 0.003s}
+12. Re1 {1.7s} O-O {+0.75/3 0.003s} 13. Kc1 {0.71s} Qc7 {+0.83/3 0.003s}
+14. Bd3 {1.0s} Nd7 {+1.07/3 0.003s} 15. Qd2 {2.3s} c5 {+1.01/3 0.002s}
+16. d5 {3.4s} Bxd5 {+3.50/3 0.002s} 17. Bxh7+ {1.4s} Kxh7 {+0.52/3 0.002s}
+18. Qxd5 {0.91s} Kg8 {+1.12/3 0.004s} 19. Re7 {1.0s} Nb6 {+1.01/3 0.004s}
+20. Qxb7 {0.57s} Qf4+ {+2.11/3 0.002s} 21. Kb1 {10s} Rad8 {+2.18/3 0.008s}
+22. Re1 {1.9s} Nc4 {+3.28/3 0.005s} 23. Qxa7 {2.6s} Rb8 {+1.93/2 0.005s}
+24. Re3 {3.5s} Nxb2 {+6.61/3 0.003s} 25. Rb3 {1.6s} Nc4 {+3.52/3 0.004s}
+26. Qxc5 {1.5s} Rbc8 {+2.66/3 0.005s} 27. Qd4 {2.8s} Qc7 {+2.28/3 0.002s}
+28. Qh4 {2.7s} Nd2+ {+7.02/3 0.001s} 29. Kb2 {1.2s} Qxc2+ {+7.42/3 0.002s}
+30. Ka3 Rc4 {+10.27/3 0.004s} 31. Qxc4 {2.7s} Nb1+ {+9.88/3 0.001s}
+32. Kb4 {2.1s} Rb8+ {+1.46/3 0.005s} 33. Ka5 {2.1s} Qf5+ {+0.51/3 0.007s}
+34. Rb5 {2.5s} Na3 {-3.04/3 0.006s} 35. Qxf7+ {0.56s} Kxf7 {-3.69/3 0s}
+36. Rxf5 {0.61s} Nc4+ {-4.17/3 0.004s} 37. Ka6 {3.3s} Kg6 {-3.88/3 0.002s}
+38. Rc5 {1.2s} Ra8+ {-5.79/3 0.005s} 39. Kb7 {2.1s} Ra4 {-7.07/3 0.003s}
+40. Rd1 {3.2s} Nd6+ {-6.13/3 0.003s} 41. Rxd6 {1.3s} Kh7 {-8.03/3 0.002s}
+42. Rd2 {1.2s} Kh6 {-7.33/3 0.004s} 43. Nd4 {1.6s} g6 {-7.24/3 0.002s}
+44. Kc6 {1.1s} f5 {-8.58/3 0.002s} 45. f4 {1.1s}
+Ra6+ {-7.73/3 0.004s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "11"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "1-0"]
+[ECO "B15"]
+[GameDuration "00:00:51"]
+[GameEndTime "2026-10-10T21:01:56.833 India Standard Time"]
+[GameStartTime "2026-10-10T21:01:04.921 India Standard Time"]
+[Opening "Caro-Kann defense"]
+[PlyCount "39"]
+[TimeControl "inf"]
+
+1. e4 {book} c6 {book} 2. d4 {book} d5 {book} 3. Nc3 {book} dxe4 {book}
+4. Bc4 {+0.09/3 0.003s} Nf6 {1.7s} 5. Bg5 {-0.13/3 0.002s} Bf5 {3.6s}
+6. Bb3 {-1.00/3 0.007s} Nbd7 {1.3s} 7. Nge2 {-1.40/3 0.004s} e5 {2.6s}
+8. Ng3 {-0.07/3 0.004s} exd4 {3.0s} 9. Qxd4 {+0.42/3 0.002s} Bc5 {4.8s}
+10. Qa4 {0.00/2 0.004s} Nb6 {6.5s} 11. Qa5 {+1.83/3 0.002s} Qd4 {4.2s}
+12. O-O {+4.70/3 0.007s} Bg6 {8.7s} 13. Nb5 {0.00/2 0.004s} cxb5 {2.4s}
+14. Rad1 {-2.94/3 0.002s} Qxb2 {2.6s} 15. Qxb5+ {-1.35/3 0.007s} Kf8 {2.5s}
+16. Qxc5+ {+4.94/3 0.002s} Kg8 {4.1s} 17. Qe7 {+4.08/2 0.007s} Rb8 {2.0s}
+18. Rd8+ {+M5/3 0.006s} Rxd8 {1.7s} 19. Qxd8+ {+M3/3 0.004s} Ne8
+20. Qxe8# {+M1/3 0.002s, White mates} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "12"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1320"]
+[Result "1-0"]
+[ECO "B07"]
+[GameDuration "00:00:15"]
+[GameEndTime "2026-10-10T21:02:08.190 India Standard Time"]
+[GameStartTime "2026-10-10T21:01:53.155 India Standard Time"]
+[Opening "Pirc defense"]
+[PlyCount "30"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+
+1. e4 {book} d6 {book} 2. d4 {book} Nf6 {book} 3. Nc3 {book} g6 {book}
+4. d5 {0.93s} Nbd7 {+0.02/3 0.005s} 5. Nge2 {1.3s} a6 {-0.19/3 0.003s}
+6. Be3 {0.80s} Ng4 {+0.48/3 0.002s} 7. Bf4 {1.0s} b5 {-0.18/3 0.003s}
+8. Nd4 {2.4s} h5 {0.00/2 0.003s} 9. Nc6 {0.83s} Nxf2 {-6.99/3 0.002s}
+10. Kxf2 {0.64s} Bb7 {-5.33/3 0.001s} 11. Nxd8 Ra7 {-8.27/3 0.002s}
+12. Qd4 {2.9s} e5 {-9.28/3 0.002s} 13. Qxa7 {0.90s} Bc8 {-9.11/3 0.002s}
+14. Qxc7 {1.6s} Bg7 {-10.41/3 0.004s} 15. Qxc8 {1.1s}
+Ke7 {-9.76/3 0.003s, White wins by adjudication} 1-0
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "12"]
+[White "Stockfish_1320"]
+[Black "ORION_Complete_Engine"]
+[Result "0-1"]
+[ECO "B07"]
+[GameDuration "00:00:10"]
+[GameEndTime "2026-10-10T21:02:07.540 India Standard Time"]
+[GameStartTime "2026-10-10T21:01:56.860 India Standard Time"]
+[Opening "Pirc defense"]
+[PlyCount "29"]
+[Termination "adjudication"]
+[TimeControl "inf"]
+
+1. e4 {book} d6 {book} 2. d4 {book} Nf6 {book} 3. Nc3 {book} g6 {book}
+4. Be2 {+0.66/3 0.005s} Nc6 {2.0s} 5. h3 {+0.83/3 0.002s} d5 {1.1s}
+6. exd5 {+0.81/3 0.003s} Nxd5 {0.57s} 7. Bc4 {+0.49/3 0.002s} Nxc3 {0.67s}
+8. Qd2 {+0.10/3 0.001s} Ne4 {1.1s} 9. Qf4 {-6.82/3 0.002s} Nd6 {2.0s}
+10. Bb5 {-6.80/3 0.004s} Nxb5 {0.84s} 11. Qe5 {-10.05/3 0.002s} Nxe5
+12. dxe5 {-9.71/3 0.002s} Nd4 {0.65s} 13. c3 {-9.43/3 0.003s} Nc2+ {0.67s}
+14. Ke2 {-12.03/3 0s} Nxa1 15. a4 {-9.95/3 0.002s, Black wins by adjudication}
+0-1
+

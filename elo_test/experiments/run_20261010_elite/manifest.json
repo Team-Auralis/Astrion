@@ -1,0 +1,78 @@
+{
+  "audit_timestamp": "2026-10-10T22:02:00",
+  "audit_classification": "VALIDATED LOCAL ELO ESTIMATE",
+  "hardware": {
+    "cpu": "Intel Core i5-11260H @ 4.40 GHz (12 threads)",
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU (3.87 GiB VRAM)",
+    "os": "Windows 11 Home (25H2) x86_64"
+  },
+  "experiment_summary": {
+    "tournament_format": "Depth=3 uniform, 2-game paired openings, sequential openings from openings.pgn",
+    "total_completed_games": 168,
+    "planned_matchups": 10,
+    "completed_matchups": 10,
+    "anchor_engine": "Stockfish_1500",
+    "anchor_elo": 1500.0,
+    "ordo_simulations": 1000
+  },
+  "official_ratings": {
+    "BBC_1.1": {
+      "elo": 1855.6,
+      "error": 151.7,
+      "games": 28,
+      "score_pct": 85.7
+    },
+    "Stockfish_1900": {
+      "elo": 1706.9,
+      "error": 160.8,
+      "games": 16,
+      "score_pct": 68.8
+    },
+    "Stockfish_1700": {
+      "elo": 1682.0,
+      "error": 156.6,
+      "games": 16,
+      "score_pct": 65.6
+    },
+    "ORION_Complete_Engine": {
+      "elo": 1568.7,
+      "error": 86.6,
+      "games": 112,
+      "score_pct": 56.2
+    },
+    "Stockfish_1500": {
+      "elo": 1500.0,
+      "error": 0.0,
+      "games": 64,
+      "score_pct": 56.2
+    },
+    "Stockfish_1320": {
+      "elo": 1304.7,
+      "error": 112.7,
+      "games": 52,
+      "score_pct": 44.2
+    },
+    "ORION_Policy_Only": {
+      "elo": 623.2,
+      "error": 172.5,
+      "games": 48,
+      "score_pct": 1.0
+    }
+  },
+  "file_hashes": {
+    "checkpoints/distilled/orion_distill_5ep.json": "7e88f0f76bd0726ce1a6d413ddf26774e9745d7db73885ce6f6811e7c329d8ac",
+    "stockfish.exe": "45bc8e4969147db9c2eb533810637994619bff0eacc81ccfd9854394901bcbd0",
+    "ordo.exe": "e8cea4244b1185c35d1b98b129e46d9b214465f17a4450f03ed291bdade43a3b",
+    "elo_test/bbc_repo/bin/windows/bbc_1.1_64bit_windows.exe": "7c635214bbc185259edc1475240bc3b6d516237d3337797ee34c1bac82249151",
+    "elo_test/openings.pgn": "af17bdb928ac4cc46458c98a2b6713a7339340ebffa95ef527223f11745b56cc",
+    "elo_test/games.pgn": "c54d132eafbd208ecea7c034bf936ac571f98e76c0a5e4b01dc32ef24e6886be",
+    "elo_test/game_results.csv": "e64dc1687d095683126b5d3bb212cd60040b2c4a6eceb39c5121dd73e67c96f0",
+    "elo_test/rating_results.txt": "308d4fe4f57618ffa53a175399913ace2b7f6e037ae755b49c3ebc83703e2145",
+    "elo_test/rating_results.csv": "ce556b5f0167d3d2d5820b72fff1e26e7952f9d01281b7aa97929a2e365ec8bf",
+    "elo_test/cfs_matrix.csv": "fc7207e7dbb77cc325dba02a5a19910c342b82ac4221756a3951bb78c6313b87",
+    "elo_test/head2head.txt": "9c19f491db4ff2f318449cd4040397ec38efccc781ab777ec10ecd8587626ad4",
+    "elo_test/uncertainty.json": "4ec8c43c381eef435fdf342b1ebf0bcfc3f1ae2d889662507b3f26feaad78446",
+    "elo_test/color_analysis.json": "386b688223324731380eded829ebac00d9113d4b4627420178a02bd2610503f1",
+    "elo_test/opponent_calibration.json": "048d6602545b2f9dd0dcf056603fb5a50c81ab21fb56403d38e774578253c232"
+  }
+}

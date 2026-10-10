@@ -1,0 +1,40 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "ORION_Complete_Engine"]
+[Black "Stockfish_1500"]
+[Result "0-1"]
+[ECO "C68"]
+[GameDuration "00:00:02"]
+[GameEndTime "2026-10-10T20:41:17.148 India Standard Time"]
+[GameStartTime "2026-10-10T20:41:14.305 India Standard Time"]
+[Opening "Ruy Lopez"]
+[PlyCount "8"]
+[Termination "time forfeit"]
+[TimeControl "1/move"]
+[Variation "Exchange variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bb5 {book} a6 {book} 4. Bxc6
+bxc6 {-0.78/17 1.00s, White loses on time} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "Stockfish_1500"]
+[Black "ORION_Complete_Engine"]
+[Result "1-0"]
+[ECO "C77"]
+[GameDuration "00:00:06"]
+[GameEndTime "2026-10-10T20:41:23.984 India Standard Time"]
+[GameStartTime "2026-10-10T20:41:17.150 India Standard Time"]
+[Opening "Ruy Lopez"]
+[PlyCount "9"]
+[Termination "time forfeit"]
+[TimeControl "1/move"]
+[Variation "Four knights (Tarrasch) variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bb5 {book} a6 {book}
+4. Ba4 {+0.42/18 1.0s} Nf6 5. Nc3 {+0.08/16 1.0s, Black loses on time} 1-0
+

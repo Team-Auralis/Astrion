@@ -1,0 +1,90 @@
+{
+  "ORION_Policy_Only": {
+    "engine": "ORION_Policy_Only",
+    "uci_protocol": true,
+    "isready": true,
+    "ucinewgame": true,
+    "position_handling": true,
+    "legality_checks": {
+      "startpos": {
+        "fen": "rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "bestmove_returned": "e2e4",
+        "is_legal": true
+      },
+      "scholar_mate_threat": {
+        "fen": "r1bqkb1r/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 4",
+        "bestmove_returned": "h5f7",
+        "is_legal": true,
+        "expected_move": "h5f7",
+        "matched_expected": true
+      },
+      "pawn_promotion_white": {
+        "fen": "8/4P3/8/8/8/8/8/k6K w - - 0 1",
+        "bestmove_returned": "h1g1",
+        "is_legal": true,
+        "expected_move": "e7e8q",
+        "matched_expected": false
+      },
+      "en_passant_black": {
+        "fen": "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3",
+        "bestmove_returned": "d2d4",
+        "is_legal": true
+      },
+      "white_kingside_castling": {
+        "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+        "bestmove_returned": "d2d3",
+        "is_legal": true
+      },
+      "stalemate_defense": {
+        "fen": "k7/8/1K6/8/8/8/8/8 b - - 0 1",
+        "bestmove_returned": "a8b8",
+        "is_legal": true
+      }
+    },
+    "all_passed": true
+  },
+  "ORION_Complete_Engine": {
+    "engine": "ORION_Complete_Engine",
+    "uci_protocol": true,
+    "isready": true,
+    "ucinewgame": true,
+    "position_handling": true,
+    "legality_checks": {
+      "startpos": {
+        "fen": "rnbqkb1r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "bestmove_returned": "g1f3",
+        "is_legal": true
+      },
+      "scholar_mate_threat": {
+        "fen": "r1bqkb1r/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 4",
+        "bestmove_returned": "h5f7",
+        "is_legal": true,
+        "expected_move": "h5f7",
+        "matched_expected": true
+      },
+      "pawn_promotion_white": {
+        "fen": "8/4P3/8/8/8/8/8/k6K w - - 0 1",
+        "bestmove_returned": "e7e8q",
+        "is_legal": true,
+        "expected_move": "e7e8q",
+        "matched_expected": true
+      },
+      "en_passant_black": {
+        "fen": "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3",
+        "bestmove_returned": "b1c3",
+        "is_legal": true
+      },
+      "white_kingside_castling": {
+        "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+        "bestmove_returned": "b1c3",
+        "is_legal": true
+      },
+      "stalemate_defense": {
+        "fen": "k7/8/1K6/8/8/8/8/8 b - - 0 1",
+        "bestmove_returned": "a8b8",
+        "is_legal": true
+      }
+    },
+    "all_passed": true
+  }
+}

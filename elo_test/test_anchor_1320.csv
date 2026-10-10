@@ -1,0 +1,5 @@
+"#","PLAYER","RATING","ERROR","POINTS","PLAYED","(%)"
+1,"ORION_Complete_Engine",1527.9,"-",49.50,64,77.34
+2,"Stockfish_1500",1394.8,"-",24.00,40,60.00
+3,"Stockfish_1320",1320.0,"-",22.00,40,55.00
+4,"ORION_Policy_Only",550.5,"-",0.50,48,1.04

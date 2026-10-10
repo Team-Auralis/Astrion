@@ -1,0 +1,62 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "ORION_Policy_Only"]
+[Black "Stockfish_1500"]
+[Result "0-1"]
+[ECO "C70"]
+[GameDuration "00:00:09"]
+[GameEndTime "2026-10-10T20:39:32.481 India Standard Time"]
+[GameStartTime "2026-10-10T20:39:23.374 India Standard Time"]
+[Opening "Ruy Lopez"]
+[PlyCount "78"]
+[TimeControl "40/5+0.1"]
+[Variation "Cozio defense deferred"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bb5 {book} a6 {book} 4. Ba4
+Nge7 {0.00/19 1.1s} 5. O-O d6 {-0.27/14 0.26s} 6. c3 Bd7 {-0.55/20 0.89s} 7. d4
+Ng6 {-0.56/14 0.19s} 8. Re1 Qc8 {-0.50/17 0.26s} 9. Bb3 b5 {-0.60/15 0.39s}
+10. Nbd2 Na5 {-0.76/12 0.093s} 11. Bc2 Nb7 {-0.87/17 0.60s} 12. h4
+h5 {-1.12/13 0.32s} 13. g3 Bg4 {-2.11/15 0.73s} 14. b3 c5 {-1.16/13 0.26s}
+15. dxc5 Qxc5 {0.00/14 0.59s} 16. Bb2 Nd8 {-1.45/14 0.45s} 17. Rc1
+Be7 {-0.37/11 0.16s} 18. a4 Qc7 {0.00/10 0.13s} 19. a5 Bxh4 {+0.37/11 0.11s}
+20. gxh4 Qd7 {+0.18/11 0.11s} 21. c4 Ne6 {+0.10/11 0.11s} 22. c5
+Nef4 {+0.88/11 0.10s} 23. cxd6 Qxd6 {+1.18/11 0.10s} 24. Kf1
+Qe7 {0.00/12 0.099s} 25. Nc4 bxc4 {+6.82/16 0.10s} 26. Ng5 Nxh4 {+8.25/14 0.10s}
+27. Nf3 Nxf3 {+13.56/14 0.10s} 28. Qxf3 Bxf3 {+14.19/14 0.10s} 29. b4
+Rd8 {+M5/14 0.094s} 30. Red1 Bxd1 {+12.05/14 0.10s} 31. Rxd1
+Rxd1+ {+14.50/13 0.10s} 32. Bxd1 c3 {0.00/12 0.099s} 33. Bc2
+Qxb4 {+13.48/12 0.10s} 34. Bxc3 Qxc3 {+M9/20 0.068s} 35. Kg1
+Qxc2 {+M5/49 0.043s} 36. Kh2 Qd1 {+M3/245 0.068s} 37. Kg3 Qg1+ {+M3/245 0.074s}
+38. Kh4 f6 {+M1/2 0s} 39. f3 Qh2# {+M1/1 0s, Black mates} 0-1
+
+[Event "?"]
+[Site "?"]
+[Date "2026.10.10"]
+[Round "1"]
+[White "Stockfish_1500"]
+[Black "ORION_Policy_Only"]
+[Result "1-0"]
+[ECO "C69"]
+[GameDuration "00:00:07"]
+[GameEndTime "2026-10-10T20:39:40.138 India Standard Time"]
+[GameStartTime "2026-10-10T20:39:32.506 India Standard Time"]
+[Opening "Ruy Lopez"]
+[PlyCount "51"]
+[TimeControl "40/5+0.1"]
+[Variation "Exchange, Bronstein variation"]
+
+1. e4 {book} e5 {book} 2. Nf3 {book} Nc6 {book} 3. Bb5 {book} a6 {book}
+4. Bxc6 {+0.41/16 0.39s} dxc6 5. O-O {+0.09/14 0.28s} Qd6
+6. Na3 {+0.24/13 0.17s} Qc5 7. c3 {+0.78/15 0.53s} Be6 8. Nc2 {+0.79/16 0.98s}
+Rd8 9. Re1 {+2.02/14 0.30s} f6 10. Ne3 {+1.33/13 0.30s} Qa7
+11. Qa4 {+1.87/15 0.42s} Bd5 12. Nxd5 {+8.69/14 0.091s} Bd6
+13. Ne3 {+8.77/14 0.12s} Ne7 14. d4 {+8.43/16 0.84s} exd4
+15. cxd4 {+8.27/15 0.56s} Bb4 16. Re2 {+10.75/15 0.15s} Bc3
+17. Nf5 {+10.93/15 0.16s} Nxf5 18. bxc3 {+9.58/15 0.27s} h6
+19. Qa3 {0.00/14 0.58s} b6 20. e5 {+10.90/14 0.18s} Kf7 21. Re4 {0.00/14 0.37s}
+Ke8 22. h3 {0.00/14 0.15s} fxe5 23. Qb3 {+10.21/14 0.12s} c5
+24. Nxe5 {+12.64/12 0.089s} g6 25. Nxg6+ {+M1/15 0.10s} Kd7
+26. Qe6# {+M1/13 0.12s, White mates} 1-0
+

@@ -18,7 +18,7 @@ from orion.model.encoder import ChessEncoder
 from orion.model.network import ORIONNetwork
 from orion.search.search_agent import StockfishInspiredSearchAgent
 from orion.utils.checkpoint import Checkpoint
-from orion.arena import OrionBot, RandomBot, GreedyMaterialBot, MinimaxBot, StockfishBot, Arena
+from orion.arena import OrionBot, RandomBot, GreedyMaterialBot, MinimaxBot, StockfishBot, EnsembleCouncilBot, DecaCouncilBot, Arena
 
 
 import glob
@@ -28,14 +28,27 @@ def find_best_checkpoint(requested_path: str = None) -> str:
     if requested_path and os.path.exists(requested_path) and requested_path != "checkpoints/v0.5_supervised/orion_1000.json":
         return requested_path
 
-    # Auto-discover newest checkpoint
+    # Auto-discover newest checkpoint with validation
     candidates = []
-    for pattern in ["checkpoints/resnet_v1/*.json", "checkpoints/fast_torch/*.json", "checkpoints/full_hf/*.json", "checkpoints/v0.5_supervised/*.json"]:
+    for pattern in ["checkpoints/ccrl_master/*best*.json", "checkpoints/ccrl_master/*master*.json", "checkpoints/ccrl_master/*.json", "checkpoints/distilled/*.json", "checkpoints/gm_master/*.json", "checkpoints/fast_torch/*.json", "checkpoints/resnet_v1/*.json", "checkpoints/full_hf/*.json", "checkpoints/v0.5_supervised/*.json"]:
         candidates.extend(glob.glob(pattern))
 
-    if candidates:
-        candidates.sort(key=lambda p: os.path.getmtime(p), reverse=True)
-        return candidates[0]
+    candidates = list(dict.fromkeys(candidates))
+    candidates.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+
+    for cand in candidates:
+        if os.path.getsize(cand) > 1000000:
+            try:
+                with open(cand, "r") as f:
+                    f.seek(0, os.SEEK_END)
+                    size = f.tell()
+                    f.seek(max(0, size - 100))
+                    tail = f.read().strip()
+                    if tail.endswith("}"):
+                        return cand
+            except Exception:
+                continue
+
     return requested_path or "checkpoints/v0.5_supervised/orion_1000.json"
 
 
@@ -68,6 +81,51 @@ def cmd_train(args):
     train_main()
 
 
+def cmd_train_gm(args):
+    """Train ORION directly on Grandmaster dataset from angeluriot/chess_games."""
+    from train_gm_dataset import train_on_gm_data
+    train_on_gm_data(args)
+
+
+def cmd_train_distill(args):
+    """Train ORION using SOTA Knowledge Distillation & Tactical Curriculum."""
+    from train_sota_distillation import train_distillation
+    train_distillation(args)
+
+
+def cmd_train_ccrl(args):
+    """Train ORION deeply on CCRL 40/40 Super-GM engine tournament archive."""
+    from train_ccrl import train_ccrl
+    train_ccrl(
+        archive_path=args.archive,
+        max_positions=args.max_positions,
+        min_elo=args.min_elo,
+        stride=args.stride,
+        batch_size=args.batch_size,
+        epochs=args.epochs,
+        lr=args.lr,
+        checkpoint_in=args.warm_start,
+        checkpoint_out=args.output
+    )
+
+
+def cmd_train_full_corpus(args):
+    """Train ORION continuously across all 2.46M CCRL games with chunk streaming."""
+    from train_ccrl_full_corpus import stream_train_full_corpus
+    stream_train_full_corpus(
+        archive_path=args.archive,
+        chunk_positions=args.chunk_positions,
+        min_elo=args.min_elo,
+        stride=args.stride,
+        batch_size=args.batch_size,
+        lr=args.lr,
+        checkpoint_in=args.warm_start,
+        output_prefix=args.output_prefix,
+        target_accuracy=args.target_acc,
+        max_total_positions=args.max_positions
+    )
+
+
 def cmd_battle(args):
     """Run bot arena battle against Random, Greedy, Minimax, or real Stockfish."""
     network = ORIONNetwork()
@@ -75,7 +133,8 @@ def cmd_battle(args):
     encoder = ChessEncoder()
 
     use_search = not args.policy_only
-    orion = OrionBot(network, encoder, use_search=use_search, depth=args.search_depth, rating=args.orion_elo)
+    temp = getattr(args, "temperature", 0.0)
+    orion = OrionBot(network, encoder, use_search=use_search, depth=args.search_depth, rating=args.orion_elo, temperature=temp)
 
     opp_name = args.opponent.lower()
     if opp_name == "random":
@@ -95,12 +154,55 @@ def cmd_battle(args):
             opponent = MinimaxBot(depth=2)
         else:
             opponent = sf
+    elif opp_name in ("deca", "10bots", "deca-council"):
+        opponent = DecaCouncilBot(
+            stockfish_elo=args.stockfish_elo,
+            stockfish_depth=args.stockfish_depth,
+            network=network,
+            encoder=encoder
+        )
+    elif opp_name in ("ensemble", "alliance"):
+        opponent = EnsembleCouncilBot(
+            stockfish_elo=args.stockfish_elo,
+            stockfish_depth=args.stockfish_depth,
+            network=network,
+            encoder=encoder
+        )
     else:
-        print(f"[ERROR] Unknown opponent '{args.opponent}'. Choose: random, greedy, minimax, stockfish")
+        print(f"[ERROR] Unknown opponent '{args.opponent}'. Choose: random, greedy, minimax, stockfish, ensemble, alliance, deca, 10bots")
         sys.exit(1)
 
     arena = Arena(orion, opponent, max_moves=args.max_moves)
     arena.run_match(rounds=args.rounds)
+
+
+def cmd_ordo(args):
+    """Run official Ordo maximum-likelihood rating calculation on a PGN file."""
+    import subprocess
+    ordo_path = "ordo.exe" if os.path.exists("ordo.exe") else ("tools/ordo/ordo.exe" if os.path.exists("tools/ordo/ordo.exe") else None)
+    if not ordo_path:
+        print("[ERROR] ordo.exe binary not found. Build it with: mingw32-make -C tools/ordo")
+        sys.exit(1)
+
+    if not os.path.exists(args.pgn):
+        print(f"[ERROR] PGN file not found: {args.pgn}")
+        sys.exit(1)
+
+    cmd = [ordo_path, "-p", args.pgn, "-a", str(args.anchor_rating)]
+    if args.anchor_player:
+        cmd.extend(["-A", args.anchor_player])
+    if args.simulations > 0:
+        cmd.extend(["-s", str(args.simulations)])
+
+    print("=" * 65)
+    print("      OFFICIAL ORDO MAXIMUM LIKELIHOOD RATING CALCULATION       ")
+    print("=" * 65)
+    print(f"PGN File     : {args.pgn}")
+    print(f"Anchor Rating: {args.anchor_rating} ({args.anchor_player or 'Pool Average'})")
+    print(f"Simulations  : {args.simulations}")
+    print("=" * 65 + "\n")
+
+    subprocess.run(cmd)
 
 
 def cmd_play(args):
@@ -220,9 +322,59 @@ Examples:
     train_parser.add_argument("--max-puzzles", type=int, default=50000, help="Max puzzles to load")
     train_parser.add_argument("--checkpoint-dir", default="checkpoints/fast_torch", help="Output checkpoint directory")
 
+    # TRAIN GM
+    gm_parser = subparsers.add_parser("train-gm", help="Stream and train on 2300+ Elo Grandmaster dataset (angeluriot/chess_games)")
+    gm_parser.add_argument("--max-positions", type=int, default=100000, help="Max positions to extract")
+    gm_parser.add_argument("--min-elo", type=int, default=2200, help="Minimum player Elo (default: 2200)")
+    gm_parser.add_argument("--moves-per-game", type=int, default=35, help="Max opening/middle moves per game")
+    gm_parser.add_argument("--batch-size", type=int, default=256, help="Batch size (default: 256)")
+    gm_parser.add_argument("--epochs", type=int, default=10, help="Epochs (default: 10)")
+    gm_parser.add_argument("--lr", type=float, default=0.0005, help="Learning rate (default: 0.0005)")
+    gm_parser.add_argument("--output-dir", default="checkpoints/gm_master", help="Output directory")
+    gm_parser.add_argument("--resume-checkpoint", default=None, help="Resume from previous checkpoint")
+
+    # TRAIN DISTILL (SOTA Knowledge Distillation)
+    distill_parser = subparsers.add_parser("train-distill", help="SOTA Knowledge Distillation & Tactical Focal Training from Stockfish")
+    distill_parser.add_argument("--num-samples", type=int, default=10000, help="Number of positions to distill")
+    distill_parser.add_argument("--multipv", type=int, default=3, help="Multi-PV count for dark knowledge extraction")
+    distill_parser.add_argument("--teacher-depth", type=int, default=8, help="Stockfish evaluation depth")
+    distill_parser.add_argument("--batch-size", type=int, default=256, help="Batch size")
+    distill_parser.add_argument("--epochs", type=int, default=5, help="Epochs")
+    distill_parser.add_argument("--lr", type=float, default=0.0003, help="Learning rate")
+    distill_parser.add_argument("--tactical-boost", type=float, default=2.5, help="Loss weight for tactical positions")
+    distill_parser.add_argument("--distill-temp", type=float, default=1.5, help="Temperature for soft targets")
+    distill_parser.add_argument("--output-dir", default="checkpoints/distilled", help="Output directory")
+    distill_parser.add_argument("--resume-checkpoint", default="checkpoints/gm_master/orion_gm_resnet_perfect_acc_98.0pct.json", help="Warm-start checkpoint")
+    distill_parser.add_argument("--stockfish-path", default="stockfish.exe", help="Path to Stockfish engine")
+
+    # TRAIN CCRL (Super-GM Engine Corpus 2.46M games)
+    ccrl_parser = subparsers.add_parser("train-ccrl", help="Deep Super-GM Training on CCRL 40/40 2.46M Game Corpus")
+    ccrl_parser.add_argument("--archive", default=r"D:\orion-game-ai\CCRL-4040.[2463682].pgn.7z", help="Path to CCRL .7z archive")
+    ccrl_parser.add_argument("--max-positions", type=int, default=150000, help="Number of positions to stream and train on")
+    ccrl_parser.add_argument("--min-elo", type=int, default=2600, help="Minimum engine Elo filter")
+    ccrl_parser.add_argument("--stride", type=int, default=2, help="Move sampling stride per game")
+    ccrl_parser.add_argument("--batch-size", type=int, default=512, help="Mini-batch size")
+    ccrl_parser.add_argument("--epochs", type=int, default=10, help="Number of epochs")
+    ccrl_parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
+    ccrl_parser.add_argument("--warm-start", default=None, help="Checkpoint to warm start from")
+    ccrl_parser.add_argument("--output", default="checkpoints/ccrl_master/orion_ccrl_deep_master.json", help="Output checkpoint path")
+
+    # TRAIN FULL CORPUS (2.46M games chunk-streaming)
+    corpus_parser = subparsers.add_parser("train-full-corpus", help="Continuous Chunk-Streaming Trainer across all 2.46M CCRL Games")
+    corpus_parser.add_argument("--archive", default=r"D:\orion-game-ai\CCRL-4040.[2463682].pgn.7z", help="Path to CCRL .7z archive")
+    corpus_parser.add_argument("--chunk-positions", type=int, default=50000, help="Positions per in-memory training chunk")
+    corpus_parser.add_argument("--min-elo", type=int, default=2500, help="Minimum engine Elo filter")
+    corpus_parser.add_argument("--stride", type=int, default=2, help="Move sampling stride per game")
+    corpus_parser.add_argument("--batch-size", type=int, default=512, help="Mini-batch size")
+    corpus_parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
+    corpus_parser.add_argument("--target-acc", type=float, default=90.0, help="Target consensus accuracy (default: 90.0 percent)")
+    corpus_parser.add_argument("--max-positions", type=int, default=None, help="Optional max positions cap")
+    corpus_parser.add_argument("--warm-start", default=None, help="Checkpoint to warm start from")
+    corpus_parser.add_argument("--output-prefix", default="checkpoints/ccrl_master/orion_ccrl_full_corpus", help="Output prefix")
+
     # BATTLE / ARENA
     battle_parser = subparsers.add_parser("battle", aliases=["arena"], help="Arena match against real bots with Elo tracking")
-    battle_parser.add_argument("--opponent", default="random", choices=["random", "greedy", "minimax", "stockfish"], help="Opponent bot")
+    battle_parser.add_argument("--opponent", default="random", choices=["random", "greedy", "minimax", "stockfish", "ensemble", "alliance", "deca", "10bots"], help="Opponent bot")
     battle_parser.add_argument("--rounds", type=int, default=6, help="Number of games to play")
     battle_parser.add_argument("--search-depth", type=int, default=3, help="ORION search depth")
     battle_parser.add_argument("--policy-only", action="store_true", help="Disable search and use pure policy network")
@@ -232,8 +384,9 @@ Examples:
     battle_parser.add_argument("--stockfish-path", default=None, help="Path to stockfish executable")
     battle_parser.add_argument("--stockfish-elo", type=int, default=1400, help="Stockfish UCI Elo limit (1320-3190)")
     battle_parser.add_argument("--stockfish-depth", type=int, default=3, help="Stockfish depth")
-    battle_parser.add_argument("--max-moves", type=int, default=100, help="Max moves before draw")
+    battle_parser.add_argument("--max-moves", type=int, default=200, help="Max moves before draw")
     battle_parser.add_argument("--seed", type=int, default=42, help="RNG seed")
+    battle_parser.add_argument("--temperature", type=float, default=0.0, help="Move randomization temperature (0.0=deterministic, >0=randomize among top moves)")
 
     # PLAY
     play_parser = subparsers.add_parser("play", help="Play interactively against ORION in the terminal")
@@ -244,6 +397,13 @@ Examples:
 
     # UCI
     subparsers.add_parser("uci", help="Launch UCI engine protocol for Arena/Cutechess/Lichess")
+
+    # ORDO
+    ordo_parser = subparsers.add_parser("ordo", help="Run official Ordo maximum-likelihood Elo rating calculation on PGN")
+    ordo_parser.add_argument("--pgn", default="matches/arena_match.pgn", help="PGN games file")
+    ordo_parser.add_argument("--anchor-rating", type=int, default=2200, help="Anchor reference rating")
+    ordo_parser.add_argument("--anchor-player", default=None, help="Name of anchor player (e.g. 'Stockfish (Elo 2200)')")
+    ordo_parser.add_argument("--simulations", type=int, default=1000, help="Monte Carlo simulations for error margin")
 
     # APP / SERVER
     app_parser = subparsers.add_parser("app", aliases=["server"], help="Launch ORION mobile app API server & PWA interface")
@@ -259,8 +419,18 @@ Examples:
 
     if args.command == "train":
         cmd_train(args)
+    elif args.command == "train-gm":
+        cmd_train_gm(args)
+    elif args.command == "train-distill":
+        cmd_train_distill(args)
+    elif args.command == "train-ccrl":
+        cmd_train_ccrl(args)
+    elif args.command == "train-full-corpus":
+        cmd_train_full_corpus(args)
     elif args.command in ("battle", "arena"):
         cmd_battle(args)
+    elif args.command == "ordo":
+        cmd_ordo(args)
     elif args.command == "play":
         cmd_play(args)
     elif args.command == "uci":
