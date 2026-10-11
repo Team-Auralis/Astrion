@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.abspath("experiments/calibrated_eval"))
 import chess
 import chess.engine
 import chess.pgn
+import chess.polyglot
 import torch
 import numpy as np
 
@@ -53,6 +54,153 @@ PIECE_VALS = {
 MATE_SCORE = 30000.0
 
 
+# Tomasz Michniewski Simplified Evaluation Tables
+PAWN_TABLE = [
+    [ 0,  0,  0,  0,  0,  0,  0,  0],
+    [50, 50, 50, 50, 50, 50, 50, 50],
+    [10, 10, 20, 30, 30, 20, 10, 10],
+    [ 5,  5, 10, 25, 25, 10,  5,  5],
+    [ 0,  0,  0, 20, 20,  0,  0,  0],
+    [ 5, -5,-10,  0,  0,-10, -5,  5],
+    [ 5, 10, 10,-20,-20, 10, 10,  5],
+    [ 0,  0,  0,  0,  0,  0,  0,  0]
+]
+
+KNIGHT_TABLE = [
+    [-50,-40,-30,-30,-30,-30,-40,-50],
+    [-40,-20,  0,  0,  0,  0,-20,-40],
+    [-30,  0, 10, 15, 15, 10,  0,-30],
+    [-30,  5, 15, 20, 20, 15,  5,-30],
+    [-30,  0, 15, 20, 20, 15,  0,-30],
+    [-30,  5, 10, 15, 15, 10,  5,-30],
+    [-40,-20,  0,  5,  5,  0,-20,-40],
+    [-50,-40,-30,-30,-30,-30,-40,-50]
+]
+
+BISHOP_TABLE = [
+    [-20,-10,-10,-10,-10,-10,-10,-20],
+    [-10,  0,  0,  0,  0,  0,  0,-10],
+    [-10,  0,  5, 10, 10,  5,  0,-10],
+    [-10,  5,  5, 10, 10,  5,  5,-10],
+    [-10,  0, 10, 10, 10, 10,  0,-10],
+    [-10, 10, 10, 10, 10, 10, 10,-10],
+    [-10,  5,  0,  0,  0,  0,  5,-10],
+    [-20,-10,-10,-10,-10,-10,-10,-20]
+]
+
+ROOK_TABLE = [
+    [ 0,  0,  0,  0,  0,  0,  0,  0],
+    [ 5, 10, 10, 10, 10, 10, 10,  5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [-5,  0,  0,  0,  0,  0,  0, -5],
+    [ 0,  0,  0,  5,  5,  0,  0,  0]
+]
+
+QUEEN_TABLE = [
+    [-20,-10,-10, -5, -5,-10,-10,-20],
+    [-10,  0,  0,  0,  0,  0,  0,-10],
+    [-10,  0,  5,  5,  5,  5,  0,-10],
+    [ -5,  0,  5,  5,  5,  5,  0, -5],
+    [  0,  0,  5,  5,  5,  5,  0, -5],
+    [-10,  5,  5,  5,  5,  5,  0,-10],
+    [-10,  0,  5,  0,  0,  0,  0,-10],
+    [-20,-10,-10, -5, -5,-10,-10,-20]
+]
+
+KING_MG_TABLE = [
+    [-30,-40,-40,-50,-50,-40,-40,-30],
+    [-30,-40,-40,-50,-50,-40,-40,-30],
+    [-30,-40,-40,-50,-50,-40,-40,-30],
+    [-30,-40,-40,-50,-50,-40,-40,-30],
+    [-20,-30,-30,-40,-40,-30,-30,-20],
+    [-10,-20,-20,-20,-20,-20,-20,-10],
+    [ 20, 20,  0,  0,  0,  0, 20, 20],
+    [ 20, 30, 10,  0,  0, 10, 30, 20]
+]
+
+KING_EG_TABLE = [
+    [-50,-40,-30,-20,-20,-30,-40,-50],
+    [-30,-20,-10,  0,  0,-10,-20,-30],
+    [-30,-10, 20, 30, 30, 20,-10,-30],
+    [-30,-10, 30, 40, 40, 30,-10,-30],
+    [-30,-10, 30, 40, 40, 30,-10,-30],
+    [-30,-10, 20, 30, 30, 20,-10,-30],
+    [-30,-30,  0,  0,  0,  0,-30,-30],
+    [-50,-30,-30,-30,-30,-30,-30,-50]
+]
+
+WHITE_PST = {pt: [0] * 64 for pt in PIECE_VALS}
+BLACK_PST = {pt: [0] * 64 for pt in PIECE_VALS}
+WHITE_KING_EG = [0] * 64
+BLACK_KING_EG = [0] * 64
+
+RAW_TABLES = {
+    chess.PAWN: PAWN_TABLE,
+    chess.KNIGHT: KNIGHT_TABLE,
+    chess.BISHOP: BISHOP_TABLE,
+    chess.ROOK: ROOK_TABLE,
+    chess.QUEEN: QUEEN_TABLE,
+    chess.KING: KING_MG_TABLE
+}
+
+for pt, table in RAW_TABLES.items():
+    for sq in range(64):
+        r, c = chess.square_rank(sq), chess.square_file(sq)
+        WHITE_PST[pt][sq] = table[7 - r][c]
+        BLACK_PST[pt][sq] = table[r][c]
+
+for sq in range(64):
+    r, c = chess.square_rank(sq), chess.square_file(sq)
+    WHITE_KING_EG[sq] = KING_EG_TABLE[7 - r][c]
+    BLACK_KING_EG[sq] = KING_EG_TABLE[r][c]
+
+PHASE_WEIGHTS = {
+    chess.KNIGHT: 1,
+    chess.BISHOP: 1,
+    chess.ROOK: 2,
+    chess.QUEEN: 4,
+    chess.PAWN: 0,
+    chess.KING: 0
+}
+TOTAL_PHASE = 24
+
+FLAG_EXACT = 0
+FLAG_LOWERBOUND = 1
+FLAG_UPPERBOUND = 2
+
+
+def evaluate_tapered(board: chess.Board) -> float:
+    """Tapered piece-square and material evaluation."""
+    if board.is_checkmate():
+        return -MATE_SCORE
+    if board.is_stalemate() or board.is_insufficient_material():
+        return 0.0
+
+    mg_score = 0
+    eg_score = 0
+    game_phase = 0
+
+    piece_map = board.piece_map()
+    for sq, pc in piece_map.items():
+        pt = pc.piece_type
+        val = PIECE_VALS[pt]
+        game_phase += PHASE_WEIGHTS[pt]
+
+        if pc.color == chess.WHITE:
+            mg_score += val + WHITE_PST[pt][sq]
+            eg_score += val + (WHITE_KING_EG[sq] if pt == chess.KING else WHITE_PST[pt][sq])
+        else:
+            mg_score -= val + BLACK_PST[pt][sq]
+            eg_score -= val + (BLACK_KING_EG[sq] if pt == chess.KING else BLACK_PST[pt][sq])
+
+    phase = min(game_phase, TOTAL_PHASE)
+    score = (mg_score * phase + eg_score * (TOTAL_PHASE - phase)) / TOTAL_PHASE
+    return score if board.turn == chess.WHITE else -score
+
+
 def evaluate_material(board: chess.Board) -> float:
     score = 0.0
     turn = board.turn
@@ -70,6 +218,50 @@ def mvv_lva(board: chess.Board, m: chess.Move) -> int:
     return v * 10 - a
 
 
+class TranspositionTable:
+    """64-bit Zobrist Transposition Table with replacement policy."""
+    def __init__(self, max_entries: int = 500000):
+        self.table: Dict[int, Tuple[int, float, int, Optional[chess.Move]]] = {}
+        self.max_entries = max_entries
+
+    def clear(self):
+        self.table.clear()
+
+    def probe(self, key: int, depth: int, alpha: float, beta: float, ply: int) -> Tuple[Optional[float], Optional[chess.Move]]:
+        entry = self.table.get(key)
+        if not entry:
+            return None, None
+        e_depth, e_score, e_flag, e_move = entry
+
+        score = e_score
+        if score > MATE_SCORE - 100:
+            score -= ply
+        elif score < -MATE_SCORE + 100:
+            score += ply
+
+        if e_depth >= depth:
+            if e_flag == FLAG_EXACT:
+                return score, e_move
+            elif e_flag == FLAG_LOWERBOUND and score >= beta:
+                return score, e_move
+            elif e_flag == FLAG_UPPERBOUND and score <= alpha:
+                return score, e_move
+
+        return None, e_move
+
+    def store(self, key: int, depth: int, score: float, flag: int, best_move: Optional[chess.Move], ply: int):
+        if len(self.table) >= self.max_entries:
+            self.table.clear()
+
+        stored_score = score
+        if stored_score > MATE_SCORE - 100:
+            stored_score += ply
+        elif stored_score < -MATE_SCORE + 100:
+            stored_score -= ply
+
+        self.table[key] = (depth, stored_score, flag, best_move)
+
+
 def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: int = 4, ply: int = 0) -> float:
     if board.is_checkmate():
         return -MATE_SCORE + ply
@@ -78,7 +270,7 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
 
     in_check = board.is_check()
     if not in_check:
-        stand_pat = evaluate_material(board)
+        stand_pat = evaluate_tapered(board)
         if stand_pat >= beta:
             return beta
         if stand_pat > alpha:
@@ -89,7 +281,6 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
         if not moves:
             return stand_pat
     else:
-        # In check: must evade check! Stand-pat is illegal while in check.
         moves = list(board.legal_moves)
         if not moves:
             return -MATE_SCORE + ply
@@ -132,6 +323,170 @@ def alphabeta_search(board: chess.Board, depth: int, alpha: float, beta: float, 
     return alpha
 
 
+class OptimizedSearchEngine:
+    """Full-featured Alpha-Beta engine with TT, Iterative Deepening, and Move Ordering."""
+    def __init__(self):
+        self.tt = TranspositionTable(max_entries=300000)
+        self.killer_moves: List[List[Optional[chess.Move]]] = [[None, None] for _ in range(64)]
+        self.history_table: Dict[Tuple[int, int], int] = {}
+        self.nodes_visited = 0
+        self.start_time = 0.0
+        self.time_limit = 0.5
+        self.stop_search = False
+
+    def clear_heuristics(self):
+        self.killer_moves = [[None, None] for _ in range(64)]
+        self.history_table.clear()
+        self.nodes_visited = 0
+        self.stop_search = False
+
+    def score_move(self, board: chess.Board, m: chess.Move, tt_move: Optional[chess.Move], ply: int) -> int:
+        if tt_move and m == tt_move:
+            return 1000000
+        if board.is_capture(m):
+            return 100000 + mvv_lva(board, m)
+        if ply < 64:
+            if m == self.killer_moves[ply][0]:
+                return 90000
+            elif m == self.killer_moves[ply][1]:
+                return 80000
+        return self.history_table.get((m.from_square, m.to_square), 0)
+
+    def negamax(self, board: chess.Board, depth: int, alpha: float, beta: float, ply: int = 0) -> float:
+        self.nodes_visited += 1
+
+        if (self.nodes_visited & 1023) == 0:
+            if time.perf_counter() - self.start_time >= self.time_limit:
+                self.stop_search = True
+                return alpha
+
+        if board.is_checkmate():
+            return -MATE_SCORE + ply
+        if board.is_stalemate() or board.is_insufficient_material():
+            return 0.0
+
+        if depth <= 0:
+            return quiescence_search(board, alpha, beta, ply=ply)
+
+        pos_key = chess.polyglot.zobrist_hash(board)
+        tt_val, tt_move = self.tt.probe(pos_key, depth, alpha, beta, ply)
+        if tt_val is not None:
+            return tt_val
+
+        moves = list(board.legal_moves)
+        if not moves:
+            if board.is_check():
+                return -MATE_SCORE + ply
+            return 0.0
+
+        moves.sort(key=lambda m: self.score_move(board, m, tt_move, ply), reverse=True)
+
+        best_score = -float("inf")
+        best_m = None
+        orig_alpha = alpha
+
+        for m in moves:
+            board.push(m)
+            score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+            board.pop()
+
+            if self.stop_search:
+                return alpha
+
+            if score > best_score:
+                best_score = score
+                best_m = m
+
+            if score > alpha:
+                alpha = score
+
+            if alpha >= beta:
+                if not board.is_capture(m) and ply < 64:
+                    if self.killer_moves[ply][0] != m:
+                        self.killer_moves[ply][1] = self.killer_moves[ply][0]
+                        self.killer_moves[ply][0] = m
+                    h_key = (m.from_square, m.to_square)
+                    self.history_table[h_key] = self.history_table.get(h_key, 0) + depth * depth
+                break
+
+        if best_score <= orig_alpha:
+            flag = FLAG_UPPERBOUND
+        elif best_score >= beta:
+            flag = FLAG_LOWERBOUND
+        else:
+            flag = FLAG_EXACT
+
+        self.tt.store(pos_key, depth, best_score, flag, best_m, ply)
+        return best_score
+
+    def search(self, board: chess.Board, time_limit: float = 0.5, max_depth: int = 15, root_prior: Optional[Dict[chess.Move, float]] = None) -> Tuple[chess.Move, float, int]:
+        self.start_time = time.perf_counter()
+        self.time_limit = time_limit
+        self.clear_heuristics()
+
+        moves = list(board.legal_moves)
+        if not moves:
+            return None, 0.0, 0
+        if len(moves) == 1:
+            return moves[0], 0.0, 1
+
+        for m in moves:
+            board.push(m)
+            if board.is_checkmate():
+                board.pop()
+                return m, MATE_SCORE - 1, 1
+            board.pop()
+
+        if root_prior:
+            moves.sort(key=lambda m: (board.is_capture(m) * 100.0 + root_prior.get(m, 0.0)), reverse=True)
+        else:
+            moves.sort(key=lambda m: (board.is_capture(m) * 1000 + mvv_lva(board, m)), reverse=True)
+
+        best_move = moves[0]
+        best_val = 0.0
+        completed_depth = 0
+
+        for d in range(1, max_depth + 1):
+            iter_best_move = None
+            iter_best_val = -float("inf")
+            alpha = -float("inf")
+            beta = float("inf")
+
+            for m in moves:
+                board.push(m)
+                val = -self.negamax(board, d - 1, -beta, -alpha, ply=1)
+                board.pop()
+
+                if self.stop_search:
+                    break
+
+                if val > iter_best_val:
+                    iter_best_val = val
+                    iter_best_move = m
+
+                if val > alpha:
+                    alpha = val
+
+            if self.stop_search:
+                break
+
+            best_move = iter_best_move
+            best_val = iter_best_val
+            completed_depth = d
+
+            moves.remove(best_move)
+            moves.insert(0, best_move)
+
+            if abs(best_val) > MATE_SCORE - 100:
+                break
+
+            elapsed = time.perf_counter() - self.start_time
+            if elapsed >= time_limit * 0.6:
+                break
+
+        return best_move, best_val, completed_depth
+
+
 class OrionModelRunner:
     def __init__(self, checkpoint_path: str, device: str = "cuda"):
         self.device = torch.device(device if torch.cuda.is_available() else "cpu")
@@ -149,10 +504,11 @@ class OrionModelRunner:
 
 
 class OrionSearchPlayer:
-    """Full Engine: Policy prior + Alpha-Beta Minimax + Quiescence."""
+    """Full Engine: Root Neural Prior + Iterative Deepening + Zobrist TT + Tapered Evaluation + Move Ordering."""
     def __init__(self, runner: OrionModelRunner):
         self.runner = runner
         self.name = "ORION-Search-Full"
+        self.engine = OptimizedSearchEngine()
 
     def play(self, board: chess.Board, time_limit: float = 0.5) -> chess.Move:
         moves = list(board.legal_moves)
@@ -161,34 +517,11 @@ class OrionSearchPlayer:
         if len(moves) == 1:
             return moves[0]
 
-        # Immediate mate-in-1 check
-        for m in moves:
-            board.push(m)
-            if board.is_checkmate():
-                board.pop()
-                return m
-            board.pop()
-
+        # Neural policy prior at root
         p_scores = self.runner.get_policy(board)
-        ranked = sorted(
-            moves,
-            key=lambda mv: (board.is_capture(mv) * 20.0 + p_scores[fast_encode_action(mv)]),
-            reverse=True
-        )
+        root_prior = {m: float(p_scores[fast_encode_action(m)]) for m in moves}
 
-        best_m = ranked[0]
-        best_val = -float("inf")
-        # Search candidate moves: search top candidates deeper, evaluate all to prevent blunders
-        for i, m in enumerate(ranked):
-            d = 2 if i < 6 else 1
-            board.push(m)
-            val = -alphabeta_search(board, d, -50000.0, 50000.0, ply=1)
-            board.pop()
-            prior = float(p_scores[fast_encode_action(m)])
-            combined = val + prior * 0.1
-            if combined > best_val:
-                best_val = combined
-                best_m = m
+        best_m, val, depth = self.engine.search(board, time_limit=time_limit, root_prior=root_prior)
         return best_m
 
 
