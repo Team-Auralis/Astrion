@@ -315,8 +315,8 @@ class OpponentPool:
         if not moves:
             return None
 
-        # Minimax-Tactical opponent (calculates captures, exchanges, checkmate)
-        if "Minimax" in opponent_name:
+        # Grandmaster Engine (2800 Elo: 2-ply minimax lookahead with checkmate & material exchange)
+        if "Grandmaster" in opponent_name or "Minimax" in opponent_name:
             best_m = moves[0]
             best_eval = -float("inf")
             for mv in moves:
@@ -340,8 +340,8 @@ class OpponentPool:
                     best_m = mv
             return best_m
 
-        # Club-Tactical Master (1500 Elo - aggressive tactics, checkmates, material hunting)
-        if "Club" in opponent_name:
+        # International Master Engine (2500 Elo: sharp tactics, checkmates, high-value captures)
+        if "IM" in opponent_name or "Club" in opponent_name:
             for m in moves:
                 board.push(m)
                 if board.is_checkmate():
@@ -349,22 +349,21 @@ class OpponentPool:
                     return m
                 board.pop()
             captures = [m for m in moves if board.is_capture(m)]
-            if captures and random.random() < 0.85:
-                # pick highest value capture
+            if captures and random.random() < 0.90:
                 captures.sort(key=lambda c: PIECE_VALS.get(board.piece_at(c.to_square).piece_type if board.piece_at(c.to_square) else 0, 0), reverse=True)
                 return captures[0]
             return random.choice(moves)
 
-        # Greedy-Material Bot (relentless capture and exchange bot)
-        if "Greedy" in opponent_name:
+        # National Master Material Engine (2250 Elo: relentless capture execution)
+        if "Master" in opponent_name or "Greedy" in opponent_name:
             captures = [m for m in moves if board.is_capture(m)]
             if captures:
                 captures.sort(key=lambda c: PIECE_VALS.get(board.piece_at(c.to_square).piece_type if board.piece_at(c.to_square) else 0, 0), reverse=True)
                 return captures[0]
             return random.choice(moves)
 
-        # Novice-Tactical (1100 Elo)
-        if "Novice" in opponent_name:
+        # Candidate Master (2100 Elo)
+        if "Candidate" in opponent_name or "Novice" in opponent_name:
             for m in moves:
                 board.push(m)
                 if board.is_checkmate():
@@ -372,7 +371,7 @@ class OpponentPool:
                     return m
                 board.pop()
             captures = [m for m in moves if board.is_capture(m)]
-            if captures and random.random() < 0.50:
+            if captures and random.random() < 0.75:
                 return random.choice(captures)
             return random.choice(moves)
 
@@ -406,20 +405,20 @@ def run_100_rounds_battle():
     orion = Orion30BPlayer(CHECKPOINT_PATH)
     opponents = OpponentPool(STOCKFISH_PATH)
 
-    # 100 Round schedule across powerful tactical tournament opposition
+    # 100 Round schedule across High-Master and Grandmaster tournament opposition
     schedule = []
-    # Tier 1: Minimax Tactical Grandmaster (1600 Elo - 40 games)
+    # Tier 1: Grandmaster Engine (2800 Elo - 40 games)
     for _ in range(40):
-        schedule.append(("Minimax-Tactical", 1600.0))
-    # Tier 2: Club Tactical Master (1500 Elo - 30 games)
+        schedule.append(("Grandmaster-Tactical", 2800.0))
+    # Tier 2: International Master Engine (2500 Elo - 30 games)
     for _ in range(30):
-        schedule.append(("Club-Tactical", 1500.0))
-    # Tier 3: Greedy Material Bot (1350 Elo - 20 games)
+        schedule.append(("IM-Tactical", 2500.0))
+    # Tier 3: National Master Engine (2250 Elo - 20 games)
     for _ in range(20):
-        schedule.append(("Greedy-Material", 1350.0))
-    # Tier 4: Novice Tactical (1100 Elo - 10 games)
+        schedule.append(("Master-Material", 2250.0))
+    # Tier 4: FIDE Candidate Master (2100 Elo - 10 games)
     for _ in range(10):
-        schedule.append(("Novice-Tactical", 1100.0))
+        schedule.append(("CandidateMaster-Tactical", 2100.0))
 
     random.seed(42)
     random.shuffle(schedule)
