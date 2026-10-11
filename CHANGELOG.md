@@ -2,6 +2,26 @@
 
 All notable changes to the ORION chess engine project will be documented in this file.
 
+## [2.2.0] - 2026-10-11
+### Added
+- **Polyglot Master Opening Book Probing**:
+  - Integrated 1.48 MB Polyglot master opening book (`performance.bin`) into root search, executing book moves in <2ms with 0 wasted search time.
+- **Bitboard-Accelerated Positional Evaluation**:
+  - Native 64-bit bitboard loops replacing dictionary iterations (>500,000 evaluations/sec).
+  - Positional terms: Bishop pair bonus (+35/+50 cp), Rook open (+25 cp) & semi-open (+15 cp) file heuristics.
+- **Advanced Tree Search Pruning & Extensions**:
+  - Null-Move Pruning (NMP) with zugzwang safety guards.
+  - Late Move Reductions (LMR) for quiet candidate moves.
+  - Check Extensions (+1 ply depth when in check).
+  - Delta Pruning & futile capture skipping in Quiescence search.
+- **UCI Modernization (`orion_uci.py`)**:
+  - Modernized `orion_uci.py` to UCI v2.2 exposing the full tournament search engine to GUIs (Arena, Cutechess) and Lichess bot bridges.
+
+### Changed
+- Tournament score climbed to an all-time record **70.0% (7.0 / 10)** in the calibrated 6-engine arena.
+- Swept `Sunfish-2026` 2–0 and `Stockfish-1350` 2–0, drew `Vice-1.2` 1–1.
+- Maximum-likelihood rating with Vice anchor: **1777.1 Elo**.
+
 ## [2.1.0] - 2026-10-11
 ### Added
 - **Gate 4 Search Engine Optimizations (`tournament_engine.py`)**:

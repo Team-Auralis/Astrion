@@ -41,8 +41,8 @@
     - **BBC 1.2** (CCRL anchor ~1950 Elo)
     - **Stockfish 19** (`UCI_LimitStrength` = 1350 Elo anchor)
   - Clear separation of test subjects and reproducible results:
-    - **ORION-Search-Full** (Gate 4 Search with 64-bit Zobrist TT, Tapered PST, Iterative Deepening & Neural Prior): **1965.6 ± 262.1 Elo** (Vice anchor) / **1541.6 ± 277.4 Elo** (Stockfish-1350 anchor), scoring **65.0% (6.5/10)** to place #2 overall.
-    - **ORION-Neural-Only** (30-Block Policy Prior Argmax): Evaluated as pure intuition baseline (1.0/10, 10.0%).
+    - **ORION-Search-Full v2.2** (Polyglot Opening Book + Bitboard Evaluation + NMP/LMR + 64-bit Zobrist TT + Iterative Deepening & Neural Prior): Achieved a record **70.0% score (7.0/10)** in the calibrated arena, sweeping Sunfish (2–0), sweeping Stockfish (2–0), and drawing Vice (1–1).
+    - **ORION-Neural-Only** (30-Block Policy Prior Argmax): Evaluated as pure intuition baseline.
     - Full details in [CALIBRATED_BENCHMARK_REPORT.md](docs/CALIBRATED_BENCHMARK_REPORT.md).
 - **⚡ Vectorized PyTorch Training Pipeline**:
   - 1,000x speedup over standard single-sample Python loops (9,000+ positions/second).

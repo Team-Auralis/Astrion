@@ -265,6 +265,8 @@ class OptimizedSearchEngine:
                 alpha = stand_pat
             if q_depth <= 0:
                 return stand_pat
+            if stand_pat + 1000 < alpha:
+                return alpha
             moves = [m for m in board.legal_moves if board.is_capture(m)]
             if not moves:
                 return stand_pat
@@ -275,6 +277,12 @@ class OptimizedSearchEngine:
 
         moves.sort(key=lambda m: mvv_lva(board, m), reverse=True)
         for m in moves:
+            if not in_check and not m.promotion:
+                vic = board.piece_at(m.to_square)
+                vic_val = PIECE_VALS.get(vic.piece_type, 0) if vic else 100
+                if stand_pat + vic_val + 200 < alpha:
+                    continue
+
             board.push(m)
             score = -self.quiescence_search(board, -beta, -alpha, q_depth - 1 if not in_check else q_depth, ply + 1)
             board.pop()
@@ -310,6 +318,11 @@ class OptimizedSearchEngine:
         if board.is_stalemate() or board.is_insufficient_material():
             return 0.0
 
+        in_check = board.is_check()
+        # Check Extension: extend search by +1 ply when in check
+        if in_check:
+            depth += 1
+
         if depth <= 0:
             return self.quiescence_search(board, alpha, beta, ply=ply)
 
@@ -318,9 +331,25 @@ class OptimizedSearchEngine:
         if tt_val is not None:
             return tt_val
 
+        # Null-Move Pruning (NMP): if passing a turn still maintains a beta cutoff, prune branch
+        if depth >= 3 and not in_check and ply > 0:
+            has_pieces = any(
+                pc.piece_type not in (chess.PAWN, chess.KING) and pc.color == board.turn
+                for pc in board.piece_map().values()
+            )
+            if has_pieces:
+                r = 2 + (depth // 6)
+                board.push(chess.Move.null())
+                null_score = -self.negamax(board, depth - 1 - r, -beta, -beta + 1, ply + 1)
+                board.pop()
+                if self.stop_search:
+                    return alpha
+                if null_score >= beta:
+                    return beta
+
         moves = list(board.legal_moves)
         if not moves:
-            if board.is_check():
+            if in_check:
                 return -MATE_SCORE + ply
             return 0.0
 
@@ -332,8 +361,20 @@ class OptimizedSearchEngine:
         orig_alpha = alpha
 
         for i, m in enumerate(moves):
+            is_capture = board.is_capture(m)
             board.push(m)
-            score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+            gives_check = board.is_check()
+
+            # Late Move Reductions (LMR): search late quiet moves with reduced depth
+            if i >= 3 and depth >= 3 and not in_check and not is_capture and not gives_check and not m.promotion:
+                reduced_depth = max(1, depth - 2)
+                score = -self.negamax(board, reduced_depth, -alpha - 1, -alpha, ply + 1)
+                if score > alpha and not self.stop_search:
+                    # Re-search at full depth
+                    score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+            else:
+                score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+
             board.pop()
 
             if self.stop_search:
@@ -348,7 +389,7 @@ class OptimizedSearchEngine:
 
             if alpha >= beta:
                 # Beta cutoff
-                if not board.is_capture(m) and ply < 64:
+                if not is_capture and ply < 64:
                     if self.killer_moves[ply][0] != m:
                         self.killer_moves[ply][1] = self.killer_moves[ply][0]
                         self.killer_moves[ply][0] = m
@@ -419,7 +460,7 @@ class OptimizedSearchEngine:
                 if val > alpha:
                     alpha = val
 
-            if self.stop_search:
+            if self.stop_search or iter_best_move is None:
                 break
 
             best_move = iter_best_move
@@ -427,8 +468,9 @@ class OptimizedSearchEngine:
             completed_depth = d
 
             # Re-sort root moves so best move is searched first next iteration
-            moves.remove(best_move)
-            moves.insert(0, best_move)
+            if best_move in moves:
+                moves.remove(best_move)
+                moves.insert(0, best_move)
 
             # Check if mate was found
             if abs(best_val) > MATE_SCORE - 100:

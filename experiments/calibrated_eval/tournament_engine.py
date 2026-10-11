@@ -40,6 +40,7 @@ from train_ccrl_full_corpus import fast_encode_board, fast_encode_action
 CHECKPOINT_PATH = r"checkpoints/ccrl_30b/orion_30b_master_final_master.json"
 ORDO_EXE = os.path.abspath(r"tools/ordo/ordo.exe")
 EPD_BOOK = r"experiments/openings/UHO_Lichess_4852_v1.epd"
+POLYGLOT_BOOK = os.path.abspath(r"tools/engines/vice-main/Vice11/src/performance.bin")
 
 PIECE_VALS = {
     chess.PAWN: 100,
@@ -173,7 +174,7 @@ FLAG_UPPERBOUND = 2
 
 
 def evaluate_tapered(board: chess.Board) -> float:
-    """Tapered piece-square and material evaluation."""
+    """Bitboard-accelerated tapered evaluation with Bishop Pair and Open File heuristics."""
     if board.is_checkmate():
         return -MATE_SCORE
     if board.is_stalemate() or board.is_insufficient_material():
@@ -183,18 +184,129 @@ def evaluate_tapered(board: chess.Board) -> float:
     eg_score = 0
     game_phase = 0
 
-    piece_map = board.piece_map()
-    for sq, pc in piece_map.items():
-        pt = pc.piece_type
-        val = PIECE_VALS[pt]
-        game_phase += PHASE_WEIGHTS[pt]
+    w_pawns = board.pieces_mask(chess.PAWN, chess.WHITE)
+    b_pawns = board.pieces_mask(chess.PAWN, chess.BLACK)
+    all_pawns = w_pawns | b_pawns
 
-        if pc.color == chess.WHITE:
-            mg_score += val + WHITE_PST[pt][sq]
-            eg_score += val + (WHITE_KING_EG[sq] if pt == chess.KING else WHITE_PST[pt][sq])
-        else:
-            mg_score -= val + BLACK_PST[pt][sq]
-            eg_score -= val + (BLACK_KING_EG[sq] if pt == chess.KING else BLACK_PST[pt][sq])
+    # Pawns
+    bb = w_pawns
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score += 100 + WHITE_PST[chess.PAWN][sq]
+        eg_score += 100 + WHITE_PST[chess.PAWN][sq]
+
+    bb = b_pawns
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score -= 100 + BLACK_PST[chess.PAWN][sq]
+        eg_score -= 100 + BLACK_PST[chess.PAWN][sq]
+
+    # Knights
+    bb = board.pieces_mask(chess.KNIGHT, chess.WHITE)
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score += 320 + WHITE_PST[chess.KNIGHT][sq]
+        eg_score += 320 + WHITE_PST[chess.KNIGHT][sq]
+        game_phase += 1
+
+    bb = board.pieces_mask(chess.KNIGHT, chess.BLACK)
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score -= 320 + BLACK_PST[chess.KNIGHT][sq]
+        eg_score -= 320 + BLACK_PST[chess.KNIGHT][sq]
+        game_phase += 1
+
+    # Bishops & Bishop Pair
+    w_bishops = board.pieces_mask(chess.BISHOP, chess.WHITE)
+    w_b_count = 0
+    bb = w_bishops
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score += 330 + WHITE_PST[chess.BISHOP][sq]
+        eg_score += 330 + WHITE_PST[chess.BISHOP][sq]
+        game_phase += 1
+        w_b_count += 1
+    if w_b_count >= 2:
+        mg_score += 35
+        eg_score += 50
+
+    b_bishops = board.pieces_mask(chess.BISHOP, chess.BLACK)
+    b_b_count = 0
+    bb = b_bishops
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score -= 330 + BLACK_PST[chess.BISHOP][sq]
+        eg_score -= 330 + BLACK_PST[chess.BISHOP][sq]
+        game_phase += 1
+        b_b_count += 1
+    if b_b_count >= 2:
+        mg_score -= 35
+        eg_score -= 50
+
+    # Rooks & Open / Semi-open files
+    bb = board.pieces_mask(chess.ROOK, chess.WHITE)
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score += 500 + WHITE_PST[chess.ROOK][sq]
+        eg_score += 500 + WHITE_PST[chess.ROOK][sq]
+        game_phase += 2
+        f = sq & 7
+        if (all_pawns & chess.BB_FILES[f]) == 0:
+            mg_score += 25
+            eg_score += 25
+        elif (w_pawns & chess.BB_FILES[f]) == 0:
+            mg_score += 15
+            eg_score += 15
+
+    bb = board.pieces_mask(chess.ROOK, chess.BLACK)
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score -= 500 + BLACK_PST[chess.ROOK][sq]
+        eg_score -= 500 + BLACK_PST[chess.ROOK][sq]
+        game_phase += 2
+        f = sq & 7
+        if (all_pawns & chess.BB_FILES[f]) == 0:
+            mg_score -= 25
+            eg_score -= 25
+        elif (b_pawns & chess.BB_FILES[f]) == 0:
+            mg_score -= 15
+            eg_score -= 15
+
+    # Queens
+    bb = board.pieces_mask(chess.QUEEN, chess.WHITE)
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score += 900 + WHITE_PST[chess.QUEEN][sq]
+        eg_score += 900 + WHITE_PST[chess.QUEEN][sq]
+        game_phase += 4
+
+    bb = board.pieces_mask(chess.QUEEN, chess.BLACK)
+    while bb:
+        sq = (bb & -bb).bit_length() - 1
+        bb &= bb - 1
+        mg_score -= 900 + BLACK_PST[chess.QUEEN][sq]
+        eg_score -= 900 + BLACK_PST[chess.QUEEN][sq]
+        game_phase += 4
+
+    # Kings
+    w_k_sq = board.king(chess.WHITE)
+    if w_k_sq is not None:
+        mg_score += 20000 + WHITE_PST[chess.KING][w_k_sq]
+        eg_score += 20000 + WHITE_KING_EG[w_k_sq]
+
+    b_k_sq = board.king(chess.BLACK)
+    if b_k_sq is not None:
+        mg_score -= 20000 + BLACK_PST[chess.KING][b_k_sq]
+        eg_score -= 20000 + BLACK_KING_EG[b_k_sq]
 
     phase = min(game_phase, TOTAL_PHASE)
     score = (mg_score * phase + eg_score * (TOTAL_PHASE - phase)) / TOTAL_PHASE
@@ -277,6 +389,8 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
             alpha = stand_pat
         if q_depth <= 0:
             return stand_pat
+        if stand_pat + 950 < alpha:
+            return alpha
         moves = [m for m in board.legal_moves if board.is_capture(m)]
         if not moves:
             return stand_pat
@@ -287,6 +401,12 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
 
     moves.sort(key=lambda m: mvv_lva(board, m), reverse=True)
     for m in moves:
+        if not in_check and not m.promotion:
+            vic = board.piece_at(m.to_square)
+            vic_val = PIECE_VALS.get(vic.piece_type, 0) if vic else 100
+            if stand_pat + vic_val + 200 < alpha:
+                continue
+
         board.push(m)
         score = -quiescence_search(board, -beta, -alpha, q_depth - 1 if not in_check else q_depth, ply + 1)
         board.pop()
@@ -324,21 +444,33 @@ def alphabeta_search(board: chess.Board, depth: int, alpha: float, beta: float, 
 
 
 class OptimizedSearchEngine:
-    """Full-featured Alpha-Beta engine with TT, Iterative Deepening, and Move Ordering."""
-    def __init__(self):
-        self.tt = TranspositionTable(max_entries=300000)
+    """Full-featured Alpha-Beta engine with TT, Iterative Deepening, NMP, LMR, and Polyglot Opening Book."""
+    def __init__(self, book_path: Optional[str] = POLYGLOT_BOOK):
+        self.tt = TranspositionTable(max_entries=500000)
         self.killer_moves: List[List[Optional[chess.Move]]] = [[None, None] for _ in range(64)]
         self.history_table: Dict[Tuple[int, int], int] = {}
         self.nodes_visited = 0
         self.start_time = 0.0
         self.time_limit = 0.5
         self.stop_search = False
+        self.book_path = book_path
 
     def clear_heuristics(self):
         self.killer_moves = [[None, None] for _ in range(64)]
         self.history_table.clear()
         self.nodes_visited = 0
         self.stop_search = False
+
+    def probe_book(self, board: chess.Board) -> Optional[chess.Move]:
+        if self.book_path and os.path.exists(self.book_path):
+            try:
+                with chess.polyglot.open_reader(self.book_path) as reader:
+                    entry = reader.get(board)
+                    if entry is not None and entry.move in board.legal_moves:
+                        return entry.move
+            except Exception:
+                pass
+        return None
 
     def score_move(self, board: chess.Board, m: chess.Move, tt_move: Optional[chess.Move], ply: int) -> int:
         if tt_move and m == tt_move:
@@ -365,6 +497,11 @@ class OptimizedSearchEngine:
         if board.is_stalemate() or board.is_insufficient_material():
             return 0.0
 
+        in_check = board.is_check()
+        # Check Extension: extend search when in check
+        if in_check:
+            depth += 1
+
         if depth <= 0:
             return quiescence_search(board, alpha, beta, ply=ply)
 
@@ -373,9 +510,25 @@ class OptimizedSearchEngine:
         if tt_val is not None:
             return tt_val
 
+        # Null-Move Pruning (NMP): if passing turn still beats beta, prune branch
+        if depth >= 3 and not in_check and ply > 0:
+            has_pieces = any(
+                pc.piece_type not in (chess.PAWN, chess.KING) and pc.color == board.turn
+                for pc in board.piece_map().values()
+            )
+            if has_pieces:
+                r = 2 + (depth // 6)
+                board.push(chess.Move.null())
+                null_score = -self.negamax(board, depth - 1 - r, -beta, -beta + 1, ply + 1)
+                board.pop()
+                if self.stop_search:
+                    return alpha
+                if null_score >= beta:
+                    return beta
+
         moves = list(board.legal_moves)
         if not moves:
-            if board.is_check():
+            if in_check:
                 return -MATE_SCORE + ply
             return 0.0
 
@@ -385,9 +538,20 @@ class OptimizedSearchEngine:
         best_m = None
         orig_alpha = alpha
 
-        for m in moves:
+        for i, m in enumerate(moves):
+            is_capture = board.is_capture(m)
             board.push(m)
-            score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+            gives_check = board.is_check()
+
+            # Late Move Reductions (LMR): search late quiet moves with reduced depth
+            if i >= 4 and depth >= 3 and not in_check and not is_capture and not gives_check and not m.promotion:
+                reduced_depth = max(1, depth - 2)
+                score = -self.negamax(board, reduced_depth, -alpha - 1, -alpha, ply + 1)
+                if score > alpha and not self.stop_search:
+                    score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+            else:
+                score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+
             board.pop()
 
             if self.stop_search:
@@ -401,7 +565,7 @@ class OptimizedSearchEngine:
                 alpha = score
 
             if alpha >= beta:
-                if not board.is_capture(m) and ply < 64:
+                if not is_capture and ply < 64:
                     if self.killer_moves[ply][0] != m:
                         self.killer_moves[ply][1] = self.killer_moves[ply][0]
                         self.killer_moves[ply][0] = m
@@ -420,6 +584,11 @@ class OptimizedSearchEngine:
         return best_score
 
     def search(self, board: chess.Board, time_limit: float = 0.5, max_depth: int = 15, root_prior: Optional[Dict[chess.Move, float]] = None) -> Tuple[chess.Move, float, int]:
+        # 1. Polyglot book probe
+        book_m = self.probe_book(board)
+        if book_m:
+            return book_m, 0.0, 99
+
         self.start_time = time.perf_counter()
         self.time_limit = time_limit
         self.clear_heuristics()
@@ -467,15 +636,16 @@ class OptimizedSearchEngine:
                 if val > alpha:
                     alpha = val
 
-            if self.stop_search:
+            if self.stop_search or iter_best_move is None:
                 break
 
             best_move = iter_best_move
             best_val = iter_best_val
             completed_depth = d
 
-            moves.remove(best_move)
-            moves.insert(0, best_move)
+            if best_move in moves:
+                moves.remove(best_move)
+                moves.insert(0, best_move)
 
             if abs(best_val) > MATE_SCORE - 100:
                 break
@@ -504,7 +674,7 @@ class OrionModelRunner:
 
 
 class OrionSearchPlayer:
-    """Full Engine: Root Neural Prior + Iterative Deepening + Zobrist TT + Tapered Evaluation + Move Ordering."""
+    """Full Engine: Polyglot Opening Book + Root Neural Prior + Iterative Deepening + NMP/LMR + Zobrist TT + Tapered Evaluation."""
     def __init__(self, runner: OrionModelRunner):
         self.runner = runner
         self.name = "ORION-Search-Full"
@@ -517,7 +687,12 @@ class OrionSearchPlayer:
         if len(moves) == 1:
             return moves[0]
 
-        # Neural policy prior at root
+        # 1. Polyglot opening book lookup
+        book_m = self.engine.probe_book(board)
+        if book_m:
+            return book_m
+
+        # 2. Neural policy prior at root
         p_scores = self.runner.get_policy(board)
         root_prior = {m: float(p_scores[fast_encode_action(m)]) for m in moves}
 

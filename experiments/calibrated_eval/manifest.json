@@ -1,14 +1,26 @@
 {
+  "version": "2.2.0",
   "total_games": 30,
-  "pgn_sha256": "28a255ac9d1316f217ced5406495642fbdad0c1f8f408c94392d43ea28c79b00",
-  "ordo_vice_anchor": {
-    "ORION-Search-Full": 1965.6,
-    "error": 262.1,
-    "score_pct": 65.0
-  },
-  "ordo_sf_anchor": {
-    "ORION-Search-Full": 1541.6,
-    "error": 277.4,
-    "score_pct": 65.0
+  "pgn_sha256": "d8cce044688b76c9c7dd8c43a7201d606455b873474dab7e5d6e060216b30f39",
+  "results": {
+    "ORION-Search-Full": {
+      "score": 7.0,
+      "played": 10,
+      "pct": 70.0,
+      "rank": 3,
+      "ordo_vice_anchor": 1777.1
+    },
+    "Vice-1.2": {
+      "score": 7.5,
+      "played": 10,
+      "pct": 75.0,
+      "anchor": 1850.0
+    },
+    "BBC-1.2": {
+      "score": 9.5,
+      "played": 10,
+      "pct": 95.0,
+      "ordo_vice_anchor": 2157.4
+    }
   }
 }
