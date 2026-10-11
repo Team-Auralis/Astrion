@@ -1,9 +1,11 @@
 
    # PLAYER               :  RATING  ERROR  POINTS  PLAYED   (%)
-   1 Vice-1.2             :  1588.9  291.3     7.0      10    70
-   2 Sunfish-2026         :  1407.0  294.8     5.5      10    55
-   3 Stockfish-1350       :  1350.0   ----     5.0      10    50
-   4 ORION-Search-Full    :  1006.0  258.0     2.5      10    25
+   1 BBC-1.2              :  1785.6  282.4     9.0      10    90
+   2 ORION-Search-Full    :  1541.6  277.4     6.5      10    65
+   3 Vice-1.2             :  1426.0  251.2     5.0      10    50
+   4 Sunfish-2026         :  1388.2  246.7     4.5      10    45
+   5 Stockfish-1350       :  1350.0   ----     4.0      10    40
+   6 ORION-Neural-Only    :  1068.3  250.7     1.0      10    10
 
 White advantage = 0.00 +/- 0.00
 Draw rate (equal opponents) = 50.00 % +/- 0.00

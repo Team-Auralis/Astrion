@@ -1,0 +1,153 @@
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "1"]
+[White "ORION-Search-Full"]
+[Black "Sunfish-2026"]
+[Result "1-0"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Nge2 c5 5. d4 cxd4 6. f4 Qe6 7. Qxd4 Nc6 8. Qd5 Nf6 9. Qb5 Ne4 10. Nxe4 Qxe4
+11. Qd3 Bf5 12. Qxe4 Bxe4 13. Kd2 Rd8+ 14. Kc3 Rd1 15. Ng3 Bg6 16. f5 e5 17.
+fxg6 Bb4+ 18. Kb3 hxg6 19. Kc4 Rh4+ 20. Kb3 Kd7 21. Rb1 Kd6 22. a3 Bc5 23. Ka2
+Bf2 24. Ne2 Re4 25. Nc3 Rxc1 26. Nxe4+ Kd5 27. Nc3+ Kd4 28. Nb5+ Kc5 29. Rxc1
+Nd4 30. Nxa7 Be3 31. b4+ Kb6 32. Nc8+ Kc7 33. Re1 Nxc2 34. Re2 Kxc8 35. Rxc2+
+Kd7 36. Bc4 f5 37. Bd5 b6 38. Rc6 g5 39. Rg6 g4 40. Re1 f4 41. Bc4 e4 42. Rxg4
+g5 43. Bd5 Bf2 44. Rxe4 Bh4 45. Re6 b5 46. Rb6 Bf2 47. Rxb5 Bh4 48. Rb7+ Kd6
+49. Bc4 Ke5 50. b5 Kf5 51. h3 Ke5 52. b6 Kd4 53. Kb3 Ke5 54. Kc3 Ke4 55. Re7+
+Kf5 56. b7 Kf6 57. b8=Q Kxe7 58. Qc7+ Kf6 59. Rxf4+ gxf4 60. Qxf4+ Kg6 61. Qxh4
+Kf5 62. Kd4 Kg6 63. Qf4 Kh5 64. Bf7# 1-0
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "2"]
+[White "Sunfish-2026"]
+[Black "ORION-Search-Full"]
+[Result "0-1"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Nge2 Nf6 5. d4 Qd6 6. Bf4 Qb6 7. Na4 Qb4+ 8. c3 Qc4 9. Nc5 Nbd7 10. Ng3 Qd5
+11. c4 Qc6 12. Nb3 e6 13. Na5 Bb4+ 14. Bd2 Bxd2+ 15. Qxd2 Qb6 16. Be2 O-O 17.
+O-O e5 18. Nf5 Ne4 19. Ne7+ Kh8 20. Nxc8 Raxc8 21. Qd3 Qxd4 22. Qxd4 exd4 23.
+Rad1 Ne5 24. Rxd4 Nd6 25. Rd5 Rfe8 26. Rfd1 Kg8 27. Kf1 a6 28. f4 Ng6 29. g3
+Ne7 30. Re5 Ng6 31. Rc5 Ne4 32. Rcd5 Nf6 33. Rc5 b6 34. Rc6 bxa5 35. Rxa6 Rb8
+36. b3 Ra8 37. Rc6 Rac8 38. Ke1 Ne4 39. Rd7 h6 40. Rcxc7 Rxc7 41. Rxc7 Nc3 42.
+Kd2 Nxe2 43. f5 Nf8 44. Kd3 Nc1+ 45. Kd4 Rd8+ 46. Ke4 Re8+ 47. Kd4 Rd8+ 48. Ke4
+Nxa2 49. h3 Nc3+ 50. Ke5 Nd7+ 51. Kd4 Ne2+ 52. Ke4 Nxg3+ 53. Kf4 Ne2+ 54. Ke4
+Nc3+ 55. Kd3 Nd1 56. Ke2 Ne5 57. Re7 Nc3+ 58. Ke3 Rd3+ 59. Kf4 Nc6 60. Rc7 Nd4
+61. Rc8+ Kh7 62. Rd8 Nde2+ 63. Ke5 Rxd8 64. f6 Nd4 65. fxg7 Kxg7 66. b4 Nc6+
+67. Kf4 Rd4+ 68. Ke3 Re4+ 69. Kd2 axb4 70. Kc2 Rh4 71. Kd3 Kf6 72. Ke3 Ke5 73.
+Kd3 Ne4 74. Ke3 Nd4 75. Kd3 Rxh3# 0-1
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "3"]
+[White "ORION-Search-Full"]
+[Black "Vice-1.2"]
+[Result "0-1"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Nge2 Qa5 5. d4 Bd7 6. Be3 Nc6 7. d5 Ne5 8. Qd4 Ng4 9. Qc5 Qxc5 10. Bxc5 e5
+11. Bxf8 Kxf8 12. h3 N4f6 13. Kd2 Ne7 14. f4 e4 15. Ke3 Bf5 16. Rd1 Rd8 17. Kf2
+Nexd5 18. Nxd5 Rxd5 19. Rxd5 Nxd5 20. Nd4 e3+ 21. Kf3 Bd7 22. Bc4 Nb6 23. Bb3
+c5 24. Ne2 c4 25. Kxe3 cxb3 26. axb3 Kg8 27. Rd1 f5 28. Nd4 g6 29. c4 Kf7 30.
+Ra1 Nc8 31. c5 Re8+ 32. Kd3 Re4 33. g3 Kg8 34. b4 Kf8 35. b5 Be8 36. c6 Re7 37.
+cxb7 Rxb7 38. Ne6+ Ke7 39. Re1 Bxb5+ 40. Kd4 Kf6 41. Nc5 Rc7 42. Re6+ Kf7 43.
+Re1 Nb6 44. g4 fxg4 45. hxg4 Nc4 46. Ne6 Rd7+ 47. Kc5 a6 48. Ng5+ Kg7 49. Rh1
+Kg8 50. Rh2 Ne3 51. Rh4 Ng2 52. Rh1 Nxf4 53. Kb4 Nd5+ 54. Kc5 Nf6 55. Ne6 Nxg4
+56. Nd4 Nf2 57. Rh4 g5 58. Nxb5 gxh4 59. Nd6 Rxd6 60. Kxd6 h3 61. b4 h2 62. Ke5
+h1=Q 63. Kd4 Qc1 64. b5 axb5 65. Ke5 b4 66. Kd4 b3 67. Kd5 Kf7 68. Ke5 b2 69.
+Kd5 b1=Q 70. Ke5 Qc7+ 71. Kd4 Qd3# 0-1
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "4"]
+[White "Vice-1.2"]
+[Black "ORION-Search-Full"]
+[Result "1-0"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Be2 Nf6 5. d4 Qd6 6. Nf3 Nc6 7. Nb5 Qb4+ 8. Bd2 Qxb2 9. Nxc7+ Kd7 10. Nxa8
+Nxd4 11. Be3 Qxa1 12. Ne5+ Ke6 13. Bc4+ Nd5 14. Bxd5+ Kd6 15. Nxf7+ Kd7 16.
+Qxa1 Nxc2+ 17. Ke2 Nxa1 18. Nxh8 Nc2 19. Bxa7 e5 20. Nf7 Nd4+ 21. Kd3 Nb5 22.
+Nb6+ Ke7 23. Nxc8+ Kd7 24. Rb1 e4+ 25. Bxe4 Na3 26. Bf5+ Kc6 27. Rc1+ Kb5 28.
+Bxh7 Ka6 29. Be3 Nb5 30. Be4 Ba3 31. Rb1 Bf8 32. a4 Nc7 33. Rxb7 Ka5 34. Rxc7
+Kxa4 35. Ng5 Kb5 36. Bc6+ Ka5 37. Bd2+ Ka6 38. Ra7# 1-0
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "5"]
+[White "ORION-Search-Full"]
+[Black "BBC-1.2"]
+[Result "0-1"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Nge2 c5 5. d4 cxd4 6. f4 Qh5 7. Nxd4 Bg4 8. Be2 Bxe2 9. Qxe2 Qxe2+ 10. Kxe2
+Nd7 11. Be3 Ngf6 12. f5 g6 13. fxg6 hxg6 14. Ndb5 Rc8 15. Nxa7 Rc4 16. Nab5 Bg7
+17. Kd3 Ne5+ 18. Ke2 Nfg4 19. b3 Nxe3 20. bxc4 Nxg2 21. c5 Rh3 22. Nd5 Nf3 23.
+Nbc7+ Kf8 24. Rab1 Bd4 25. Rxb7 Bxc5 26. Rb8+ Kg7 27. Ne8+ Kh6 28. Rb7 Nd4+ 29.
+Kf2 Nf4 30. Nxf4 Ne6+ 31. Ke1 Nxf4 32. Kd2 Ne6 33. Nc7 Be3+ 34. Ke2 Nf4+ 35.
+Kf1 Rf3+ 36. Ke1 Rf2 37. Nb5 Ng2+ 38. Kd1 Rd2+ 39. Kc1 Rd7+ 40. Kb1 Rxb7 41. c4
+Bc5 42. Kc2 Kg7 43. Kd3 Nf4+ 44. Ke4 Nh3 45. Re1 Rd7 46. a3 Rd2 47. Ke5 f6+ 48.
+Ke4 Ng5+ 49. Kf4 Rxh2 50. Kg3 Rc2 51. Kg4 Rxc4+ 52. Kg3 Ra4 53. Kg2 Rg4+ 54.
+Kf1 Rf4+ 55. Ke2 Rf2+ 56. Kd3 Ra2 57. Re2 Ra1 58. Kc4 Rc1+ 59. Kd3 Nh3 60. Kd2
+Rb1 61. a4 Rb4 62. Nc3 Nf4 63. Re1 Rb2+ 64. Kd1 Ng2 65. Rf1 Ne3+ 66. Kc1 Rb3
+67. Re1 Rxc3+ 68. Kd2 Ra3 69. Rc1 Bb6 70. Rc6 Rxa4 71. Kd3 Nd5 72. Rc4 Ra1 73.
+Ke4 Rd1 74. Rc6 Be3 75. Re6 Rd4+ 76. Kf3 Bf4 77. Kf2 Rd2+ 78. Kf3 Kf7 0-1
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "6"]
+[White "BBC-1.2"]
+[Black "ORION-Search-Full"]
+[Result "1-0"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Be2 Nf6 5. Nf3 Qd6 6. O-O Nc6 7. d4 e5 8. dxe5 Nxe5 9. Nxe5 Qxe5 10. Bb5+
+Ke7 11. Re1 Ne4 12. Rxe4 Qxe4 13. Nxe4 Bf5 14. Qd5 Bc8 15. Bg5+ f6 16. Nxf6 Be6
+17. Re1 Kf7 18. Qxe6+ Kg6 19. Ne4+ Kh5 20. g4# 1-0
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "7"]
+[White "ORION-Search-Full"]
+[Black "Stockfish-1350"]
+[Result "1-0"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Nge2 Nc6 5. d4 Qa5 6. d5 Nb4 7. Be3 Nf6 8. Nf4 Bg4 9. Bb5+ Bd7 10. Bxd7+
+Kxd7 11. O-O Rd8 12. a3 Nc6 13. dxc6+ Ke8 14. Qf3 Qxc3 15. bxc3 b5 16. Bxa7 b4
+17. cxb4 g5 18. Nd3 Ne4 19. Qxe4 f5 20. Qe5 Bg7 21. Qxg7 Rxd3 22. Rfe1 Re3 23.
+Rxe3 g4 24. Qxe7# 1-0
+
+[Event "ORION Calibrated Benchmark Arena"]
+[Site "Local Rigorous Testbed"]
+[Date "2026.10.11"]
+[Round "8"]
+[White "Stockfish-1350"]
+[Black "ORION-Search-Full"]
+[Result "0-1"]
+[FEN "rnb1kbnr/ppp1pppp/8/4q3/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4"]
+[SetUp "1"]
+
+4. Nge2 Nc6 5. d4 Qd6 6. d5 Ne5 7. Nb5 Qb4+ 8. Nec3 Qc5 9. Be3 Nf3+ 10. gxf3
+Qb4 11. Bd4 Qa5 12. b4 Qxb4 13. a3 Qa5 14. Rb1 a6 15. Rb4 axb5 16. Bxb5+ Kd8
+17. Ra4 Qxb5 18. Rxa8 Qc4 19. Rg1 Nf6 20. f4 Nxd5 21. f3 Rg8 22. Rg5 e6 23.
+Nxd5 exd5 24. Bf6+ Kd7 25. Rxd5+ Bd6 26. Bh4 Re8+ 27. Kf2 Qxf4 28. Bg3 Qe3+ 29.
+Kf1 Qb6 30. c4 Ke7 31. Bxd6+ cxd6 32. Kg2 Bh3+ 33. Kxh3 Rxa8 34. Qd3 Qb2 35.
+Rxd6 Rxa3 36. Qd1 Ra2 37. Qd2 Qxd2 38. Re6+ Kxe6 39. Kg4 Qd4+ 40. Kh3 Qf4 41.
+c5 Rxh2# 0-1
+

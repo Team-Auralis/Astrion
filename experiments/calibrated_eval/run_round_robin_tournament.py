@@ -171,14 +171,16 @@ def run_full_round_robin(num_pairings: int = 1, time_limit: float = 0.05, pgn_pa
     for e in external_engines:
         e.close()
 
-    with open(pgn_path, "w") as f:
+    abs_pgn = os.path.abspath(pgn_path)
+    os.makedirs(os.path.dirname(abs_pgn), exist_ok=True)
+    with open(abs_pgn, "w", encoding="utf-8") as f:
         for g in all_games:
-            exporter = chess.pgn.FileExporter(f)
-            g.accept(exporter)
+            print(g, file=f, end="\n\n")
+            f.flush()
 
     elapsed = time.time() - t_start
-    print(f"\nFinished {len(all_games)} games in {elapsed:.1f}s. Saved PGN: {pgn_path}")
-    return pgn_path
+    print(f"\nFinished {len(all_games)} games in {elapsed:.1f}s. Saved PGN: {abs_pgn}")
+    return abs_pgn
 
 
 def analyze_with_ordo(pgn_path: str, anchor_name: str = "Vice-1.2", anchor_rating: float = 1850.0):

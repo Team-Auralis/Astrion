@@ -113,7 +113,7 @@ def play_game(white_player, black_player, start_fen: str, round_id: int, time_li
     return game
 
 
-def run_tournament(num_pairings: int, time_limit: float = 0.2, pgn_path: str = "experiments/calibrated_eval/matches.pgn"):
+def run_tournament(num_pairings: int, time_limit: float = 0.2, pgn_path: str = "experiments/calibrated_eval/matches.pgn", subjects_filter: str = "both"):
     os.makedirs(os.path.dirname(pgn_path), exist_ok=True)
     openings = load_openings(EPD_BOOK, num_pairings)
 
@@ -123,9 +123,9 @@ def run_tournament(num_pairings: int, time_limit: float = 0.2, pgn_path: str = "
 
     opponents = [
         ExternalEnginePlayer("Sunfish-2026", ["python", "tools/engines/sunfish-master/sunfish.py", "-u"]),
+        ExternalEnginePlayer("Vice-1.2", [os.path.abspath("tools/engines/vice.exe")]),
         ExternalEnginePlayer("BBC-1.2", [os.path.abspath("tools/engines/bbc-master/bin/windows/bbc_1.2_64bit_windows.exe")]),
         ExternalEnginePlayer("Stockfish-1350", [os.path.abspath("stockfish.exe")], options={"UCI_LimitStrength": True, "UCI_Elo": 1350}),
-        ExternalEnginePlayer("Stockfish-1600", [os.path.abspath("stockfish.exe")], options={"UCI_LimitStrength": True, "UCI_Elo": 1600}),
     ]
 
     for opp in opponents:
@@ -134,7 +134,12 @@ def run_tournament(num_pairings: int, time_limit: float = 0.2, pgn_path: str = "
     all_games = []
     round_counter = 1
 
-    test_subjects = [orion_search, orion_neural]
+    if subjects_filter == "search":
+        test_subjects = [orion_search]
+    elif subjects_filter == "neural":
+        test_subjects = [orion_neural]
+    else:
+        test_subjects = [orion_search, orion_neural]
 
     print(f"=== Starting Calibrated Tournament ({len(openings)} paired openings x 2 colors) ===")
     print(f"Subjects: {[s.name for s in test_subjects]}")
@@ -160,16 +165,18 @@ def run_tournament(num_pairings: int, time_limit: float = 0.2, pgn_path: str = "
         opp.close()
 
     # Save PGN
-    with open(pgn_path, "w") as f:
+    abs_pgn_path = os.path.abspath(pgn_path)
+    os.makedirs(os.path.dirname(abs_pgn_path), exist_ok=True)
+    with open(abs_pgn_path, "w", encoding="utf-8") as f:
         for g in all_games:
-            exporter = chess.pgn.FileExporter(f)
-            g.accept(exporter)
+            print(g, file=f, end="\n\n")
+            f.flush()
 
-    print(f"\nSaved {len(all_games)} tournament games to {pgn_path}")
-    return pgn_path
+    print(f"\nSaved {len(all_games)} tournament games to {abs_pgn_path}")
+    return abs_pgn_path
 
 
-def run_ordo_analysis(pgn_path: str, anchor_name: str = "Sunfish-2026", anchor_rating: float = 1750.0) -> str:
+def run_ordo_analysis(pgn_path: str, anchor_name: str = "Stockfish-1350", anchor_rating: float = 1350.0) -> str:
     out_txt = os.path.splitext(pgn_path)[0] + "_ordo.txt"
     cmd = [
         ORDO_EXE,
@@ -198,9 +205,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pairs", type=int, default=1, help="Number of paired openings")
     parser.add_argument("--time", type=float, default=0.1, help="Time limit per move")
-    parser.add_argument("--pilot", action="store_true", help="Run pilot check only")
+    parser.add_argument("--subjects", type=str, default="search", choices=["search", "neural", "both"], help="Which subjects to test")
+    parser.add_argument("--anchor", type=str, default="Stockfish-1350", help="Ordo anchor name")
+    parser.add_argument("--anchor-rating", type=float, default=1350.0, help="Ordo anchor rating")
+    parser.add_argument("--out", type=str, default="experiments/calibrated_eval/gate4_tournament.pgn", help="Output PGN path")
     args = parser.parse_args()
 
-    pgn_file = "experiments/calibrated_eval/pilot.pgn" if args.pilot else "experiments/calibrated_eval/calibrated_tournament.pgn"
-    pgn_out = run_tournament(num_pairings=args.pairs, time_limit=args.time, pgn_path=pgn_file)
-    run_ordo_analysis(pgn_out)
+    pgn_out = run_tournament(num_pairings=args.pairs, time_limit=args.time, pgn_path=args.out, subjects_filter=args.subjects)
+    run_ordo_analysis(pgn_out, anchor_name=args.anchor, anchor_rating=args.anchor_rating)

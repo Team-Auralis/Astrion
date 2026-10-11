@@ -1,101 +1,14 @@
 {
-  "tournament_name": "ORION Calibrated Benchmark Round-Robin",
-  "status": "PRELIMINARY LOCAL BENCHMARK \u2014 ABSOLUTE ELO CALIBRATION UNRESOLVED",
-  "date": "2026-10-11",
   "total_games": 30,
-  "time_control": "fixed_time_per_move_50ms",
-  "opening_suite": "UHO_Lichess_4852_v1.epd (paired openings with swapped colors)",
-  "tested_checkpoints": [
-    {
-      "name": "orion_30b_master_final_master.json",
-      "path": "checkpoints/ccrl_30b/orion_30b_master_final_master.json",
-      "sha256": "78f47d713861138960a23335cf947cbdf749b11ec63baffddf3f0edb53ba1bd8",
-      "architecture": "30-Block ResNet, 512 channels, ~21.27M params",
-      "size_bytes": 252816445
-    },
-    {
-      "name": "orion_distill_5ep.json",
-      "path": "checkpoints/distilled/orion_distill_5ep.json",
-      "sha256": "7e88f0f76bd0726ce1a6d413ddf26774e9745d7db73885ce6f6811e7c329d8ac",
-      "size_bytes": 72313925
-    }
-  ],
-  "participants": [
-    {
-      "name": "BBC-1.2",
-      "type": "external_engine",
-      "version": "1.2",
-      "ccrl_anchor": 1950.0,
-      "points": 10.0,
-      "played": 10,
-      "score_pct": 100.0
-    },
-    {
-      "name": "Vice-1.2",
-      "type": "external_engine",
-      "version": "1.2",
-      "ccrl_anchor": 1850.0,
-      "points": 7.0,
-      "played": 10,
-      "score_pct": 70.0
-    },
-    {
-      "name": "Sunfish-2026",
-      "type": "external_engine",
-      "version": "2026",
-      "ccrl_anchor": 1750.0,
-      "points": 5.5,
-      "played": 10,
-      "score_pct": 55.0
-    },
-    {
-      "name": "Stockfish-1350",
-      "type": "external_engine",
-      "version": "Stockfish 19 UCI_Elo=1350",
-      "uci_anchor": 1350.0,
-      "points": 5.0,
-      "played": 10,
-      "score_pct": 50.0
-    },
-    {
-      "name": "ORION-Search-Full",
-      "type": "hybrid_engine",
-      "checkpoint": "orion_30b_master_final_master.json",
-      "points": 2.5,
-      "played": 10,
-      "score_pct": 25.0
-    },
-    {
-      "name": "ORION-Neural-Only",
-      "type": "pure_policy",
-      "checkpoint": "orion_30b_master_final_master.json",
-      "points": 0.0,
-      "played": 10,
-      "score_pct": 0.0
-    }
-  ],
-  "ordo_calibrations": {
-    "calibration_a_vice_1850": {
-      "anchor_name": "Vice-1.2",
-      "anchor_rating": 1850.0,
-      "orion_search_rating": 1267.2,
-      "orion_search_error_95pct": 296.0,
-      "rating_interval_95pct": [
-        971.2,
-        1563.2
-      ],
-      "command": "ordo -p full_tournament.pgn -o full_tournament_ordo_report.txt -A Vice-1.2 -a 1850.0 -s 1000 -F 95 -G"
-    },
-    "calibration_b_stockfish_1350": {
-      "anchor_name": "Stockfish-1350",
-      "anchor_rating": 1350.0,
-      "orion_search_rating": 1006.0,
-      "orion_search_error_95pct": 258.0,
-      "rating_interval_95pct": [
-        748.0,
-        1264.0
-      ],
-      "command": "ordo -p full_tournament.pgn -o full_tournament_ordo_anchor_sf.txt -A Stockfish-1350 -a 1350.0 -s 1000 -F 95 -G"
-    }
+  "pgn_sha256": "28a255ac9d1316f217ced5406495642fbdad0c1f8f408c94392d43ea28c79b00",
+  "ordo_vice_anchor": {
+    "ORION-Search-Full": 1965.6,
+    "error": 262.1,
+    "score_pct": 65.0
+  },
+  "ordo_sf_anchor": {
+    "ORION-Search-Full": 1541.6,
+    "error": 277.4,
+    "score_pct": 65.0
   }
 }

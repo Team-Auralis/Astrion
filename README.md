@@ -40,9 +40,10 @@
     - **Sunfish 2026** (CCRL anchor ~1750 Elo)
     - **BBC 1.2** (CCRL anchor ~1950 Elo)
     - **Stockfish 19** (`UCI_LimitStrength` = 1350 Elo anchor)
-  - Clear separation of test subjects:
-    - **ORION-Search-Full** (30-Block Master + Alpha-Beta Minimax + Quiescence): **1267.2 ± 296.0 Elo** (Vice anchor) / **1006.0 ± 258.0 Elo** (Stockfish-1350 anchor)
-    - **ORION-Neural-Only** (30-Block Policy Prior Argmax): Evaluated as pure intuition baseline.
+  - Clear separation of test subjects and reproducible results:
+    - **ORION-Search-Full** (Gate 4 Search with 64-bit Zobrist TT, Tapered PST, Iterative Deepening & Neural Prior): **1965.6 ± 262.1 Elo** (Vice anchor) / **1541.6 ± 277.4 Elo** (Stockfish-1350 anchor), scoring **65.0% (6.5/10)** to place #2 overall.
+    - **ORION-Neural-Only** (30-Block Policy Prior Argmax): Evaluated as pure intuition baseline (1.0/10, 10.0%).
+    - Full details in [CALIBRATED_BENCHMARK_REPORT.md](docs/CALIBRATED_BENCHMARK_REPORT.md).
 - **⚡ Vectorized PyTorch Training Pipeline**:
   - 1,000x speedup over standard single-sample Python loops (9,000+ positions/second).
   - Train on massive Lichess puzzle and opening datasets in minutes.
