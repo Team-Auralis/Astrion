@@ -19,6 +19,7 @@ Features:
 """
 
 import argparse
+import io
 import json
 import math
 import os
@@ -155,13 +156,19 @@ def stream_train_full_corpus(
     checkpoint_in: Optional[str] = None,
     output_prefix: str = "checkpoints/ccrl_master/orion_ccrl_full_corpus",
     target_accuracy: float = 90.0,
-    max_total_positions: Optional[int] = None
+    max_total_positions: Optional[int] = None,
+    epochs_per_chunk: int = 1,
+    channels: int = 512,
+    num_blocks: int = 12,
+    policy_hidden: int = 1024,
+    value_hidden: int = 256
 ):
     print("=" * 80)
     print("      ORION FULL-CORPUS STREAMING TRAINER (2,463,682 CCRL ENGINE GAMES)")
     print("=" * 80)
     print(f"Archive           : {archive_path}")
     print(f"Total Games       : {TOTAL_CCRL_GAMES:,}")
+    print(f"Model Capacity    : {channels} Channels, {num_blocks} Blocks ({policy_hidden} Policy, {value_hidden} Value)")
     print(f"Rolling Chunk Size: {chunk_positions:,} positions")
     print(f"Min Engine Elo    : {min_elo}")
     print(f"Target Consensus  : {target_accuracy:.1f}% Accuracy")
@@ -170,11 +177,19 @@ def stream_train_full_corpus(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[DEVICE] Hardware: {device} ({torch.cuda.get_device_name(0) if device.type == 'cuda' else 'CPU'})")
 
-    # Initialize model
-    model = OrionResNet().to(device)
+    # Initialize model with requested parameter size
+    model = OrionResNet(
+        channels=channels,
+        num_blocks=num_blocks,
+        policy_hidden=policy_hidden,
+        value_hidden=value_hidden
+    ).to(device)
+
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"[MODEL] Total Parameters: {total_params:,} ({total_params/1e6:.2f}M)")
 
     # Warm-start
-    init_ckpt = checkpoint_in or "checkpoints/ccrl_master/orion_ccrl_deep_master.json"
+    init_ckpt = checkpoint_in or "checkpoints/distilled/orion_distill_5ep.json"
     if not os.path.exists(init_ckpt):
         init_ckpt = "checkpoints/distilled/orion_distill_master.json"
 
@@ -235,16 +250,31 @@ def stream_train_full_corpus(
     signal.signal(signal.SIGINT, handle_signal)
 
     try:
+        leftover_lines = []
         while True:
             # 1. Fill current chunk buffer from stream
             chunk_filled = 0
             t_chunk_stream = time.time()
 
             while chunk_filled < chunk_positions:
-                game = chess.pgn.read_game(proc.stdout)
-                if game is None:
-                    print("\n[STREAM] Completed entire CCRL archive (2,463,682 games streamed)!")
+                game_lines = leftover_lines
+                leftover_lines = []
+                while True:
+                    line = proc.stdout.readline()
+                    if not line:
+                        break
+                    if line.startswith("[Event ") and game_lines:
+                        leftover_lines = [line]
+                        break
+                    game_lines.append(line)
+
+                if not game_lines:
+                    print("\n[STREAM] Completed CCRL stream or EOF reached!")
                     break
+
+                game = chess.pgn.read_game(io.StringIO("".join(game_lines)))
+                if game is None:
+                    continue
 
                 total_games_parsed += 1
 
@@ -274,25 +304,24 @@ def stream_train_full_corpus(
 
                 for move in game.mainline_moves():
                     ply += 1
-                    if ply < 6:
+                    if ply < 4:
                         board.push(move)
                         continue
                     if ply > 90 or chunk_filled >= chunk_positions:
                         break
 
-                    if (ply % stride) == 0:
-                        fast_encode_board(board, buf_board)
-                        action = fast_encode_action(move)
+                    fast_encode_board(board, buf_board)
+                    action = fast_encode_action(move)
 
-                        turn_outcome = white_outcome if board.turn == chess.WHITE else (1.0 - white_outcome)
-                        mat_val = fast_material_value(board)
-                        target_val = 0.85 * turn_outcome + 0.15 * mat_val
+                    turn_outcome = white_outcome if board.turn == chess.WHITE else (1.0 - white_outcome)
+                    mat_val = fast_material_value(board)
+                    target_val = 0.85 * turn_outcome + 0.15 * mat_val
 
-                        x_chunk[chunk_filled] = torch.from_numpy(buf_board.flatten())
-                        p_chunk[chunk_filled] = action
-                        v_chunk[chunk_filled, 0] = target_val
-                        chunk_filled += 1
-                        game_samples += 1
+                    x_chunk[chunk_filled] = torch.from_numpy(buf_board.flatten())
+                    p_chunk[chunk_filled] = action
+                    v_chunk[chunk_filled, 0] = target_val
+                    chunk_filled += 1
+                    game_samples += 1
 
                     board.push(move)
 
@@ -309,36 +338,37 @@ def stream_train_full_corpus(
             # 2. Train GPU on current chunk
             model.train()
             ds = TensorDataset(x_chunk[:chunk_filled], p_chunk[:chunk_filled], v_chunk[:chunk_filled])
-            loader = DataLoader(ds, batch_size=batch_size, shuffle=True, pin_memory=(device.type == "cuda"))
 
             total_loss = 0.0
             chunk_metrics = {"top1": 0.0, "top3": 0.0, "top5": 0.0, "value": 0.0, "consensus": 0.0}
             batches_count = 0
 
             t_chunk_train = time.time()
-            for bx, bp, bv in loader:
-                bx = bx.to(device, non_blocking=True).float()
-                bp = bp.to(device, non_blocking=True)
-                bv = bv.to(device, non_blocking=True)
+            for ep_c in range(epochs_per_chunk):
+                loader = DataLoader(ds, batch_size=batch_size, shuffle=True, pin_memory=(device.type == "cuda"))
+                for bx, bp, bv in loader:
+                    bx = bx.to(device, non_blocking=True).float()
+                    bp = bp.to(device, non_blocking=True)
+                    bv = bv.to(device, non_blocking=True)
 
-                optimizer.zero_grad()
-                p_logits, v_pred = model(bx)
+                    optimizer.zero_grad()
+                    p_logits, v_pred = model(bx)
 
-                p_loss = policy_criterion(p_logits, bp)
-                v_loss = value_criterion(v_pred, bv)
-                loss = p_loss + 0.5 * v_loss
+                    p_loss = policy_criterion(p_logits, bp)
+                    v_loss = value_criterion(v_pred, bv)
+                    loss = p_loss + 0.5 * v_loss
 
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-                optimizer.step()
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                    optimizer.step()
 
-                total_loss += loss.item()
+                    total_loss += loss.item()
 
-                with torch.no_grad():
-                    m = compute_metrics(p_logits, bp, v_pred, bv)
-                    for k in chunk_metrics:
-                        chunk_metrics[k] += m[k]
-                batches_count += 1
+                    with torch.no_grad():
+                        m = compute_metrics(p_logits, bp, v_pred, bv)
+                        for k in chunk_metrics:
+                            chunk_metrics[k] += m[k]
+                    batches_count += 1
 
             train_sec = time.time() - t_chunk_train
             total_positions_trained += chunk_filled
@@ -412,6 +442,11 @@ def main():
     parser.add_argument("--max-positions", type=int, default=None, help="Optional max positions cap")
     parser.add_argument("--warm-start", default=None, help="Warm-start checkpoint")
     parser.add_argument("--output-prefix", default="checkpoints/ccrl_master/orion_ccrl_full_corpus", help="Output path prefix")
+    parser.add_argument("--epochs-per-chunk", type=int, default=1, help="Number of training epochs per in-memory chunk")
+    parser.add_argument("--channels", type=int, default=512, help="Number of convolutional/FC channels")
+    parser.add_argument("--num-blocks", type=int, default=12, help="Number of residual blocks")
+    parser.add_argument("--policy-hidden", type=int, default=1024, help="Policy head hidden dimension")
+    parser.add_argument("--value-hidden", type=int, default=256, help="Value head hidden dimension")
     args = parser.parse_args()
 
     stream_train_full_corpus(
@@ -424,7 +459,12 @@ def main():
         checkpoint_in=args.warm_start,
         output_prefix=args.output_prefix,
         target_accuracy=args.target_acc,
-        max_total_positions=args.max_positions
+        max_total_positions=args.max_positions,
+        epochs_per_chunk=args.epochs_per_chunk,
+        channels=args.channels,
+        num_blocks=args.num_blocks,
+        policy_hidden=args.policy_hidden,
+        value_hidden=args.value_hidden
     )
 
 

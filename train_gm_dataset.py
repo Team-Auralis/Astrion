@@ -127,49 +127,92 @@ def load_json_to_model(model: OrionResNet, json_path: str):
     with open(json_path, "r") as f:
         data = json.load(f)
 
+    src_channels = data.get("channels", 256)
+    src_blocks = len(data.get("block_wa", []))
+    dst_channels = model.channels
+    dst_blocks = model.num_blocks
+
+    min_ch = min(src_channels, dst_channels)
+    min_bl = min(src_blocks, dst_blocks)
+
     with torch.no_grad():
-        model.input_fc.weight.copy_(torch.tensor(data["input_w"], dtype=torch.float32))
-        model.input_fc.bias.copy_(torch.tensor(data["input_b"], dtype=torch.float32))
+        w_in = torch.tensor(data["input_w"], dtype=torch.float32)
+        b_in = torch.tensor(data["input_b"], dtype=torch.float32)
+        model.input_fc.weight[:min_ch, :] = w_in[:min_ch, :]
+        model.input_fc.bias[:min_ch] = b_in[:min_ch]
         model.input_bn.weight.fill_(1.0)
         model.input_bn.bias.fill_(0.0)
         model.input_bn.running_mean.fill_(0.0)
         model.input_bn.running_var.fill_(1.0)
 
-        for i, block in enumerate(model.blocks):
-            block.fc1.weight.copy_(torch.tensor(data["block_wa"][i], dtype=torch.float32))
-            block.fc1.bias.copy_(torch.tensor(data["block_ba"][i], dtype=torch.float32))
+        for i in range(min_bl):
+            block = model.blocks[i]
+            wa = torch.tensor(data["block_wa"][i], dtype=torch.float32)
+            ba = torch.tensor(data["block_ba"][i], dtype=torch.float32)
+            wb = torch.tensor(data["block_wb"][i], dtype=torch.float32)
+            bb = torch.tensor(data["block_bb"][i], dtype=torch.float32)
+
+            block.fc1.weight[:min_ch, :min_ch] = wa[:min_ch, :min_ch]
+            block.fc1.bias[:min_ch] = ba[:min_ch]
             block.bn1.weight.fill_(1.0)
             block.bn1.bias.fill_(0.0)
             block.bn1.running_mean.fill_(0.0)
             block.bn1.running_var.fill_(1.0)
 
-            block.fc2.weight.copy_(torch.tensor(data["block_wb"][i], dtype=torch.float32))
-            block.fc2.bias.copy_(torch.tensor(data["block_bb"][i], dtype=torch.float32))
+            block.fc2.weight[:min_ch, :min_ch] = wb[:min_ch, :min_ch]
+            block.fc2.bias[:min_ch] = bb[:min_ch]
             block.bn2.weight.fill_(1.0)
             block.bn2.bias.fill_(0.0)
             block.bn2.running_mean.fill_(0.0)
             block.bn2.running_var.fill_(1.0)
 
-        model.policy_fc1.weight.copy_(torch.tensor(data["policy_w1"], dtype=torch.float32))
-        model.policy_fc1.bias.copy_(torch.tensor(data["policy_b1"], dtype=torch.float32))
+        # For any extra new blocks, initialize fc layers as identity residual
+        for i in range(min_bl, dst_blocks):
+            block = model.blocks[i]
+            block.fc1.weight.data.zero_()
+            block.fc1.bias.data.zero_()
+            block.bn1.weight.fill_(1.0)
+            block.bn1.bias.fill_(0.0)
+            block.bn1.running_mean.fill_(0.0)
+            block.bn1.running_var.fill_(1.0)
+
+            block.fc2.weight.data.zero_()
+            block.fc2.bias.data.zero_()
+            block.bn2.weight.fill_(1.0)
+            block.bn2.bias.fill_(0.0)
+            block.bn2.running_mean.fill_(0.0)
+            block.bn2.running_var.fill_(1.0)
+
+        pw1 = torch.tensor(data["policy_w1"], dtype=torch.float32)
+        pb1 = torch.tensor(data["policy_b1"], dtype=torch.float32)
+        min_p_hid = min(pw1.shape[0], model.policy_fc1.weight.shape[0])
+        model.policy_fc1.weight[:min_p_hid, :min_ch] = pw1[:min_p_hid, :min_ch]
+        model.policy_fc1.bias[:min_p_hid] = pb1[:min_p_hid]
         model.policy_bn.weight.fill_(1.0)
         model.policy_bn.bias.fill_(0.0)
         model.policy_bn.running_mean.fill_(0.0)
         model.policy_bn.running_var.fill_(1.0)
 
-        model.policy_fc2.weight.copy_(torch.tensor(data["policy_w2"], dtype=torch.float32))
-        model.policy_fc2.bias.copy_(torch.tensor(data["policy_b2"], dtype=torch.float32))
+        pw2 = torch.tensor(data["policy_w2"], dtype=torch.float32)
+        pb2 = torch.tensor(data["policy_b2"], dtype=torch.float32)
+        model.policy_fc2.weight[:, :min_p_hid] = pw2[:, :min_p_hid]
+        model.policy_fc2.bias[:] = pb2[:]
 
-        model.value_fc1.weight.copy_(torch.tensor(data["value_w1"], dtype=torch.float32))
-        model.value_fc1.bias.copy_(torch.tensor(data["value_b1"], dtype=torch.float32))
+        vw1 = torch.tensor(data["value_w1"], dtype=torch.float32)
+        vb1 = torch.tensor(data["value_b1"], dtype=torch.float32)
+        min_v_hid = min(vw1.shape[0], model.value_fc1.weight.shape[0])
+        model.value_fc1.weight[:min_v_hid, :min_ch] = vw1[:min_v_hid, :min_ch]
+        model.value_fc1.bias[:min_v_hid] = vb1[:min_v_hid]
         model.value_bn.weight.fill_(1.0)
         model.value_bn.bias.fill_(0.0)
         model.value_bn.running_mean.fill_(0.0)
         model.value_bn.running_var.fill_(1.0)
 
-        model.value_fc2.weight.copy_(torch.tensor([data["value_w2"]], dtype=torch.float32))
-        model.value_fc2.bias.copy_(torch.tensor([data["value_b2"]], dtype=torch.float32))
-    print(f"[RESUME] Successfully loaded warm-start weights from {json_path}")
+        vw2 = torch.tensor(data["value_w2"], dtype=torch.float32)
+        vb2 = float(data["value_b2"])
+        model.value_fc2.weight[0, :min_v_hid] = vw2[:min_v_hid]
+        model.value_fc2.bias[0] = vb2
+    print(f"[RESUME] Successfully loaded warm-start weights from {json_path} (transplanted {min_ch}ch/{min_bl}b -> {dst_channels}ch/{dst_blocks}b)")
 
 
 def train_on_gm_data(args):

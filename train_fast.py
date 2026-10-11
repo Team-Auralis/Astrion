@@ -61,19 +61,25 @@ class ResBlock(nn.Module):
 
 
 class OrionResNet(nn.Module):
-    def __init__(self):
+    def __init__(self, channels: int = CHANNELS, num_blocks: int = NUM_BLOCKS,
+                 policy_hidden: int = 512, value_hidden: int = 64):
         super().__init__()
-        self.input_fc = nn.Linear(INPUT_SIZE, CHANNELS)
-        self.input_bn = nn.BatchNorm1d(CHANNELS)
-        self.blocks = nn.ModuleList([ResBlock(CHANNELS) for _ in range(NUM_BLOCKS)])
+        self.channels = channels
+        self.num_blocks = num_blocks
+        self.policy_hidden = policy_hidden
+        self.value_hidden = value_hidden
 
-        self.policy_fc1 = nn.Linear(CHANNELS, 512)
-        self.policy_bn = nn.BatchNorm1d(512)
-        self.policy_fc2 = nn.Linear(512, POLICY_SIZE)
+        self.input_fc = nn.Linear(INPUT_SIZE, channels)
+        self.input_bn = nn.BatchNorm1d(channels)
+        self.blocks = nn.ModuleList([ResBlock(channels) for _ in range(num_blocks)])
 
-        self.value_fc1 = nn.Linear(CHANNELS, 64)
-        self.value_bn = nn.BatchNorm1d(64)
-        self.value_fc2 = nn.Linear(64, 1)
+        self.policy_fc1 = nn.Linear(channels, policy_hidden)
+        self.policy_bn = nn.BatchNorm1d(policy_hidden)
+        self.policy_fc2 = nn.Linear(policy_hidden, POLICY_SIZE)
+
+        self.value_fc1 = nn.Linear(channels, value_hidden)
+        self.value_bn = nn.BatchNorm1d(value_hidden)
+        self.value_fc2 = nn.Linear(value_hidden, 1)
 
     def forward(self, x):
         out = F.relu(self.input_bn(self.input_fc(x)))
@@ -108,8 +114,8 @@ class OrionResNet(nn.Module):
         data = {
             "episode": episode,
             "arch": "resnet",
-            "channels": CHANNELS,
-            "num_blocks": NUM_BLOCKS,
+            "channels": self.channels,
+            "num_blocks": self.num_blocks,
             "input_size": INPUT_SIZE,
             "input_w": w_in,
             "input_b": b_in,
