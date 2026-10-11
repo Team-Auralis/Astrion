@@ -17,7 +17,7 @@
 
 ## 📖 Overview
 
-**ORION Gaming Mind** is a modern chess intelligence platform developed by [Team-Auralis](https://github.com/Team-Auralis). It merges **Deep Reinforcement Learning** (Dual-Head Policy & Value Network) with **Stockfish-inspired classical search techniques** (Alpha-Beta Minimax, Quiescence Search, MVV-LVA move ordering) and provides a **real-time Bot Arena** to measure playing strength and compute **official FIDE-style Elo ratings** against real chess bots—including the world-champion **Stockfish**.
+**ORION Gaming Mind** is a modern chess intelligence platform developed by [Team-Auralis](https://github.com/Team-Auralis). It merges **Deep Reinforcement Learning** (Dual-Head Policy & Value Network) with **Stockfish-inspired classical search techniques** (Alpha-Beta Minimax, Quiescence Search, MVV-LVA move ordering) and provides a **calibrated engine evaluation testbed** to measure playing strength and compute **statistical ratings with Ordo** against versioned chess engines.
 
 ---
 
