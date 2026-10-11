@@ -1,0 +1,8 @@
+
+   # PLAYER        :  RATING  ERROR  POINTS  PLAYED   (%)
+   1 ORION-v2.3    :  1904.6   50.8    64.5     100    64
+   2 ORION-v2.2    :  1800.0   ----    35.5     100    36
+
+White advantage = 0.00 +/- 0.00
+Draw rate (equal opponents) = 50.00 % +/- 0.00
+

@@ -1,0 +1,118 @@
+{
+  "timed_ablation": [
+    {
+      "config": "Config A: Baseline v2.2",
+      "description": "Standard Alpha-Beta, No PVS, No Repetition, Infinite Window",
+      "avg_nps": 10885.8,
+      "avg_depth": 2.28,
+      "avg_time_ms": 77.9,
+      "total_nodes": 21206,
+      "solved_count": 19,
+      "total_tested": 25,
+      "accuracy_pct": 76.0
+    },
+    {
+      "config": "Config B: v2.2 + Move Ordering & Repetition Guard",
+      "description": "Repetition guard + Queen promotion ordering + Countermoves",
+      "avg_nps": 10498.6,
+      "avg_depth": 2.2,
+      "avg_time_ms": 77.4,
+      "total_nodes": 20319,
+      "solved_count": 19,
+      "total_tested": 25,
+      "accuracy_pct": 76.0
+    },
+    {
+      "config": "Config C: v2.2 + PVS & Move Ordering",
+      "description": "Zero-window search (PVS) + Move ordering + Repetition guard",
+      "avg_nps": 10675.4,
+      "avg_depth": 2.12,
+      "avg_time_ms": 76.4,
+      "total_nodes": 20377,
+      "solved_count": 19,
+      "total_tested": 25,
+      "accuracy_pct": 76.0
+    },
+    {
+      "config": "Config D: Full v2.3 Candidate",
+      "description": "PVS + Move ordering + Repetition guard + Aspiration Windows",
+      "avg_nps": 10649.2,
+      "avg_depth": 2.24,
+      "avg_time_ms": 81.0,
+      "total_nodes": 21562,
+      "solved_count": 19,
+      "total_tested": 25,
+      "accuracy_pct": 76.0
+    }
+  ],
+  "fixed_depth_pruning": {
+    "Config A: Baseline v2.2": {
+      "Startpos": {
+        "nodes": 650,
+        "time_ms": 36.1,
+        "move": "g1f3"
+      },
+      "KiwiPete": {
+        "nodes": 2717,
+        "time_ms": 350.1,
+        "move": "e2a6"
+      },
+      "Tension Middlegame": {
+        "nodes": 2696,
+        "time_ms": 173.8,
+        "move": "c4f7"
+      }
+    },
+    "Config B: v2.2 + Move Ordering & Repetition Guard": {
+      "Startpos": {
+        "nodes": 650,
+        "time_ms": 35.6,
+        "move": "g1f3"
+      },
+      "KiwiPete": {
+        "nodes": 2717,
+        "time_ms": 352.3,
+        "move": "e2a6"
+      },
+      "Tension Middlegame": {
+        "nodes": 2696,
+        "time_ms": 180.7,
+        "move": "c4f7"
+      }
+    },
+    "Config C: v2.2 + PVS & Move Ordering": {
+      "Startpos": {
+        "nodes": 653,
+        "time_ms": 35.8,
+        "move": "g1f3"
+      },
+      "KiwiPete": {
+        "nodes": 2722,
+        "time_ms": 268.0,
+        "move": "e2a6"
+      },
+      "Tension Middlegame": {
+        "nodes": 2891,
+        "time_ms": 187.0,
+        "move": "c4f7"
+      }
+    },
+    "Config D: Full v2.3 Candidate": {
+      "Startpos": {
+        "nodes": 1020,
+        "time_ms": 71.2,
+        "move": "g1f3"
+      },
+      "KiwiPete": {
+        "nodes": 4890,
+        "time_ms": 735.1,
+        "move": "e2a6"
+      },
+      "Tension Middlegame": {
+        "nodes": 5581,
+        "time_ms": 540.2,
+        "move": "d1d5"
+      }
+    }
+  }
+}

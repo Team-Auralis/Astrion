@@ -1,0 +1,2037 @@
+[
+  {
+    "white": "ORION-Search-Full",
+    "black": "BBC-1.2",
+    "result": "0-1",
+    "source": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_plies": 150,
+    "decisive_mistake": {
+      "move_number": 3,
+      "ply": 5,
+      "played_move": "f2f4",
+      "best_move": "c1f4",
+      "eval_before_cp": 287,
+      "eval_after_cp": 46,
+      "eval_drop_cp": 241,
+      "classification": "Positional / Evaluation Inaccuracy (Static PST overvaluation)",
+      "fen_before": "rnb1kbnr/pp2pppp/8/4q3/3p4/2N5/PPP1NPPP/R1BQKB1R w KQkq - 0 6"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "g1e2",
+        "score_cp": 83
+      },
+      {
+        "ply": 2,
+        "move": "c7c5",
+        "score_cp": 61
+      },
+      {
+        "ply": 3,
+        "move": "d2d4",
+        "score_cp": 144
+      },
+      {
+        "ply": 4,
+        "move": "c5d4",
+        "score_cp": 283
+      },
+      {
+        "ply": 5,
+        "move": "f2f4",
+        "score_cp": 287
+      },
+      {
+        "ply": 6,
+        "move": "e5h5",
+        "score_cp": 46
+      },
+      {
+        "ply": 7,
+        "move": "e2d4",
+        "score_cp": 101
+      },
+      {
+        "ply": 8,
+        "move": "c8g4",
+        "score_cp": 92
+      },
+      {
+        "ply": 9,
+        "move": "f1b5",
+        "score_cp": 228
+      },
+      {
+        "ply": 10,
+        "move": "b8c6",
+        "score_cp": 187
+      },
+      {
+        "ply": 11,
+        "move": "b5c6",
+        "score_cp": 187
+      },
+      {
+        "ply": 12,
+        "move": "b7c6",
+        "score_cp": 157
+      },
+      {
+        "ply": 13,
+        "move": "d1d3",
+        "score_cp": 127
+      },
+      {
+        "ply": 14,
+        "move": "a8d8",
+        "score_cp": 133
+      },
+      {
+        "ply": 15,
+        "move": "d3c4",
+        "score_cp": 157
+      },
+      {
+        "ply": 16,
+        "move": "c6c5",
+        "score_cp": 169
+      },
+      {
+        "ply": 17,
+        "move": "c4b5",
+        "score_cp": 431
+      },
+      {
+        "ply": 18,
+        "move": "g4d7",
+        "score_cp": 31
+      },
+      {
+        "ply": 19,
+        "move": "b5e2",
+        "score_cp": 34
+      },
+      {
+        "ply": 20,
+        "move": "h5h4",
+        "score_cp": -49
+      },
+      {
+        "ply": 21,
+        "move": "g2g3",
+        "score_cp": 77
+      },
+      {
+        "ply": 22,
+        "move": "h4f6",
+        "score_cp": 81
+      },
+      {
+        "ply": 23,
+        "move": "d4b5",
+        "score_cp": 89
+      },
+      {
+        "ply": 24,
+        "move": "f6b6",
+        "score_cp": -30
+      },
+      {
+        "ply": 25,
+        "move": "e1g1",
+        "score_cp": 83
+      },
+      {
+        "ply": 26,
+        "move": "a7a6",
+        "score_cp": 10
+      },
+      {
+        "ply": 27,
+        "move": "b5a3",
+        "score_cp": 12
+      },
+      {
+        "ply": 28,
+        "move": "g8f6",
+        "score_cp": 10
+      },
+      {
+        "ply": 29,
+        "move": "a3c4",
+        "score_cp": 70
+      },
+      {
+        "ply": 30,
+        "move": "b6c7",
+        "score_cp": 90
+      },
+      {
+        "ply": 31,
+        "move": "f1d1",
+        "score_cp": 244
+      },
+      {
+        "ply": 32,
+        "move": "d7g4",
+        "score_cp": 70
+      },
+      {
+        "ply": 33,
+        "move": "d1d8",
+        "score_cp": 107
+      },
+      {
+        "ply": 34,
+        "move": "c7d8",
+        "score_cp": 106
+      },
+      {
+        "ply": 35,
+        "move": "e2e3",
+        "score_cp": 115
+      },
+      {
+        "ply": 36,
+        "move": "d8d4",
+        "score_cp": -21
+      },
+      {
+        "ply": 37,
+        "move": "c4e5",
+        "score_cp": 13
+      },
+      {
+        "ply": 38,
+        "move": "h7h5",
+        "score_cp": -12
+      },
+      {
+        "ply": 39,
+        "move": "e5g4",
+        "score_cp": 9
+      },
+      {
+        "ply": 40,
+        "move": "h5g4",
+        "score_cp": 0
+      },
+      {
+        "ply": 41,
+        "move": "c1d2",
+        "score_cp": 40
+      },
+      {
+        "ply": 42,
+        "move": "e7e6",
+        "score_cp": -19
+      },
+      {
+        "ply": 43,
+        "move": "a1d1",
+        "score_cp": -19
+      },
+      {
+        "ply": 44,
+        "move": "h8h3",
+        "score_cp": -13
+      },
+      {
+        "ply": 45,
+        "move": "a2a3",
+        "score_cp": 11
+      },
+      {
+        "ply": 46,
+        "move": "f8d6",
+        "score_cp": -17
+      },
+      {
+        "ply": 47,
+        "move": "f4f5",
+        "score_cp": 26
+      },
+      {
+        "ply": 48,
+        "move": "d6g3",
+        "score_cp": -410
+      },
+      {
+        "ply": 49,
+        "move": "g1f1",
+        "score_cp": -410
+      },
+      {
+        "ply": 50,
+        "move": "d4e3",
+        "score_cp": -566
+      },
+      {
+        "ply": 51,
+        "move": "d2e3",
+        "score_cp": -503
+      },
+      {
+        "ply": 52,
+        "move": "g3h2",
+        "score_cp": -434
+      },
+      {
+        "ply": 53,
+        "move": "f1e2",
+        "score_cp": -408
+      },
+      {
+        "ply": 54,
+        "move": "e6f5",
+        "score_cp": -589
+      },
+      {
+        "ply": 55,
+        "move": "e3c5",
+        "score_cp": -598
+      },
+      {
+        "ply": 56,
+        "move": "h2e5",
+        "score_cp": -552
+      },
+      {
+        "ply": 57,
+        "move": "c5b4",
+        "score_cp": -528
+      },
+      {
+        "ply": 58,
+        "move": "h3h2",
+        "score_cp": -587
+      },
+      {
+        "ply": 59,
+        "move": "e2d3",
+        "score_cp": -565
+      },
+      {
+        "ply": 60,
+        "move": "g4g3",
+        "score_cp": -564
+      },
+      {
+        "ply": 61,
+        "move": "d1e1",
+        "score_cp": -551
+      },
+      {
+        "ply": 62,
+        "move": "f6g4",
+        "score_cp": -562
+      },
+      {
+        "ply": 63,
+        "move": "b4d6",
+        "score_cp": -522
+      },
+      {
+        "ply": 64,
+        "move": "f7f6",
+        "score_cp": -635
+      },
+      {
+        "ply": 65,
+        "move": "c3d5",
+        "score_cp": -619
+      },
+      {
+        "ply": 66,
+        "move": "e8f7",
+        "score_cp": -652
+      },
+      {
+        "ply": 67,
+        "move": "d6e5",
+        "score_cp": -655
+      },
+      {
+        "ply": 68,
+        "move": "g4e5",
+        "score_cp": -665
+      },
+      {
+        "ply": 69,
+        "move": "d3c3",
+        "score_cp": -679
+      },
+      {
+        "ply": 70,
+        "move": "g3g2",
+        "score_cp": -672
+      },
+      {
+        "ply": 71,
+        "move": "d5f4",
+        "score_cp": -670
+      },
+      {
+        "ply": 72,
+        "move": "e5f3",
+        "score_cp": -696
+      },
+      {
+        "ply": 73,
+        "move": "f4g2",
+        "score_cp": -702
+      },
+      {
+        "ply": 74,
+        "move": "h2g2",
+        "score_cp": -710
+      },
+      {
+        "ply": 75,
+        "move": "e1f1",
+        "score_cp": -686
+      },
+      {
+        "ply": 76,
+        "move": "g2g3",
+        "score_cp": -712
+      },
+      {
+        "ply": 77,
+        "move": "f1d1",
+        "score_cp": -640
+      },
+      {
+        "ply": 78,
+        "move": "f7g6",
+        "score_cp": -738
+      },
+      {
+        "ply": 79,
+        "move": "d1d6",
+        "score_cp": -655
+      },
+      {
+        "ply": 80,
+        "move": "f3e5",
+        "score_cp": -749
+      },
+      {
+        "ply": 81,
+        "move": "c3d4",
+        "score_cp": -725
+      },
+      {
+        "ply": 82,
+        "move": "a6a5",
+        "score_cp": -792
+      },
+      {
+        "ply": 83,
+        "move": "d6d5",
+        "score_cp": -688
+      },
+      {
+        "ply": 84,
+        "move": "a5a4",
+        "score_cp": -724
+      },
+      {
+        "ply": 85,
+        "move": "d5d6",
+        "score_cp": -741
+      },
+      {
+        "ply": 86,
+        "move": "g3g4",
+        "score_cp": -787
+      },
+      {
+        "ply": 87,
+        "move": "d4c3",
+        "score_cp": -751
+      },
+      {
+        "ply": 88,
+        "move": "g4c4",
+        "score_cp": -795
+      },
+      {
+        "ply": 89,
+        "move": "c3d2",
+        "score_cp": -800
+      },
+      {
+        "ply": 90,
+        "move": "c4c8",
+        "score_cp": -808
+      },
+      {
+        "ply": 91,
+        "move": "d6d5",
+        "score_cp": -787
+      },
+      {
+        "ply": 92,
+        "move": "e5c4",
+        "score_cp": -807
+      },
+      {
+        "ply": 93,
+        "move": "d2c1",
+        "score_cp": -759
+      },
+      {
+        "ply": 94,
+        "move": "c8b8",
+        "score_cp": -780
+      },
+      {
+        "ply": 95,
+        "move": "d5d4",
+        "score_cp": -671
+      },
+      {
+        "ply": 96,
+        "move": "c4b2",
+        "score_cp": -723
+      },
+      {
+        "ply": 97,
+        "move": "c1d2",
+        "score_cp": -588
+      },
+      {
+        "ply": 98,
+        "move": "b8c8",
+        "score_cp": -707
+      },
+      {
+        "ply": 99,
+        "move": "c2c3",
+        "score_cp": -744
+      },
+      {
+        "ply": 100,
+        "move": "b2c4",
+        "score_cp": -769
+      },
+      {
+        "ply": 101,
+        "move": "d2d3",
+        "score_cp": -758
+      },
+      {
+        "ply": 102,
+        "move": "c4e5",
+        "score_cp": -756
+      },
+      {
+        "ply": 103,
+        "move": "d3c2",
+        "score_cp": -753
+      },
+      {
+        "ply": 104,
+        "move": "c8c4",
+        "score_cp": -771
+      },
+      {
+        "ply": 105,
+        "move": "d4d1",
+        "score_cp": -708
+      },
+      {
+        "ply": 106,
+        "move": "c4e4",
+        "score_cp": -794
+      },
+      {
+        "ply": 107,
+        "move": "d1g1",
+        "score_cp": -800
+      },
+      {
+        "ply": 108,
+        "move": "e5g4",
+        "score_cp": -850
+      },
+      {
+        "ply": 109,
+        "move": "c2d3",
+        "score_cp": -722
+      },
+      {
+        "ply": 110,
+        "move": "g6g5",
+        "score_cp": -789
+      },
+      {
+        "ply": 111,
+        "move": "g1b1",
+        "score_cp": -771
+      },
+      {
+        "ply": 112,
+        "move": "g4e5",
+        "score_cp": -817
+      },
+      {
+        "ply": 113,
+        "move": "d3c2",
+        "score_cp": -819
+      },
+      {
+        "ply": 114,
+        "move": "e4e2",
+        "score_cp": -859
+      },
+      {
+        "ply": 115,
+        "move": "c2d1",
+        "score_cp": -831
+      },
+      {
+        "ply": 116,
+        "move": "e2a2",
+        "score_cp": -865
+      },
+      {
+        "ply": 117,
+        "move": "b1b4",
+        "score_cp": -872
+      },
+      {
+        "ply": 118,
+        "move": "e5d3",
+        "score_cp": -901
+      },
+      {
+        "ply": 119,
+        "move": "b4b7",
+        "score_cp": -746
+      },
+      {
+        "ply": 120,
+        "move": "g5g6",
+        "score_cp": -782
+      },
+      {
+        "ply": 121,
+        "move": "b7e7",
+        "score_cp": -761
+      },
+      {
+        "ply": 122,
+        "move": "d3e5",
+        "score_cp": -816
+      },
+      {
+        "ply": 123,
+        "move": "c3c4",
+        "score_cp": -786
+      },
+      {
+        "ply": 124,
+        "move": "e5c4",
+        "score_cp": -801
+      },
+      {
+        "ply": 125,
+        "move": "e7e2",
+        "score_cp": -741
+      },
+      {
+        "ply": 126,
+        "move": "a2a3",
+        "score_cp": -761
+      },
+      {
+        "ply": 127,
+        "move": "d1c2",
+        "score_cp": -733
+      },
+      {
+        "ply": 128,
+        "move": "a3h3",
+        "score_cp": -772
+      },
+      {
+        "ply": 129,
+        "move": "e2e7",
+        "score_cp": -751
+      },
+      {
+        "ply": 130,
+        "move": "a4a3",
+        "score_cp": -782
+      },
+      {
+        "ply": 131,
+        "move": "e7c7",
+        "score_cp": -779
+      },
+      {
+        "ply": 132,
+        "move": "c4e3",
+        "score_cp": -751
+      },
+      {
+        "ply": 133,
+        "move": "c2d2",
+        "score_cp": -801
+      },
+      {
+        "ply": 134,
+        "move": "e3d5",
+        "score_cp": -794
+      },
+      {
+        "ply": 135,
+        "move": "c7d7",
+        "score_cp": -773
+      },
+      {
+        "ply": 136,
+        "move": "a3a2",
+        "score_cp": -816
+      },
+      {
+        "ply": 137,
+        "move": "d7a7",
+        "score_cp": -797
+      },
+      {
+        "ply": 138,
+        "move": "h3h1",
+        "score_cp": -794
+      },
+      {
+        "ply": 139,
+        "move": "d2d3",
+        "score_cp": -727
+      },
+      {
+        "ply": 140,
+        "move": "a2a1q",
+        "score_cp": -788
+      },
+      {
+        "ply": 141,
+        "move": "a7a1",
+        "score_cp": -784
+      },
+      {
+        "ply": 142,
+        "move": "h1a1",
+        "score_cp": -729
+      },
+      {
+        "ply": 143,
+        "move": "d3c4",
+        "score_cp": -749
+      },
+      {
+        "ply": 144,
+        "move": "f5f4",
+        "score_cp": -811
+      },
+      {
+        "ply": 145,
+        "move": "c4d5",
+        "score_cp": -881
+      },
+      {
+        "ply": 146,
+        "move": "f4f3",
+        "score_cp": -942
+      },
+      {
+        "ply": 147,
+        "move": "d5e4",
+        "score_cp": -961
+      },
+      {
+        "ply": 148,
+        "move": "f3f2",
+        "score_cp": -1000
+      },
+      {
+        "ply": 149,
+        "move": "e4d4",
+        "score_cp": -1012
+      },
+      {
+        "ply": 150,
+        "move": "f2f1q",
+        "score_cp": -1018
+      }
+    ]
+  },
+  {
+    "white": "BBC-1.2",
+    "black": "ORION-Search-Full",
+    "result": "1-0",
+    "source": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_plies": 59,
+    "decisive_mistake": {
+      "move_number": 7,
+      "ply": 14,
+      "played_move": "e4f3",
+      "best_move": "f6d5",
+      "eval_before_cp": -311,
+      "eval_after_cp": -566,
+      "eval_drop_cp": 255,
+      "classification": "Search Depth Horizon (Multi-ply tactical consequence beyond reach)",
+      "fen_before": "r1b1kb1r/ppp1qppp/2n2n2/1N6/3PpB2/5N2/PPP1BPPP/R2Q1RK1 b kq - 1 10"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "f1e2",
+        "score_cp": -90
+      },
+      {
+        "ply": 2,
+        "move": "g8f6",
+        "score_cp": -92
+      },
+      {
+        "ply": 3,
+        "move": "g1f3",
+        "score_cp": -113
+      },
+      {
+        "ply": 4,
+        "move": "e5d6",
+        "score_cp": -114
+      },
+      {
+        "ply": 5,
+        "move": "e1g1",
+        "score_cp": -118
+      },
+      {
+        "ply": 6,
+        "move": "b8c6",
+        "score_cp": -105
+      },
+      {
+        "ply": 7,
+        "move": "d2d3",
+        "score_cp": -126
+      },
+      {
+        "ply": 8,
+        "move": "e7e5",
+        "score_cp": -37
+      },
+      {
+        "ply": 9,
+        "move": "c3b5",
+        "score_cp": -65
+      },
+      {
+        "ply": 10,
+        "move": "d6e7",
+        "score_cp": -45
+      },
+      {
+        "ply": 11,
+        "move": "d3d4",
+        "score_cp": -125
+      },
+      {
+        "ply": 12,
+        "move": "e5e4",
+        "score_cp": -125
+      },
+      {
+        "ply": 13,
+        "move": "c1f4",
+        "score_cp": -133
+      },
+      {
+        "ply": 14,
+        "move": "e4f3",
+        "score_cp": -311
+      },
+      {
+        "ply": 15,
+        "move": "b5c7",
+        "score_cp": -521
+      },
+      {
+        "ply": 16,
+        "move": "e8d7",
+        "score_cp": -331
+      },
+      {
+        "ply": 17,
+        "move": "e2f3",
+        "score_cp": -542
+      },
+      {
+        "ply": 18,
+        "move": "a8b8",
+        "score_cp": -578
+      },
+      {
+        "ply": 19,
+        "move": "c2c4",
+        "score_cp": -587
+      },
+      {
+        "ply": 20,
+        "move": "f6e4",
+        "score_cp": -539
+      },
+      {
+        "ply": 21,
+        "move": "c7d5",
+        "score_cp": -771
+      },
+      {
+        "ply": 22,
+        "move": "e7e6",
+        "score_cp": -610
+      },
+      {
+        "ply": 23,
+        "move": "f1e1",
+        "score_cp": -681
+      },
+      {
+        "ply": 24,
+        "move": "f7f5",
+        "score_cp": -647
+      },
+      {
+        "ply": 25,
+        "move": "e1e4",
+        "score_cp": -705
+      },
+      {
+        "ply": 26,
+        "move": "f5e4",
+        "score_cp": -876
+      },
+      {
+        "ply": 27,
+        "move": "f3g4",
+        "score_cp": -897
+      },
+      {
+        "ply": 28,
+        "move": "b8a8",
+        "score_cp": -888
+      },
+      {
+        "ply": 29,
+        "move": "d5c7",
+        "score_cp": -1099
+      },
+      {
+        "ply": 30,
+        "move": "e6g4",
+        "score_cp": -943
+      },
+      {
+        "ply": 31,
+        "move": "d1g4",
+        "score_cp": -907
+      },
+      {
+        "ply": 32,
+        "move": "d7d8",
+        "score_cp": -978
+      },
+      {
+        "ply": 33,
+        "move": "g4g5",
+        "score_cp": -902
+      },
+      {
+        "ply": 34,
+        "move": "f8e7",
+        "score_cp": -953
+      },
+      {
+        "ply": 35,
+        "move": "g5d5",
+        "score_cp": -960
+      },
+      {
+        "ply": 36,
+        "move": "c8d7",
+        "score_cp": -919
+      },
+      {
+        "ply": 37,
+        "move": "c7a8",
+        "score_cp": -908
+      },
+      {
+        "ply": 38,
+        "move": "e7f6",
+        "score_cp": -895
+      },
+      {
+        "ply": 39,
+        "move": "a8c7",
+        "score_cp": -914
+      },
+      {
+        "ply": 40,
+        "move": "c6d4",
+        "score_cp": -826
+      },
+      {
+        "ply": 41,
+        "move": "d5e4",
+        "score_cp": -941
+      },
+      {
+        "ply": 42,
+        "move": "d7c6",
+        "score_cp": -828
+      },
+      {
+        "ply": 43,
+        "move": "c7d5",
+        "score_cp": -968
+      },
+      {
+        "ply": 44,
+        "move": "d8c8",
+        "score_cp": -809
+      },
+      {
+        "ply": 45,
+        "move": "a1d1",
+        "score_cp": -832
+      },
+      {
+        "ply": 46,
+        "move": "c6d5",
+        "score_cp": -887
+      },
+      {
+        "ply": 47,
+        "move": "c4d5",
+        "score_cp": -967
+      },
+      {
+        "ply": 48,
+        "move": "g7g5",
+        "score_cp": -901
+      },
+      {
+        "ply": 49,
+        "move": "f4e5",
+        "score_cp": -980
+      },
+      {
+        "ply": 50,
+        "move": "f6e5",
+        "score_cp": -860
+      },
+      {
+        "ply": 51,
+        "move": "e4e5",
+        "score_cp": -997
+      },
+      {
+        "ply": 52,
+        "move": "d4f3",
+        "score_cp": -1043
+      },
+      {
+        "ply": 53,
+        "move": "g2f3",
+        "score_cp": -1163
+      },
+      {
+        "ply": 54,
+        "move": "h8f8",
+        "score_cp": -1294
+      },
+      {
+        "ply": 55,
+        "move": "d1c1",
+        "score_cp": -9997
+      },
+      {
+        "ply": 56,
+        "move": "c8d7",
+        "score_cp": -9998
+      },
+      {
+        "ply": 57,
+        "move": "c1c7",
+        "score_cp": -9998
+      },
+      {
+        "ply": 58,
+        "move": "d7d8",
+        "score_cp": -9999
+      },
+      {
+        "ply": 59,
+        "move": "e5e7",
+        "score_cp": -9999
+      }
+    ]
+  },
+  {
+    "white": "ORION-Neural-Only",
+    "black": "Vice-1.2",
+    "result": "0-1",
+    "source": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_plies": 32,
+    "decisive_mistake": {
+      "move_number": 3,
+      "ply": 5,
+      "played_move": "f3e5",
+      "best_move": "e2g3",
+      "eval_before_cp": 62,
+      "eval_after_cp": -472,
+      "eval_drop_cp": 534,
+      "classification": "Tactical Oversight (Blunder/Hanging Piece)",
+      "fen_before": "rnb1kbnr/ppp2ppp/8/q3p3/8/5N2/PPPPNPPP/R1BQKB1R w KQkq - 0 6"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "c3e2",
+        "score_cp": 94
+      },
+      {
+        "ply": 2,
+        "move": "e5a5",
+        "score_cp": 20
+      },
+      {
+        "ply": 3,
+        "move": "g1f3",
+        "score_cp": 18
+      },
+      {
+        "ply": 4,
+        "move": "e7e5",
+        "score_cp": 13
+      },
+      {
+        "ply": 5,
+        "move": "f3e5",
+        "score_cp": 62
+      },
+      {
+        "ply": 6,
+        "move": "a5e5",
+        "score_cp": -448
+      },
+      {
+        "ply": 7,
+        "move": "b2b4",
+        "score_cp": -485
+      },
+      {
+        "ply": 8,
+        "move": "e5a1",
+        "score_cp": -878
+      },
+      {
+        "ply": 9,
+        "move": "c1b2",
+        "score_cp": -743
+      },
+      {
+        "ply": 10,
+        "move": "a1b2",
+        "score_cp": -965
+      },
+      {
+        "ply": 11,
+        "move": "d2d4",
+        "score_cp": -858
+      },
+      {
+        "ply": 12,
+        "move": "f8b4",
+        "score_cp": -1121
+      },
+      {
+        "ply": 13,
+        "move": "c2c3",
+        "score_cp": -1061
+      },
+      {
+        "ply": 14,
+        "move": "b4c3",
+        "score_cp": -1106
+      },
+      {
+        "ply": 15,
+        "move": "e2c3",
+        "score_cp": -1043
+      },
+      {
+        "ply": 16,
+        "move": "b2c3",
+        "score_cp": -1118
+      },
+      {
+        "ply": 17,
+        "move": "e1e2",
+        "score_cp": -1103
+      },
+      {
+        "ply": 18,
+        "move": "c3c4",
+        "score_cp": -1264
+      },
+      {
+        "ply": 19,
+        "move": "e2e3",
+        "score_cp": -1145
+      },
+      {
+        "ply": 20,
+        "move": "c4a2",
+        "score_cp": -1194
+      },
+      {
+        "ply": 21,
+        "move": "d1b3",
+        "score_cp": -1111
+      },
+      {
+        "ply": 22,
+        "move": "a2b3",
+        "score_cp": -1738
+      },
+      {
+        "ply": 23,
+        "move": "e3e4",
+        "score_cp": -1782
+      },
+      {
+        "ply": 24,
+        "move": "g8f6",
+        "score_cp": -9995
+      },
+      {
+        "ply": 25,
+        "move": "e4e5",
+        "score_cp": -9996
+      },
+      {
+        "ply": 26,
+        "move": "b8c6",
+        "score_cp": -9997
+      },
+      {
+        "ply": 27,
+        "move": "e5f4",
+        "score_cp": -9997
+      },
+      {
+        "ply": 28,
+        "move": "c6d4",
+        "score_cp": -9997
+      },
+      {
+        "ply": 29,
+        "move": "g2g4",
+        "score_cp": -2371
+      },
+      {
+        "ply": 30,
+        "move": "b3f3",
+        "score_cp": -9998
+      },
+      {
+        "ply": 31,
+        "move": "f4e5",
+        "score_cp": -9999
+      },
+      {
+        "ply": 32,
+        "move": "f3e4",
+        "score_cp": -9999
+      }
+    ]
+  },
+  {
+    "white": "Vice-1.2",
+    "black": "ORION-Neural-Only",
+    "result": "1-0",
+    "source": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_plies": 19,
+    "decisive_mistake": {
+      "move_number": 2,
+      "ply": 4,
+      "played_move": "g8f6",
+      "best_move": "e5a5",
+      "eval_before_cp": -101,
+      "eval_after_cp": -927,
+      "eval_drop_cp": 826,
+      "classification": "Tactical Oversight (Blunder/Hanging Piece)",
+      "fen_before": "rnb1kbnr/pp2pppp/2p5/4q3/3P4/2N5/PPP1NPPP/R1BQKB1R b KQkq - 0 5"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "g1e2",
+        "score_cp": -94
+      },
+      {
+        "ply": 2,
+        "move": "c7c6",
+        "score_cp": -60
+      },
+      {
+        "ply": 3,
+        "move": "d2d4",
+        "score_cp": -88
+      },
+      {
+        "ply": 4,
+        "move": "g8f6",
+        "score_cp": -101
+      },
+      {
+        "ply": 5,
+        "move": "d4e5",
+        "score_cp": -968
+      },
+      {
+        "ply": 6,
+        "move": "f6d7",
+        "score_cp": -971
+      },
+      {
+        "ply": 7,
+        "move": "c1f4",
+        "score_cp": -962
+      },
+      {
+        "ply": 8,
+        "move": "f7f6",
+        "score_cp": -896
+      },
+      {
+        "ply": 9,
+        "move": "e5f6",
+        "score_cp": -997
+      },
+      {
+        "ply": 10,
+        "move": "e7e6",
+        "score_cp": -984
+      },
+      {
+        "ply": 11,
+        "move": "f6g7",
+        "score_cp": -1010
+      },
+      {
+        "ply": 12,
+        "move": "f8g7",
+        "score_cp": -979
+      },
+      {
+        "ply": 13,
+        "move": "e2d4",
+        "score_cp": -1012
+      },
+      {
+        "ply": 14,
+        "move": "e8g8",
+        "score_cp": -998
+      },
+      {
+        "ply": 15,
+        "move": "d4e6",
+        "score_cp": -993
+      },
+      {
+        "ply": 16,
+        "move": "f8e8",
+        "score_cp": -1049
+      },
+      {
+        "ply": 17,
+        "move": "d1g4",
+        "score_cp": -1207
+      },
+      {
+        "ply": 18,
+        "move": "a7a6",
+        "score_cp": -1118
+      },
+      {
+        "ply": 19,
+        "move": "g4g7",
+        "score_cp": -9999
+      }
+    ]
+  },
+  {
+    "white": "ORION-Neural-Only",
+    "black": "BBC-1.2",
+    "result": "0-1",
+    "source": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_plies": 38,
+    "decisive_mistake": {
+      "move_number": 2,
+      "ply": 3,
+      "played_move": "b2b4",
+      "best_move": "g1f3",
+      "eval_before_cp": 71,
+      "eval_after_cp": -562,
+      "eval_drop_cp": 633,
+      "classification": "Tactical Oversight (Blunder/Hanging Piece)",
+      "fen_before": "rn2kbnr/ppp1pppp/8/4qb2/8/8/PPPPNPPP/R1BQKBNR w KQkq - 4 5"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "c3e2",
+        "score_cp": 94
+      },
+      {
+        "ply": 2,
+        "move": "c8f5",
+        "score_cp": 13
+      },
+      {
+        "ply": 3,
+        "move": "b2b4",
+        "score_cp": 71
+      },
+      {
+        "ply": 4,
+        "move": "e5a1",
+        "score_cp": -676
+      },
+      {
+        "ply": 5,
+        "move": "c1b2",
+        "score_cp": -557
+      },
+      {
+        "ply": 6,
+        "move": "a1b2",
+        "score_cp": -882
+      },
+      {
+        "ply": 7,
+        "move": "d2d4",
+        "score_cp": -867
+      },
+      {
+        "ply": 8,
+        "move": "f5c2",
+        "score_cp": -1059
+      },
+      {
+        "ply": 9,
+        "move": "a2a3",
+        "score_cp": -1085
+      },
+      {
+        "ply": 10,
+        "move": "c2d1",
+        "score_cp": -1320
+      },
+      {
+        "ply": 11,
+        "move": "e1d1",
+        "score_cp": -1332
+      },
+      {
+        "ply": 12,
+        "move": "b2a3",
+        "score_cp": -1372
+      },
+      {
+        "ply": 13,
+        "move": "g2g4",
+        "score_cp": -1333
+      },
+      {
+        "ply": 14,
+        "move": "a3a4",
+        "score_cp": -1474
+      },
+      {
+        "ply": 15,
+        "move": "d1c1",
+        "score_cp": -1347
+      },
+      {
+        "ply": 16,
+        "move": "a4c6",
+        "score_cp": -1395
+      },
+      {
+        "ply": 17,
+        "move": "c1d2",
+        "score_cp": -1403
+      },
+      {
+        "ply": 18,
+        "move": "c6h1",
+        "score_cp": -1478
+      },
+      {
+        "ply": 19,
+        "move": "g4g5",
+        "score_cp": -1369
+      },
+      {
+        "ply": 20,
+        "move": "e7e5",
+        "score_cp": -1501
+      },
+      {
+        "ply": 21,
+        "move": "d2c1",
+        "score_cp": -1425
+      },
+      {
+        "ply": 22,
+        "move": "f8b4",
+        "score_cp": -1587
+      },
+      {
+        "ply": 23,
+        "move": "f2f4",
+        "score_cp": -1410
+      },
+      {
+        "ply": 24,
+        "move": "e5d4",
+        "score_cp": -1659
+      },
+      {
+        "ply": 25,
+        "move": "g1f3",
+        "score_cp": -1741
+      },
+      {
+        "ply": 26,
+        "move": "h1f1",
+        "score_cp": -2160
+      },
+      {
+        "ply": 27,
+        "move": "c1b2",
+        "score_cp": -2248
+      },
+      {
+        "ply": 28,
+        "move": "f1f3",
+        "score_cp": -2290
+      },
+      {
+        "ply": 29,
+        "move": "e2d4",
+        "score_cp": -2096
+      },
+      {
+        "ply": 30,
+        "move": "b4c3",
+        "score_cp": -2186
+      },
+      {
+        "ply": 31,
+        "move": "b2b3",
+        "score_cp": -2201
+      },
+      {
+        "ply": 32,
+        "move": "c3d4",
+        "score_cp": -2304
+      },
+      {
+        "ply": 33,
+        "move": "b3a4",
+        "score_cp": -2171
+      },
+      {
+        "ply": 34,
+        "move": "f3f4",
+        "score_cp": -9996
+      },
+      {
+        "ply": 35,
+        "move": "a4a5",
+        "score_cp": -2075
+      },
+      {
+        "ply": 36,
+        "move": "d4b6",
+        "score_cp": -9998
+      },
+      {
+        "ply": 37,
+        "move": "a5b5",
+        "score_cp": -9999
+      },
+      {
+        "ply": 38,
+        "move": "c7c6",
+        "score_cp": -9999
+      }
+    ]
+  },
+  {
+    "white": "BBC-1.2",
+    "black": "ORION-Neural-Only",
+    "result": "1-0",
+    "source": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_plies": 37,
+    "decisive_mistake": {
+      "move_number": 2,
+      "ply": 4,
+      "played_move": "g8f6",
+      "best_move": "e5c7",
+      "eval_before_cp": -107,
+      "eval_after_cp": -1054,
+      "eval_drop_cp": 947,
+      "classification": "Tactical Oversight (Blunder/Hanging Piece)",
+      "fen_before": "rnb1kbnr/pp2pppp/2p5/4q3/3P4/2N5/PPP1BPPP/R1BQK1NR b KQkq - 0 5"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "f1e2",
+        "score_cp": -101
+      },
+      {
+        "ply": 2,
+        "move": "c7c6",
+        "score_cp": -101
+      },
+      {
+        "ply": 3,
+        "move": "d2d4",
+        "score_cp": -99
+      },
+      {
+        "ply": 4,
+        "move": "g8f6",
+        "score_cp": -107
+      },
+      {
+        "ply": 5,
+        "move": "d4e5",
+        "score_cp": -1033
+      },
+      {
+        "ply": 6,
+        "move": "f6d7",
+        "score_cp": -1029
+      },
+      {
+        "ply": 7,
+        "move": "g1f3",
+        "score_cp": -1052
+      },
+      {
+        "ply": 8,
+        "move": "e7e6",
+        "score_cp": -898
+      },
+      {
+        "ply": 9,
+        "move": "c3e4",
+        "score_cp": -928
+      },
+      {
+        "ply": 10,
+        "move": "f7f5",
+        "score_cp": -933
+      },
+      {
+        "ply": 11,
+        "move": "e4d6",
+        "score_cp": -999
+      },
+      {
+        "ply": 12,
+        "move": "f8d6",
+        "score_cp": -968
+      },
+      {
+        "ply": 13,
+        "move": "e5d6",
+        "score_cp": -928
+      },
+      {
+        "ply": 14,
+        "move": "e8g8",
+        "score_cp": -963
+      },
+      {
+        "ply": 15,
+        "move": "c1f4",
+        "score_cp": -1007
+      },
+      {
+        "ply": 16,
+        "move": "b8a6",
+        "score_cp": -972
+      },
+      {
+        "ply": 17,
+        "move": "a1c1",
+        "score_cp": -1001
+      },
+      {
+        "ply": 18,
+        "move": "b7b6",
+        "score_cp": -950
+      },
+      {
+        "ply": 19,
+        "move": "e1g1",
+        "score_cp": -1034
+      },
+      {
+        "ply": 20,
+        "move": "c8b7",
+        "score_cp": -909
+      },
+      {
+        "ply": 21,
+        "move": "e2c4",
+        "score_cp": -984
+      },
+      {
+        "ply": 22,
+        "move": "g7g5",
+        "score_cp": -925
+      },
+      {
+        "ply": 23,
+        "move": "c4e6",
+        "score_cp": -1106
+      },
+      {
+        "ply": 24,
+        "move": "g8h8",
+        "score_cp": -1031
+      },
+      {
+        "ply": 25,
+        "move": "e6d7",
+        "score_cp": -1268
+      },
+      {
+        "ply": 26,
+        "move": "h7h6",
+        "score_cp": -1314
+      },
+      {
+        "ply": 27,
+        "move": "f4e5",
+        "score_cp": -1446
+      },
+      {
+        "ply": 28,
+        "move": "h8g8",
+        "score_cp": -1341
+      },
+      {
+        "ply": 29,
+        "move": "d7e6",
+        "score_cp": -1365
+      },
+      {
+        "ply": 30,
+        "move": "g8h7",
+        "score_cp": -1407
+      },
+      {
+        "ply": 31,
+        "move": "f3g5",
+        "score_cp": -1482
+      },
+      {
+        "ply": 32,
+        "move": "h7g6",
+        "score_cp": -1343
+      },
+      {
+        "ply": 33,
+        "move": "g5h3",
+        "score_cp": -1671
+      },
+      {
+        "ply": 34,
+        "move": "f8e8",
+        "score_cp": -1948
+      },
+      {
+        "ply": 35,
+        "move": "h3f4",
+        "score_cp": -9996
+      },
+      {
+        "ply": 36,
+        "move": "g6g5",
+        "score_cp": -9997
+      },
+      {
+        "ply": 37,
+        "move": "d1h5",
+        "score_cp": -9999
+      }
+    ]
+  },
+  {
+    "white": "Vice-1.2",
+    "black": "ORION-Search-v2.3",
+    "result": "1-0",
+    "source": "elo_test/v2_3_verification.pgn",
+    "total_plies": 44,
+    "decisive_mistake": {
+      "move_number": 8,
+      "ply": 16,
+      "played_move": "e8g8",
+      "best_move": "c6d8",
+      "eval_before_cp": -168,
+      "eval_after_cp": -429,
+      "eval_drop_cp": 261,
+      "classification": "Search Depth Horizon (Multi-ply tactical consequence beyond reach)",
+      "fen_before": "r1b1k2r/ppp1bppp/1qn2p2/8/1P1P1N2/2P5/P3QPPP/R1B1KB1R b KQkq - 0 11"
+    },
+    "eval_trajectory": [
+      {
+        "ply": 1,
+        "move": "g1e2",
+        "score_cp": -101
+      },
+      {
+        "ply": 2,
+        "move": "b8c6",
+        "score_cp": -66
+      },
+      {
+        "ply": 3,
+        "move": "d2d4",
+        "score_cp": -163
+      },
+      {
+        "ply": 4,
+        "move": "e5d6",
+        "score_cp": -163
+      },
+      {
+        "ply": 5,
+        "move": "c3e4",
+        "score_cp": -237
+      },
+      {
+        "ply": 6,
+        "move": "d6b4",
+        "score_cp": -128
+      },
+      {
+        "ply": 7,
+        "move": "c2c3",
+        "score_cp": -221
+      },
+      {
+        "ply": 8,
+        "move": "b4b6",
+        "score_cp": -251
+      },
+      {
+        "ply": 9,
+        "move": "e2f4",
+        "score_cp": -354
+      },
+      {
+        "ply": 10,
+        "move": "g8f6",
+        "score_cp": -356
+      },
+      {
+        "ply": 11,
+        "move": "e4f6",
+        "score_cp": -413
+      },
+      {
+        "ply": 12,
+        "move": "e7f6",
+        "score_cp": -411
+      },
+      {
+        "ply": 13,
+        "move": "d1e2",
+        "score_cp": -405
+      },
+      {
+        "ply": 14,
+        "move": "f8e7",
+        "score_cp": -115
+      },
+      {
+        "ply": 15,
+        "move": "b2b4",
+        "score_cp": -205
+      },
+      {
+        "ply": 16,
+        "move": "e8g8",
+        "score_cp": -168
+      },
+      {
+        "ply": 17,
+        "move": "f4d5",
+        "score_cp": -505
+      },
+      {
+        "ply": 18,
+        "move": "b6a6",
+        "score_cp": -485
+      },
+      {
+        "ply": 19,
+        "move": "e2d1",
+        "score_cp": -715
+      },
+      {
+        "ply": 20,
+        "move": "b7b5",
+        "score_cp": -371
+      },
+      {
+        "ply": 21,
+        "move": "d5c7",
+        "score_cp": -377
+      },
+      {
+        "ply": 22,
+        "move": "a6b7",
+        "score_cp": -374
+      },
+      {
+        "ply": 23,
+        "move": "c7a8",
+        "score_cp": -349
+      },
+      {
+        "ply": 24,
+        "move": "f8e8",
+        "score_cp": -387
+      },
+      {
+        "ply": 25,
+        "move": "d4d5",
+        "score_cp": -455
+      },
+      {
+        "ply": 26,
+        "move": "c6b4",
+        "score_cp": 71
+      },
+      {
+        "ply": 27,
+        "move": "f1b5",
+        "score_cp": -227
+      },
+      {
+        "ply": 28,
+        "move": "b7b5",
+        "score_cp": 241
+      },
+      {
+        "ply": 29,
+        "move": "a8c7",
+        "score_cp": 390
+      },
+      {
+        "ply": 30,
+        "move": "b4d3",
+        "score_cp": 390
+      },
+      {
+        "ply": 31,
+        "move": "e1d2",
+        "score_cp": 170
+      },
+      {
+        "ply": 32,
+        "move": "b5d7",
+        "score_cp": 204
+      },
+      {
+        "ply": 33,
+        "move": "d2d3",
+        "score_cp": -18
+      },
+      {
+        "ply": 34,
+        "move": "d7c7",
+        "score_cp": 242
+      },
+      {
+        "ply": 35,
+        "move": "c1e3",
+        "score_cp": 203
+      },
+      {
+        "ply": 36,
+        "move": "c8f5",
+        "score_cp": 201
+      },
+      {
+        "ply": 37,
+        "move": "d3d2",
+        "score_cp": 201
+      },
+      {
+        "ply": 38,
+        "move": "f5e4",
+        "score_cp": 201
+      },
+      {
+        "ply": 39,
+        "move": "d1a4",
+        "score_cp": -502
+      },
+      {
+        "ply": 40,
+        "move": "e8c8",
+        "score_cp": -494
+      },
+      {
+        "ply": 41,
+        "move": "a4e4",
+        "score_cp": -472
+      },
+      {
+        "ply": 42,
+        "move": "c7c3",
+        "score_cp": -563
+      },
+      {
+        "ply": 43,
+        "move": "d2e2",
+        "score_cp": -510
+      },
+      {
+        "ply": 44,
+        "move": "c3b2",
+        "score_cp": -573
+      }
+    ]
+  }
+]
