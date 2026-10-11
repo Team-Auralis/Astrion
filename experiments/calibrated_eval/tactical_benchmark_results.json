@@ -5,8 +5,8 @@
   "delta_pct": 22.222222222222214,
   "baseline_blunders": 0,
   "fixed_blunders": 0,
-  "avg_baseline_ms": 57.62,
-  "avg_fixed_ms": 241.91,
+  "avg_baseline_ms": 128.89,
+  "avg_fixed_ms": 868.58,
   "results": [
     {
       "index": 1,
@@ -18,11 +18,11 @@
       "baseline_move": "h5f7",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 0.19,
+      "baseline_ms": 0.52,
       "fixed_move": "h5f7",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 0.11
+      "fixed_ms": 0.23
     },
     {
       "index": 2,
@@ -35,11 +35,11 @@
       "baseline_move": "e1e8",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 0.1,
+      "baseline_ms": 0.22,
       "fixed_move": "e1e8",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 0.08
+      "fixed_ms": 0.16
     },
     {
       "index": 4,
@@ -57,11 +57,11 @@
       "baseline_move": "b6c7",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 1.48,
+      "baseline_ms": 3.3,
       "fixed_move": "b1h1",
       "fixed_correct": false,
       "fixed_blunder": false,
-      "fixed_ms": 5.4
+      "fixed_ms": 17.19
     },
     {
       "index": 5,
@@ -76,11 +76,11 @@
       "baseline_move": "b5a4",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 100.33,
-      "fixed_move": "c3e4",
-      "fixed_correct": true,
+      "baseline_ms": 156.32,
+      "fixed_move": "b5c6",
+      "fixed_correct": false,
       "fixed_blunder": false,
-      "fixed_ms": 283.97
+      "fixed_ms": 1032.86
     },
     {
       "index": 6,
@@ -95,11 +95,11 @@
       "baseline_move": "f6h5",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 108.99,
+      "baseline_ms": 148.57,
       "fixed_move": "f6h5",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 203.81
+      "fixed_ms": 472.01
     },
     {
       "index": 7,
@@ -111,11 +111,11 @@
       "baseline_move": "d8d1",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 0.12,
+      "baseline_ms": 0.14,
       "fixed_move": "d8d1",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 0.11
+      "fixed_ms": 0.12
     },
     {
       "index": 8,
@@ -127,11 +127,11 @@
       "baseline_move": "e1e2",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 140.81,
-      "fixed_move": "c1d2",
-      "fixed_correct": true,
+      "baseline_ms": 230.35,
+      "fixed_move": "d1b3",
+      "fixed_correct": false,
       "fixed_blunder": false,
-      "fixed_ms": 947.56
+      "fixed_ms": 2612.35
     },
     {
       "index": 9,
@@ -145,11 +145,11 @@
       "baseline_move": "c4d5",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 67.8,
+      "baseline_ms": 125.8,
       "fixed_move": "c4f7",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 591.71
+      "fixed_ms": 2319.35
     },
     {
       "index": 10,
@@ -166,11 +166,11 @@
       "baseline_move": "g1h1",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 90.7,
-      "fixed_move": "h2h3",
+      "baseline_ms": 148.1,
+      "fixed_move": "d1d3",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 302.36
+      "fixed_ms": 1262.26
     },
     {
       "index": 11,
@@ -185,11 +185,11 @@
       "baseline_move": "c4b5",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 36.84,
+      "baseline_ms": 112.36,
       "fixed_move": "d2d3",
       "fixed_correct": false,
       "fixed_blunder": false,
-      "fixed_ms": 257.43
+      "fixed_ms": 1025.56
     },
     {
       "index": 12,
@@ -204,11 +204,11 @@
       "baseline_move": "f3e5",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 80.43,
+      "baseline_ms": 207.19,
       "fixed_move": "f3e5",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 143.76
+      "fixed_ms": 620.03
     },
     {
       "index": 13,
@@ -222,11 +222,11 @@
       "baseline_move": "g8f6",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 31.9,
-      "fixed_move": "f7f6",
-      "fixed_correct": false,
+      "baseline_ms": 65.5,
+      "fixed_move": "d7d6",
+      "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 90.22
+      "fixed_ms": 418.12
     },
     {
       "index": 14,
@@ -241,11 +241,11 @@
       "baseline_move": "c4b5",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 96.72,
+      "baseline_ms": 179.05,
       "fixed_move": "h2h3",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 562.46
+      "fixed_ms": 2113.33
     },
     {
       "index": 16,
@@ -257,11 +257,11 @@
       "baseline_move": "e2e8",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 0.05,
+      "baseline_ms": 0.12,
       "fixed_move": "e2e8",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 0.04
+      "fixed_ms": 0.08
     },
     {
       "index": 17,
@@ -277,11 +277,11 @@
       "baseline_move": "g8h8",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 25.67,
-      "fixed_move": "h7h6",
-      "fixed_correct": false,
+      "baseline_ms": 49.27,
+      "fixed_move": "c8e6",
+      "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 81.18
+      "fixed_ms": 471.67
     },
     {
       "index": 18,
@@ -294,11 +294,11 @@
       "baseline_move": "d4e5",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 130.35,
+      "baseline_ms": 501.03,
       "fixed_move": "d4e5",
       "fixed_correct": false,
       "fixed_blunder": false,
-      "fixed_ms": 320.04
+      "fixed_ms": 1376.08
     },
     {
       "index": 19,
@@ -313,11 +313,11 @@
       "baseline_move": "f3g5",
       "baseline_correct": false,
       "baseline_blunder": false,
-      "baseline_ms": 124.65,
+      "baseline_ms": 391.87,
       "fixed_move": "c4f7",
       "fixed_correct": false,
       "fixed_blunder": false,
-      "fixed_ms": 564.03
+      "fixed_ms": 1892.91
     },
     {
       "index": 20,
@@ -329,11 +329,11 @@
       "baseline_move": "e1e8",
       "baseline_correct": true,
       "baseline_blunder": false,
-      "baseline_ms": 0.06,
+      "baseline_ms": 0.33,
       "fixed_move": "e1e8",
       "fixed_correct": true,
       "fixed_blunder": false,
-      "fixed_ms": 0.06
+      "fixed_ms": 0.12
     }
   ]
 }
