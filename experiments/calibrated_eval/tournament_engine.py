@@ -444,11 +444,12 @@ def alphabeta_search(board: chess.Board, depth: int, alpha: float, beta: float, 
 
 
 class OptimizedSearchEngine:
-    """Full-featured Alpha-Beta engine with TT, Iterative Deepening, NMP, LMR, and Polyglot Opening Book."""
+    """Full-featured Alpha-Beta engine with TT, Iterative Deepening, PVS, NMP, LMR, and Polyglot Opening Book."""
     def __init__(self, book_path: Optional[str] = POLYGLOT_BOOK):
         self.tt = TranspositionTable(max_entries=500000)
         self.killer_moves: List[List[Optional[chess.Move]]] = [[None, None] for _ in range(64)]
         self.history_table: Dict[Tuple[int, int], int] = {}
+        self.counter_moves: Dict[Tuple[int, int], chess.Move] = {}
         self.nodes_visited = 0
         self.start_time = 0.0
         self.time_limit = 0.5
@@ -458,6 +459,7 @@ class OptimizedSearchEngine:
     def clear_heuristics(self):
         self.killer_moves = [[None, None] for _ in range(64)]
         self.history_table.clear()
+        self.counter_moves.clear()
         self.nodes_visited = 0
         self.stop_search = False
 
@@ -472,25 +474,37 @@ class OptimizedSearchEngine:
                 pass
         return None
 
-    def score_move(self, board: chess.Board, m: chess.Move, tt_move: Optional[chess.Move], ply: int) -> int:
+    def score_move(self, board: chess.Board, m: chess.Move, tt_move: Optional[chess.Move], ply: int, prev_move: Optional[chess.Move] = None) -> int:
         if tt_move and m == tt_move:
             return 1000000
+        if m.promotion == chess.QUEEN:
+            return 950000
         if board.is_capture(m):
             return 100000 + mvv_lva(board, m)
+        if m.promotion:
+            return 90000
         if ply < 64:
             if m == self.killer_moves[ply][0]:
-                return 90000
-            elif m == self.killer_moves[ply][1]:
                 return 80000
-        return self.history_table.get((m.from_square, m.to_square), 0)
+            elif m == self.killer_moves[ply][1]:
+                return 70000
+        if prev_move:
+            prev_key = (prev_move.from_square, prev_move.to_square)
+            if self.counter_moves.get(prev_key) == m:
+                return 60000
+        return min(self.history_table.get((m.from_square, m.to_square), 0), 50000)
 
-    def negamax(self, board: chess.Board, depth: int, alpha: float, beta: float, ply: int = 0) -> float:
+    def negamax(self, board: chess.Board, depth: int, alpha: float, beta: float, ply: int = 0, prev_move: Optional[chess.Move] = None) -> float:
         self.nodes_visited += 1
 
         if (self.nodes_visited & 1023) == 0:
             if time.perf_counter() - self.start_time >= self.time_limit:
                 self.stop_search = True
                 return alpha
+
+        # Repetition and 50-move rule detection
+        if ply > 0 and (board.is_repetition(2) or board.is_fifty_moves()):
+            return 0.0
 
         if board.is_checkmate():
             return -MATE_SCORE + ply
@@ -519,7 +533,7 @@ class OptimizedSearchEngine:
             if has_pieces:
                 r = 2 + (depth // 6)
                 board.push(chess.Move.null())
-                null_score = -self.negamax(board, depth - 1 - r, -beta, -beta + 1, ply + 1)
+                null_score = -self.negamax(board, depth - 1 - r, -beta, -beta + 1, ply + 1, prev_move=None)
                 board.pop()
                 if self.stop_search:
                     return alpha
@@ -532,7 +546,7 @@ class OptimizedSearchEngine:
                 return -MATE_SCORE + ply
             return 0.0
 
-        moves.sort(key=lambda m: self.score_move(board, m, tt_move, ply), reverse=True)
+        moves.sort(key=lambda m: self.score_move(board, m, tt_move, ply, prev_move), reverse=True)
 
         best_score = -float("inf")
         best_m = None
@@ -543,14 +557,22 @@ class OptimizedSearchEngine:
             board.push(m)
             gives_check = board.is_check()
 
-            # Late Move Reductions (LMR): search late quiet moves with reduced depth
-            if i >= 4 and depth >= 3 and not in_check and not is_capture and not gives_check and not m.promotion:
-                reduced_depth = max(1, depth - 2)
-                score = -self.negamax(board, reduced_depth, -alpha - 1, -alpha, ply + 1)
-                if score > alpha and not self.stop_search:
-                    score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+            # PVS (Principal Variation Search) + Late Move Reductions (LMR)
+            if i == 0:
+                # Search PV move with full window
+                score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1, prev_move=m)
             else:
-                score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1)
+                # Late quiet moves: try LMR with zero window
+                if i >= 4 and depth >= 3 and not in_check and not is_capture and not gives_check and not m.promotion:
+                    reduced_depth = max(1, depth - 2)
+                    score = -self.negamax(board, reduced_depth, -alpha - 1, -alpha, ply + 1, prev_move=m)
+                    if score > alpha and not self.stop_search:
+                        score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1, prev_move=m)
+                else:
+                    # Non-PV moves: zero-window search first
+                    score = -self.negamax(board, depth - 1, -alpha - 1, -alpha, ply + 1, prev_move=m)
+                    if alpha < score < beta and not self.stop_search:
+                        score = -self.negamax(board, depth - 1, -beta, -alpha, ply + 1, prev_move=m)
 
             board.pop()
 
@@ -571,6 +593,8 @@ class OptimizedSearchEngine:
                         self.killer_moves[ply][0] = m
                     h_key = (m.from_square, m.to_square)
                     self.history_table[h_key] = self.history_table.get(h_key, 0) + depth * depth
+                    if prev_move:
+                        self.counter_moves[(prev_move.from_square, prev_move.to_square)] = m
                 break
 
         if best_score <= orig_alpha:
@@ -618,23 +642,47 @@ class OptimizedSearchEngine:
         for d in range(1, max_depth + 1):
             iter_best_move = None
             iter_best_val = -float("inf")
-            alpha = -float("inf")
-            beta = float("inf")
 
-            for m in moves:
-                board.push(m)
-                val = -self.negamax(board, d - 1, -beta, -alpha, ply=1)
-                board.pop()
+            # Aspiration window for d >= 4
+            if d >= 4 and abs(best_val) < MATE_SCORE - 100:
+                delta = 40.0
+                alpha = best_val - delta
+                beta = best_val + delta
+            else:
+                delta = 0.0
+                alpha = -float("inf")
+                beta = float("inf")
 
-                if self.stop_search:
+            while True:
+                for m in moves:
+                    board.push(m)
+                    val = -self.negamax(board, d - 1, -beta, -alpha, ply=1, prev_move=m)
+                    board.pop()
+
+                    if self.stop_search:
+                        break
+
+                    if val > iter_best_val:
+                        iter_best_val = val
+                        iter_best_move = m
+
+                    if val > alpha:
+                        alpha = val
+
+                if self.stop_search or iter_best_move is None:
                     break
 
-                if val > iter_best_val:
-                    iter_best_val = val
-                    iter_best_move = m
-
-                if val > alpha:
-                    alpha = val
+                # Check aspiration window fail-low / fail-high
+                if delta > 0.0:
+                    if iter_best_val <= (best_val - delta):
+                        alpha = -float("inf")
+                        delta *= 2
+                        continue
+                    elif iter_best_val >= (best_val + delta):
+                        beta = float("inf")
+                        delta *= 2
+                        continue
+                break
 
             if self.stop_search or iter_best_move is None:
                 break

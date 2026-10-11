@@ -1,0 +1,61 @@
+{
+  "checkpoint": {
+    "path": "checkpoints/ccrl_30b/orion_30b_master_final_master.json",
+    "sha256": "78f47d713861138960a23335cf947cbdf749b11ec63baffddf3f0edb53ba1bd8",
+    "size_bytes": 252816445,
+    "parameters": 18810113,
+    "residual_blocks": 30,
+    "channels": 512,
+    "input_features": 1152,
+    "policy_outputs": 4096,
+    "value_outputs": 1
+  },
+  "tournament_audit": {
+    "pgn_path": "experiments/calibrated_eval/full_tournament.pgn",
+    "total_games": 30,
+    "records": {
+      "ORION-Search-Full": {
+        "wins": 6,
+        "losses": 2,
+        "draws": 2,
+        "pts": 7.0,
+        "games": 10
+      },
+      "ORION-Neural-Only": {
+        "wins": 0,
+        "losses": 10,
+        "draws": 0,
+        "pts": 0.0,
+        "games": 10
+      },
+      "Vice-1.2": {
+        "wins": 6,
+        "losses": 1,
+        "draws": 3,
+        "pts": 7.5,
+        "games": 10
+      },
+      "Sunfish-2026": {
+        "wins": 4,
+        "losses": 6,
+        "draws": 0,
+        "pts": 4.0,
+        "games": 10
+      },
+      "BBC-1.2": {
+        "wins": 9,
+        "losses": 0,
+        "draws": 1,
+        "pts": 9.5,
+        "games": 10
+      },
+      "Stockfish-1350": {
+        "wins": 2,
+        "losses": 8,
+        "draws": 0,
+        "pts": 2.0,
+        "games": 10
+      }
+    }
+  }
+}

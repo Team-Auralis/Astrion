@@ -61,7 +61,7 @@ This benchmark enforces an immutable, reproducible evaluation standard:
 - **Positional Factors:** **Bishop Pair bonus (+35/+50 cp), Rook Open/Semi-Open files (+25/+15 cp)**
 - **Pruning & Extensions:** **Check Extensions (+1 ply), Null-Move Pruning (NMP), Late Move Reductions (LMR), Delta Pruning**
 - **Tournament Score:** **7.0 / 10 (70.0%)** (all-time record)
-- **Ordo Rating (Vice = 1850.0 Anchor):** **1777.1 Elo** (7.0 / 10, scoring 5W – 2L – 3D)
+- **Ordo Rating (Vice = 1850.0 Anchor):** **1777.1 Elo** (7.0 / 10, scoring 6W – 2L – 2D)
 
 ---
 
@@ -72,8 +72,8 @@ This benchmark enforces an immutable, reproducible evaluation standard:
 | Rank | Participant | Score | Played | Record (W - L - D) | Score % |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | **1** | **BBC-1.2** | **9.5 / 10** | 10 | 9W – 0L – 1D | **95.0%** |
-| **2** | **Vice-1.2** | **7.5 / 10** | 10 | 7W – 2L – 1D | **75.0%** |
-| **3** | **ORION-Search-Full** | **7.0 / 10** | **10** | **5W – 2L – 3D** | **70.0%** |
+| **2** | **Vice-1.2** | **7.5 / 10** | 10 | 6W – 1L – 3D | **75.0%** |
+| **3** | **ORION-Search-Full** | **7.0 / 10** | **10** | **6W – 2L – 2D** | **70.0%** |
 | **4** | **Sunfish-2026** | **4.0 / 10** | 10 | 4W – 6L – 0D | **40.0%** |
 | **5** | **Stockfish-1350** | **2.0 / 10** | 10 | 2W – 8L – 0D | **20.0%** |
 | **6** | **ORION-Neural-Only** | **0.0 / 10** | 10 | 0W – 10L – 0D | **0.0%** |

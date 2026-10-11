@@ -1,0 +1,8 @@
+
+   # PLAYER               :  RATING  ERROR  POINTS  PLAYED   (%)
+   1 Vice-1.2             :  1850.0   ----     1.5       2    75
+   2 ORION-Search-v2.3    :  1657.5  231.5     4.5       6    75
+
+White advantage = 0.00 +/- 0.00
+Draw rate (equal opponents) = 50.00 % +/- 0.00
+

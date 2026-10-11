@@ -1,29 +1,59 @@
-# ORION Tournament Configuration & Protocols
+# ORION Tournament Protocol & Benchmark Specification
 
-## 1. Hardware & System Configuration
-- **Platform**: Windows 11 Home 25H2 (x86_64)
-- **CPU**: 11th Gen Intel(R) Core(TM) i5-11260H (6 Cores, 12 Threads) @ 4.40 GHz
-- **GPU**: NVIDIA GeForce RTX 3050 Laptop GPU (3.87 GB VRAM, Compute Capability 8.6)
-- **Tournament Concurrency**: 2 parallel game workers
-- **Power Profile**: High Performance plugged-in AC power
+## 1. Overview & Testbed Environment
+This document defines the rigorous, reproducible benchmarking standard for evaluating ORION Chess Engine against external reference engines.
 
-## 2. Tournament Engine Protocols
-- **Protocol**: Universal Chess Interface (UCI)
-- **Tournament Runner**: Cute Chess CLI v1.5.1
-- **Opening Suite**: `elo_test/openings.pgn` (22 balanced grandmaster opening positions)
-- **Opening Policy**: Sequential pairs with `-repeat` (each opening played twice with alternating White/Black colors)
-- **Color Equality**: Guaranteed 50% White, 50% Black games per pair
+### Host Hardware
+- **Processor:** 11th Gen Intel(R) Core(TM) i5-11260H (12 logical cores @ 4.40 GHz)
+- **Discrete GPU:** NVIDIA GeForce RTX 3050 Laptop GPU (4 GB GDDR6 VRAM)
+- **RAM:** 8 GB DDR4 System Memory
+- **Operating System:** Windows 11 Home 64-bit (Build 26100)
+- **Python Runtime:** Python 3.14 / 3.12 64-bit with PyTorch 2.6 CUDA acceleration
+- **Board Library:** `python-chess` 1.11.x
 
-## 3. Adjudication & Termination Rules
-- **Draw Adjudication**: Automatically awarded if move count >= 45 full moves, score within +/- 15 centipawns for 8 consecutive moves.
-- **Resignation Adjudication**: Automatically awarded if score is below -700 centipawns for 5 consecutive moves.
-- **Maximum Length**: 120 full moves (prevents non-progress infinite loops).
-- **Tablebases**: None utilized during tournament play.
-- **Crash Recovery**: Enabled (`-recover`).
+---
 
-## 4. Output Data Streams
-- **Master PGN**: [`elo_test/games.pgn`](file:///D:/orion-game-ai/elo_test/games.pgn)
-- **Game Results CSV**: [`elo_test/game_results.csv`](file:///D:/orion-game-ai/elo_test/game_results.csv)
-- **Engine Process Logs**: [`elo_test/engine_logs/`](file:///D:/orion-game-ai/elo_test/engine_logs/)
-- **Ordo Rating Reports**: [`elo_test/rating_results.txt`](file:///D:/orion-game-ai/elo_test/rating_results.txt) and [`elo_test/rating_results.csv`](file:///D:/orion-game-ai/elo_test/rating_results.csv)
-- **Bootstrap Uncertainty**: [`elo_test/uncertainty.json`](file:///D:/orion-game-ai/elo_test/uncertainty.json)
+## 2. Benchmark Opponents & Published Anchors
+
+| Participant | Version / Config | Engine Type | CCRL 40/15 Anchor | CEGT 40/20 Anchor | Notes |
+| :--- | :--- | :--- | :---: | :---: | :--- |
+| **Vice-1.2** | v1.2 (Bluefever) | C Bitboard / 0x88 | **1850.0 Elo** | ~1840 Elo | Primary CCRL Anchor; stable, classical alpha-beta |
+| **Sunfish-2026** | 2026 Release | Python PST engine | **1750.0 Elo** | ~1720 Elo | Fast Python baseline opponent |
+| **Stockfish-1350** | Stockfish 19 UCI_Elo=1350 | C++ NNUE / classical | **1350.0 Elo** | 1350.0 Elo | Calibrated lower anchor (`UCI_LimitStrength=true`) |
+| **BBC-1.2** | v1.2 (Code Monkey King) | Native C Bitboard | **1950.0 Elo** | ~1920 Elo | Upper anchor; deep tactical bitboard search |
+| **ORION-Neural-Only**| 30-block ResNet (18.8M) | Policy Head Argmax | Experimental | Experimental | Pure intuition baseline (no search tree) |
+| **ORION-Search-Full**| v2.2 / v2.3 Hybrid | ResNet + PVS Search | Target Anchor | Target Anchor | Full production engine |
+
+---
+
+## 3. Opening Suite & Color Pairing Rules
+To completely eliminate first-move advantage bias and book memorization variance:
+1. **Paired Games:** Every single opening line is played exactly twice between any two opponents.
+2. **Color Swap:** Game 1 features Engine A as White, Engine B as Black. Game 2 swaps colors: Engine B plays White, Engine A plays Black from the identical opening FEN.
+3. **Opening Book:** Standard opening lines drawn from `experiments/openings/UHO_Lichess_4852_v1.epd` and master performance book (`performance.bin`).
+
+---
+
+## 4. Time Controls & Adjudication Protocol
+- **Time Control:** Fixed budget per move (0.05s to 0.5s per move) or standard blitz increment.
+- **Terminal Adjudication:**
+  - Checkmate: 1-0 or 0-1
+  - Stalemate: 1/2-1/2
+  - Insufficient Material: 1/2-1/2 (FIDE rules)
+  - 50-move rule: 1/2-1/2
+  - Threefold repetition: 1/2-1/2
+  - Material cutoff: $\ge 300$ cp advantage without terminal moves past ply 150 adjudicated as win/loss.
+- **Illegal Moves / Crashes:** Engine that forfeits by illegal move or unhandled exception receives 0 points; opponent receives 1 point.
+
+---
+
+## 5. Statistical Estimation with Ordo
+All rating estimations are generated using `ordo.exe` using standard Maximum Likelihood Estimation:
+```bash
+ordo.exe -p <tournament.pgn> -o <report.txt> -A Vice-1.2 -a 1850.0 -s 1000 -F 95 -G
+```
+Or with Stockfish-1350 as dual anchor:
+```bash
+ordo.exe -p <tournament.pgn> -o <report.txt> -A Stockfish-1350 -a 1350.0 -s 1000 -F 95 -G
+```
+Both 95% confidence intervals and standard errors must be documented.

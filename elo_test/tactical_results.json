@@ -1,0 +1,679 @@
+{
+  "benchmark": "ORION Tactical Regression Suite v1.0",
+  "total_positions": 35,
+  "solved_count": 29,
+  "accuracy_percent": 82.86,
+  "sub_1s_count": 29,
+  "blunders_into_mate": 0,
+  "avg_time_ms": 329.35,
+  "avg_nodes": 3317.4,
+  "category_breakdown": {
+    "mate_in_1": {
+      "total": 6,
+      "solved": 4
+    },
+    "mate_in_2": {
+      "total": 5,
+      "solved": 4
+    },
+    "hanging_piece": {
+      "total": 5,
+      "solved": 4
+    },
+    "forks_pins": {
+      "total": 5,
+      "solved": 4
+    },
+    "defense": {
+      "total": 6,
+      "solved": 6
+    },
+    "endgame_sacrifices": {
+      "total": 8,
+      "solved": 7
+    }
+  },
+  "detailed_results": [
+    {
+      "id": 1,
+      "category": "mate_in_1",
+      "description": "Scholar's Mate (Qxf7#)",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+      "expected": [
+        "h5f7"
+      ],
+      "actual": "h5f7",
+      "depth": 1,
+      "nodes": 0,
+      "time_ms": 2.83,
+      "eval_cp": 29999.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 2,
+      "category": "mate_in_1",
+      "description": "Back-rank mate with Rooks (Rd8# / Re8#)",
+      "fen": "6k1/5ppp/8/8/8/8/8/3RR1K1 w - - 0 1",
+      "expected": [
+        "d1d8",
+        "e1e8"
+      ],
+      "actual": "e1e8",
+      "depth": 1,
+      "nodes": 0,
+      "time_ms": 2.06,
+      "eval_cp": 29999.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 3,
+      "category": "mate_in_1",
+      "description": "Queen back-rank mate (Qe8#)",
+      "fen": "6k1/5ppp/8/8/8/8/4QPPP/6K1 w - - 0 1",
+      "expected": [
+        "e2e8"
+      ],
+      "actual": "e2e8",
+      "depth": 1,
+      "nodes": 0,
+      "time_ms": 1.03,
+      "eval_cp": 29999.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 4,
+      "category": "mate_in_1",
+      "description": "Rook capture back-rank mate (Rxe8#)",
+      "fen": "4r1k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
+      "expected": [
+        "e1e8"
+      ],
+      "actual": "e1e8",
+      "depth": 1,
+      "nodes": 0,
+      "time_ms": 0.93,
+      "eval_cp": 29999.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 5,
+      "category": "mate_in_1",
+      "description": "Black Queen mate on f1 (Qxf1#)",
+      "fen": "r1b2rk1/pp3ppp/8/8/1B6/8/PPP2PPP/R2q1RK1 b - - 0 1",
+      "expected": [
+        "d1f1"
+      ],
+      "actual": "d1c2",
+      "depth": 4,
+      "nodes": 6144,
+      "time_ms": 603.72,
+      "eval_cp": 710.8,
+      "pass": false,
+      "blunder_mate": false
+    },
+    {
+      "id": 6,
+      "category": "mate_in_1",
+      "description": "Supported Queen mate on g7 (Qg7#)",
+      "fen": "5rk1/5ppp/8/8/8/8/1Q6/4K2R w K - 0 1",
+      "expected": [
+        "b2g7"
+      ],
+      "actual": "e1f2",
+      "depth": 4,
+      "nodes": 4391,
+      "time_ms": 409.24,
+      "eval_cp": 585.0,
+      "pass": false,
+      "blunder_mate": false
+    },
+    {
+      "id": 7,
+      "category": "mate_in_2",
+      "description": "Discovered check leading to mate (Rf7+ or Rf6-rook moves)",
+      "fen": "r5rk/5p1p/5R2/8/8/8/1Q4PP/6K1 w - - 0 1",
+      "expected": [
+        "f6a6",
+        "f6b6",
+        "f6c6",
+        "f6d6",
+        "f6e6",
+        "f6f7"
+      ],
+      "actual": "f6f7",
+      "depth": 1,
+      "nodes": 51,
+      "time_ms": 7.42,
+      "eval_cp": 29997.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 8,
+      "category": "mate_in_2",
+      "description": "Cornering the King (Rb8+ Kh7 Nf8+ Kg8)",
+      "fen": "6k1/1R4p1/6Np/8/8/8/8/4K3 w - - 0 1",
+      "expected": [
+        "b7b8",
+        "g6e7"
+      ],
+      "actual": "e1f2",
+      "depth": 4,
+      "nodes": 4556,
+      "time_ms": 345.28,
+      "eval_cp": 682.5,
+      "pass": false,
+      "blunder_mate": false
+    },
+    {
+      "id": 9,
+      "category": "mate_in_2",
+      "description": "Re8+ Kf7 Rxh8 or Kf7 Qe2",
+      "fen": "r1b3kr/ppp3pp/8/8/3q4/8/PPPP1PPP/RNBQR1K1 w - - 0 1",
+      "expected": [
+        "e1e8"
+      ],
+      "actual": "e1e8",
+      "depth": 4,
+      "nodes": 4043,
+      "time_ms": 405.6,
+      "eval_cp": 917.5,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 10,
+      "category": "mate_in_2",
+      "description": "Prevent back-rank vulnerability / activate Queen",
+      "fen": "3r2k1/p4ppp/8/8/8/1Q6/5PPP/6K1 w - - 0 1",
+      "expected": [
+        "b3a4",
+        "b3b7",
+        "g2g3",
+        "h2h3",
+        "g1f1"
+      ],
+      "actual": "b3a4",
+      "depth": 4,
+      "nodes": 7168,
+      "time_ms": 602.34,
+      "eval_cp": 300.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 11,
+      "category": "mate_in_2",
+      "description": "Exchange center pin knight (Nxe4 / Bxe4)",
+      "fen": "r2q1rk1/ppp2ppp/2n5/3p4/3Pn1b1/2NB1N2/PPP2PPP/R2Q1RK1 w - - 0 10",
+      "expected": [
+        "c3e4",
+        "d3e4",
+        "h2h3"
+      ],
+      "actual": "c3e4",
+      "depth": 4,
+      "nodes": 4096,
+      "time_ms": 586.37,
+      "eval_cp": 101.7,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 12,
+      "category": "hanging_piece",
+      "description": "Capture hanging Rook on d1 (Rxd1#)",
+      "fen": "3r2k1/5ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+      "expected": [
+        "d8d1"
+      ],
+      "actual": "d8d1",
+      "depth": 1,
+      "nodes": 0,
+      "time_ms": 0.75,
+      "eval_cp": 29999.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 13,
+      "category": "hanging_piece",
+      "description": "Petrov Defense: Capture free e5 pawn (Nxe5)",
+      "fen": "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+      "expected": [
+        "f3e5"
+      ],
+      "actual": "f3e5",
+      "depth": 99,
+      "nodes": 0,
+      "time_ms": 0.48,
+      "eval_cp": 0.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 14,
+      "category": "hanging_piece",
+      "description": "Capture hanging Bishop on b4 (cxb4)",
+      "fen": "r1bqk2r/pppp1ppp/2n5/4p3/1b2n3/2P2N2/PP1P1PPP/RNBQKB1R w KQkq - 0 5",
+      "expected": [
+        "c3b4"
+      ],
+      "actual": "c3b4",
+      "depth": 4,
+      "nodes": 2995,
+      "time_ms": 628.72,
+      "eval_cp": 160.6,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 15,
+      "category": "hanging_piece",
+      "description": "Main line development vs protected e5",
+      "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+      "expected": [
+        "f1b5",
+        "f1c4",
+        "d2d4",
+        "b1c3",
+        "c2c3"
+      ],
+      "actual": "f1b5",
+      "depth": 99,
+      "nodes": 2995,
+      "time_ms": 7.79,
+      "eval_cp": 0.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 16,
+      "category": "hanging_piece",
+      "description": "Relieve pin on c3 with Bd2",
+      "fen": "r1b1k2r/pppp1ppp/8/4q3/1bP5/2N1P3/PP3PPP/R1BQKB1R w KQkq - 0 9",
+      "expected": [
+        "c1d2"
+      ],
+      "actual": "d1b3",
+      "depth": 3,
+      "nodes": 4096,
+      "time_ms": 520.48,
+      "eval_cp": 340.0,
+      "pass": false,
+      "blunder_mate": false
+    },
+    {
+      "id": 17,
+      "category": "forks_pins",
+      "description": "Queen double attack fork (Qd5 threatening Qxf7# and Qxe4)",
+      "fen": "r1bqk2r/pppp1ppp/2n5/4p3/2B1n3/2P2N2/PPP2PPP/R1BQK2R w KQkq - 0 7",
+      "expected": [
+        "d1d5",
+        "c4f7"
+      ],
+      "actual": "d1d5",
+      "depth": 3,
+      "nodes": 5120,
+      "time_ms": 597.64,
+      "eval_cp": 25.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 18,
+      "category": "forks_pins",
+      "description": "Resolve pin / reinforce knight",
+      "fen": "r2qkb1r/pp2pppp/2n5/1B1p4/3Pn1b1/2N2N2/PPP2PPP/R1BQK2R w KQkq - 1 7",
+      "expected": [
+        "c1d2",
+        "d1d3",
+        "c3e4",
+        "e1g1",
+        "h2h3"
+      ],
+      "actual": "e1g1",
+      "depth": 3,
+      "nodes": 2428,
+      "time_ms": 324.21,
+      "eval_cp": 32.5,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 19,
+      "category": "forks_pins",
+      "description": "Neutralize bishop diagonal with Be6 or attack with Na5",
+      "fen": "r1b2rk1/ppp2ppp/2n5/4P3/2B2B2/2P5/P1P3PP/R4RK1 b - - 0 13",
+      "expected": [
+        "c8e6",
+        "c8f5",
+        "f8e8",
+        "c6a5"
+      ],
+      "actual": "f8e8",
+      "depth": 4,
+      "nodes": 2980,
+      "time_ms": 429.27,
+      "eval_cp": -37.5,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 20,
+      "category": "forks_pins",
+      "description": "Develop on open c-file (Rc1 / Bd3 / Be2)",
+      "fen": "r1b1k2r/ppq2ppp/2n1p3/3p4/3P4/P1N1PN2/1P3PPP/R2QKB1R w KQkq - 0 11",
+      "expected": [
+        "a1c1",
+        "f1d3",
+        "f1e2",
+        "f1b5",
+        "e1g1"
+      ],
+      "actual": "e3e4",
+      "depth": 3,
+      "nodes": 4096,
+      "time_ms": 664.53,
+      "eval_cp": 350.0,
+      "pass": false,
+      "blunder_mate": false
+    },
+    {
+      "id": 21,
+      "category": "forks_pins",
+      "description": "Queen skewer/fork winning undefended knight",
+      "fen": "4k3/8/8/3n4/8/2Q5/8/4K3 w - - 0 1",
+      "expected": [
+        "c3c6",
+        "c3e5",
+        "c3d4"
+      ],
+      "actual": "c3c6",
+      "depth": 4,
+      "nodes": 8192,
+      "time_ms": 526.45,
+      "eval_cp": 891.7,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 22,
+      "category": "defense",
+      "description": "Defend against Qxf7# threat (g6, Qe7, d5, Nh5)",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 4 4",
+      "expected": [
+        "d7d5",
+        "d8e7",
+        "f6h5",
+        "g7g6"
+      ],
+      "actual": "f6h5",
+      "depth": 5,
+      "nodes": 4632,
+      "time_ms": 527.14,
+      "eval_cp": 920.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 23,
+      "category": "defense",
+      "description": "Countering Fried Liver / Ng4 attack (d4, h3, Bg5)",
+      "fen": "r1bqk2r/pppp1ppp/2n5/2b1p3/2B1P1n1/3P1N2/PPP2PPP/RNBQ1RK1 w kq - 5 6",
+      "expected": [
+        "d3d4",
+        "c1g5",
+        "h2h3",
+        "b1c3",
+        "c2c3"
+      ],
+      "actual": "h2h3",
+      "depth": 3,
+      "nodes": 2635,
+      "time_ms": 506.2,
+      "eval_cp": 50.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 24,
+      "category": "defense",
+      "description": "Defend king against bishop check / pin (c3, Bd2 or tactical dxe5)",
+      "fen": "r3k2r/ppp2ppp/2n5/3qp3/1b1P4/5N2/PPP2PPP/R1BQR1K1 w kq - 0 10",
+      "expected": [
+        "c2c3",
+        "c1d2",
+        "d4e5"
+      ],
+      "actual": "d4e5",
+      "depth": 4,
+      "nodes": 3064,
+      "time_ms": 517.03,
+      "eval_cp": 100.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 25,
+      "category": "defense",
+      "description": "Defend c3 pawn under queen attack (Qd4 or Bd2)",
+      "fen": "r1b1k2r/pp3ppp/2p5/4q3/8/2P1P3/P4PPP/R1BQKB1R w KQkq - 0 11",
+      "expected": [
+        "d1d4",
+        "c1d2",
+        "c1b2"
+      ],
+      "actual": "d1d4",
+      "depth": 4,
+      "nodes": 3237,
+      "time_ms": 315.48,
+      "eval_cp": 363.1,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 26,
+      "category": "defense",
+      "description": "Defend e5 pawn against Nf3 (Nc6, Nf6, d6)",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+      "expected": [
+        "b8c6",
+        "g8f6",
+        "d7d6"
+      ],
+      "actual": "b8c6",
+      "depth": 99,
+      "nodes": 3237,
+      "time_ms": 0.5,
+      "eval_cp": 0.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 27,
+      "category": "defense",
+      "description": "Develop queenside pieces safely",
+      "fen": "r1b2rk1/ppp2ppp/8/8/8/8/PPP2PPP/R1B1R1K1 b - - 0 14",
+      "expected": [
+        "c8f5",
+        "c8d7",
+        "c8e6",
+        "f8d8",
+        "c7c6"
+      ],
+      "actual": "c8f5",
+      "depth": 5,
+      "nodes": 4960,
+      "time_ms": 452.18,
+      "eval_cp": -10.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 28,
+      "category": "endgame_sacrifices",
+      "description": "King and pawn endgame: maintain opposition (Kd3 or Kf3)",
+      "fen": "8/8/4k3/8/4P3/8/4K3/8 w - - 0 1",
+      "expected": [
+        "e2d3",
+        "e2f3",
+        "e2e3"
+      ],
+      "actual": "e2e3",
+      "depth": 11,
+      "nodes": 6174,
+      "time_ms": 398.18,
+      "eval_cp": 140.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 29,
+      "category": "endgame_sacrifices",
+      "description": "King + Rook cornered King: avoid stalemate (any safe rook move)",
+      "fen": "k7/8/1K6/8/8/8/8/1R6 w - - 0 1",
+      "expected": [
+        "b1a1",
+        "b1b2",
+        "b1b3",
+        "b1b4",
+        "b1b5",
+        "b1b7",
+        "b1b8",
+        "b1c1",
+        "b1d1",
+        "b1e1",
+        "b1f1",
+        "b1g1",
+        "b1h1"
+      ],
+      "actual": "b1h1",
+      "depth": 3,
+      "nodes": 439,
+      "time_ms": 33.41,
+      "eval_cp": 29997.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 30,
+      "category": "endgame_sacrifices",
+      "description": "King defense vs pawn on 7th rank (Kd2 only legal move)",
+      "fen": "8/8/8/8/8/5k2/4p3/4K3 w - - 0 1",
+      "expected": [
+        "e1d2"
+      ],
+      "actual": "e1d2",
+      "depth": 1,
+      "nodes": 0,
+      "time_ms": 0.51,
+      "eval_cp": 0.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 31,
+      "category": "endgame_sacrifices",
+      "description": "Pawn endgame: escort pawn to promotion",
+      "fen": "8/8/8/8/5K2/4p3/4k3/8 b - - 0 1",
+      "expected": [
+        "e2d2",
+        "e2d3",
+        "e2f2",
+        "e2f3"
+      ],
+      "actual": "e2f2",
+      "depth": 8,
+      "nodes": 7621,
+      "time_ms": 420.98,
+      "eval_cp": 895.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 32,
+      "category": "endgame_sacrifices",
+      "description": "Promote pawn to Queen (e8=Q)",
+      "fen": "8/4P3/8/8/8/5k2/8/4K3 w - - 0 1",
+      "expected": [
+        "e7e8q",
+        "e7e8r"
+      ],
+      "actual": "e7e8q",
+      "depth": 6,
+      "nodes": 6820,
+      "time_ms": 421.96,
+      "eval_cp": 903.3,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 33,
+      "category": "endgame_sacrifices",
+      "description": "Open Italian development / tactical strike",
+      "fen": "r1bqkb1r/ppp2ppp/2np1n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5",
+      "expected": [
+        "d2d4",
+        "f3g5",
+        "c2c3",
+        "e1g1",
+        "d2d3",
+        "b1c3"
+      ],
+      "actual": "b1c3",
+      "depth": 4,
+      "nodes": 2959,
+      "time_ms": 371.17,
+      "eval_cp": -10.0,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 34,
+      "category": "endgame_sacrifices",
+      "description": "Solid opening choice (h3, Be3, Bb3)",
+      "fen": "r2qk2r/ppp1bppp/2np1n2/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 w kq - 2 7",
+      "expected": [
+        "c1e3",
+        "h2h3",
+        "a2a3",
+        "c4b3",
+        "c4b5",
+        "h1h2"
+      ],
+      "actual": "h2h3",
+      "depth": 3,
+      "nodes": 2883,
+      "time_ms": 369.62,
+      "eval_cp": 37.5,
+      "pass": true,
+      "blunder_mate": false
+    },
+    {
+      "id": 35,
+      "category": "endgame_sacrifices",
+      "description": "Central tension: Rook or Queen activation",
+      "fen": "r4rk1/ppp2ppp/2n5/3q4/3P4/5N2/PP3PPP/R2QR1K1 w - - 0 14",
+      "expected": [
+        "a1c1",
+        "a2a3",
+        "d1d2",
+        "d1d3",
+        "e1e3",
+        "h2h3"
+      ],
+      "actual": "d1b3",
+      "depth": 3,
+      "nodes": 4096,
+      "time_ms": 525.94,
+      "eval_cp": 45.0,
+      "pass": false,
+      "blunder_mate": false
+    }
+  ]
+}
