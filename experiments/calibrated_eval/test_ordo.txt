@@ -1,0 +1,12 @@
+
+   # PLAYER               :  RATING  POINTS  PLAYED   (%)
+   1 BBC-1.2            > :  1878.9     4.0       4   100
+   2 Stockfish-1350     > :  1878.9     4.0       4   100
+   3 Stockfish-1600     > :  1878.9     4.0       4   100
+   4 Sunfish-2026         :  1596.3     3.5       4    88
+   5 ORION-Search-Full    :  1403.7     0.5       8     6
+   6 ORION-Neural-Only  < :  1213.5     0.0       8     0
+
+White advantage = 0.00
+Draw rate (equal opponents) = 50.00 %
+

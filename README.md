@@ -33,13 +33,16 @@
   - **Quiescence Search**: Evaluates capture sequences until the position is tactically stable, solving the infamous *horizon effect*.
   - **MVV-LVA Move Ordering**: Most Valuable Victim / Least Valuable Attacker sorting prunes 90%+ of irrelevant branches instantly.
   - **Root Policy Priors**: Uses ORION's learned neural intuition to bias search ordering toward principled moves.
-- **⚔️ Real Bot Arena & Elo Tracker**:
-  - Battle against built-in bot tiers:
-    - **RandomBot** (~500 Elo): Baseline random legal mover.
-    - **GreedyMaterialBot** (~1000 Elo): Tactical capture and piece preservation heuristic bot.
-    - **MinimaxBot** (~1350 Elo): Classical depth-search engine.
-    - **StockfishBot** (1320 – 3190+ Elo): Native UCI subprocess interface to official Stockfish with configurable Elo limiting.
-  - Real-time **FIDE Elo rating updates** and tournament scoreboards.
+- **⚔️ Empirically Calibrated Engine Benchmark & Ordo Evaluation**:
+  - Independent strength validation using official **Ordo** maximum-likelihood estimation with 95% confidence intervals (`-s 1000 -F 95`).
+  - Standardized round-robin testbed with paired opening positions and color reversals against versioned engines with published CCRL/CEGT anchors:
+    - **Vice 1.2** (CCRL anchor ~1850 Elo)
+    - **Sunfish 2026** (CCRL anchor ~1750 Elo)
+    - **BBC 1.2** (CCRL anchor ~1950 Elo)
+    - **Stockfish 19** (`UCI_LimitStrength` = 1350 Elo anchor)
+  - Clear separation of test subjects:
+    - **ORION-Search-Full** (30-Block Master + Alpha-Beta Minimax + Quiescence): **1267.2 ± 296.0 Elo** (Vice anchor) / **1006.0 ± 258.0 Elo** (Stockfish-1350 anchor)
+    - **ORION-Neural-Only** (30-Block Policy Prior Argmax): Evaluated as pure intuition baseline.
 - **⚡ Vectorized PyTorch Training Pipeline**:
   - 1,000x speedup over standard single-sample Python loops (9,000+ positions/second).
   - Train on massive Lichess puzzle and opening datasets in minutes.
