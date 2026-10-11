@@ -1,0 +1,339 @@
+{
+  "total_tested": 18,
+  "baseline_accuracy_pct": 44.44444444444444,
+  "fixed_accuracy_pct": 66.66666666666666,
+  "delta_pct": 22.222222222222214,
+  "baseline_blunders": 0,
+  "fixed_blunders": 0,
+  "avg_baseline_ms": 57.62,
+  "avg_fixed_ms": 241.91,
+  "results": [
+    {
+      "index": 1,
+      "description": "Scholar's Mate in 1 (Qxf7#)",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+      "acceptable": [
+        "h5f7"
+      ],
+      "baseline_move": "h5f7",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 0.19,
+      "fixed_move": "h5f7",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 0.11
+    },
+    {
+      "index": 2,
+      "description": "Back-rank Mate in 1 (Rd8# / Re8#)",
+      "fen": "6k1/5ppp/8/8/8/8/8/3RR1K1 w - - 0 1",
+      "acceptable": [
+        "d1d8",
+        "e1e8"
+      ],
+      "baseline_move": "e1e8",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 0.1,
+      "fixed_move": "e1e8",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 0.08
+    },
+    {
+      "index": 4,
+      "description": "King + Rook vs King (Avoid stalemate / Make progress)",
+      "fen": "k7/8/1K6/8/8/8/8/1R6 w - - 0 1",
+      "acceptable": [
+        "b1a1",
+        "b1b2",
+        "b1b3",
+        "b1b4",
+        "b1b5",
+        "b1b7",
+        "b1b8"
+      ],
+      "baseline_move": "b6c7",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 1.48,
+      "fixed_move": "b1h1",
+      "fixed_correct": false,
+      "fixed_blunder": false,
+      "fixed_ms": 5.4
+    },
+    {
+      "index": 5,
+      "description": "Pin defense / Development",
+      "fen": "r2qkb1r/pp2pppp/2n5/1B1p4/3Pn1b1/2N2N2/PPP2PPP/R1BQK2R w KQkq - 1 7",
+      "acceptable": [
+        "c1d2",
+        "d1d3",
+        "c3e4",
+        "e1g1"
+      ],
+      "baseline_move": "b5a4",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 100.33,
+      "fixed_move": "c3e4",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 283.97
+    },
+    {
+      "index": 6,
+      "description": "Defend against Qxf7# threat",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 4 4",
+      "acceptable": [
+        "d7d5",
+        "d8e7",
+        "f6h5",
+        "g7g6"
+      ],
+      "baseline_move": "f6h5",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 108.99,
+      "fixed_move": "f6h5",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 203.81
+    },
+    {
+      "index": 7,
+      "description": "Back-rank counter-tactic: capture hanging rook",
+      "fen": "3r2k1/5ppp/8/8/8/8/5PPP/3R2K1 b - - 0 1",
+      "acceptable": [
+        "d8d1"
+      ],
+      "baseline_move": "d8d1",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 0.12,
+      "fixed_move": "d8d1",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 0.11
+    },
+    {
+      "index": 8,
+      "description": "Relieve bishop pin on c3",
+      "fen": "r1b1k2r/pppp1ppp/8/4q3/1bP5/2N1P3/PP3PPP/R1BQKB1R w KQkq - 0 9",
+      "acceptable": [
+        "c1d2"
+      ],
+      "baseline_move": "e1e2",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 140.81,
+      "fixed_move": "c1d2",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 947.56
+    },
+    {
+      "index": 9,
+      "description": "Tactical fork / fork threat (Qd5 threatening mate on f7 and Ne4)",
+      "fen": "r1bqk2r/pppp1ppp/2n5/4p3/2B1n3/2P2N2/PPP2PPP/R1BQK2R w KQkq - 0 7",
+      "acceptable": [
+        "d1d5",
+        "c4f7",
+        "c1e3"
+      ],
+      "baseline_move": "c4d5",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 67.8,
+      "fixed_move": "c4f7",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 591.71
+    },
+    {
+      "index": 10,
+      "description": "Quiet positional move in equal middlegame",
+      "fen": "r4rk1/ppp2ppp/2n5/3q4/3P4/5N2/PP3PPP/R2QR1K1 w - - 0 14",
+      "acceptable": [
+        "a1c1",
+        "a2a3",
+        "d1d2",
+        "d1d3",
+        "e1e3",
+        "h2h3"
+      ],
+      "baseline_move": "g1h1",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 90.7,
+      "fixed_move": "h2h3",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 302.36
+    },
+    {
+      "index": 11,
+      "description": "Open Italian: d4 or Ng5",
+      "fen": "r1bqkb1r/ppp2ppp/2np1n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5",
+      "acceptable": [
+        "d2d4",
+        "f3g5",
+        "c2c3",
+        "e1g1"
+      ],
+      "baseline_move": "c4b5",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 36.84,
+      "fixed_move": "d2d3",
+      "fixed_correct": false,
+      "fixed_blunder": false,
+      "fixed_ms": 257.43
+    },
+    {
+      "index": 12,
+      "description": "Petrov: Nxe5 capture",
+      "fen": "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+      "acceptable": [
+        "f3e5",
+        "d2d4",
+        "b1c3",
+        "f1c4"
+      ],
+      "baseline_move": "f3e5",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 80.43,
+      "fixed_move": "f3e5",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 143.76
+    },
+    {
+      "index": 13,
+      "description": "Defend e5 pawn (Nc6, Nf6, d6)",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+      "acceptable": [
+        "b8c6",
+        "g8f6",
+        "d7d6"
+      ],
+      "baseline_move": "g8f6",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 31.9,
+      "fixed_move": "f7f6",
+      "fixed_correct": false,
+      "fixed_blunder": false,
+      "fixed_ms": 90.22
+    },
+    {
+      "index": 14,
+      "description": "Sound opening choice (h3, Be3)",
+      "fen": "r2qk2r/ppp1bppp/2np1n2/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 w kq - 2 7",
+      "acceptable": [
+        "c1e3",
+        "h2h3",
+        "a2a3",
+        "c4b3"
+      ],
+      "baseline_move": "c4b5",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 96.72,
+      "fixed_move": "h2h3",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 562.46
+    },
+    {
+      "index": 16,
+      "description": "Queen back-rank mate in 1 (Qe8#)",
+      "fen": "6k1/5ppp/8/8/8/8/4QPPP/6K1 w - - 0 1",
+      "acceptable": [
+        "e2e8"
+      ],
+      "baseline_move": "e2e8",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 0.05,
+      "fixed_move": "e2e8",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 0.04
+    },
+    {
+      "index": 17,
+      "description": "Back-rank development / rook files",
+      "fen": "r1b2rk1/ppp2ppp/8/8/8/8/PPP2PPP/R1B1R1K1 b - - 0 14",
+      "acceptable": [
+        "c8f5",
+        "c8d7",
+        "c8e6",
+        "f8d8",
+        "c7c6"
+      ],
+      "baseline_move": "g8h8",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 25.67,
+      "fixed_move": "h7h6",
+      "fixed_correct": false,
+      "fixed_blunder": false,
+      "fixed_ms": 81.18
+    },
+    {
+      "index": 18,
+      "description": "Defend against bishop check / pin",
+      "fen": "r3k2r/ppp2ppp/2n5/3qp3/1b1P4/5N2/PPP2PPP/R1BQR1K1 w kq - 0 10",
+      "acceptable": [
+        "c2c3",
+        "c1d2"
+      ],
+      "baseline_move": "d4e5",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 130.35,
+      "fixed_move": "d4e5",
+      "fixed_correct": false,
+      "fixed_blunder": false,
+      "fixed_ms": 320.04
+    },
+    {
+      "index": 19,
+      "description": "Countering Fried Liver / Ng4 threat",
+      "fen": "r1bqk2r/pppp1ppp/2n5/2b1p3/2B1P1n1/3P1N2/PPP2PPP/RNBQ1RK1 w kq - 5 6",
+      "acceptable": [
+        "d3d4",
+        "c1g5",
+        "h2h3",
+        "b1c3"
+      ],
+      "baseline_move": "f3g5",
+      "baseline_correct": false,
+      "baseline_blunder": false,
+      "baseline_ms": 124.65,
+      "fixed_move": "c4f7",
+      "fixed_correct": false,
+      "fixed_blunder": false,
+      "fixed_ms": 564.03
+    },
+    {
+      "index": 20,
+      "description": "Rook captures rook with back-rank mate (Rxe8#)",
+      "fen": "4r1k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1",
+      "acceptable": [
+        "e1e8"
+      ],
+      "baseline_move": "e1e8",
+      "baseline_correct": true,
+      "baseline_blunder": false,
+      "baseline_ms": 0.06,
+      "fixed_move": "e1e8",
+      "fixed_correct": true,
+      "fixed_blunder": false,
+      "fixed_ms": 0.06
+    }
+  ]
+}

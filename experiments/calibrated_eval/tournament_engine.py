@@ -50,6 +50,9 @@ PIECE_VALS = {
 }
 
 
+MATE_SCORE = 30000.0
+
+
 def evaluate_material(board: chess.Board) -> float:
     score = 0.0
     turn = board.turn
@@ -59,30 +62,42 @@ def evaluate_material(board: chess.Board) -> float:
     return score
 
 
-def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: int = 3) -> float:
-    stand_pat = evaluate_material(board)
-    if q_depth == 0 or board.is_checkmate():
-        return stand_pat
-    if stand_pat >= beta:
-        return beta
-    if stand_pat > alpha:
-        alpha = stand_pat
+def mvv_lva(board: chess.Board, m: chess.Move) -> int:
+    vic = board.piece_at(m.to_square)
+    att = board.piece_at(m.from_square)
+    v = PIECE_VALS.get(vic.piece_type, 0) if vic else 100
+    a = PIECE_VALS.get(att.piece_type, 0) if att else 100
+    return v * 10 - a
 
-    captures = [m for m in board.legal_moves if board.is_capture(m)]
-    if not captures:
-        return stand_pat
 
-    def mvv_lva(m):
-        vic = board.piece_at(m.to_square)
-        att = board.piece_at(m.from_square)
-        v = PIECE_VALS.get(vic.piece_type, 0) if vic else 100
-        a = PIECE_VALS.get(att.piece_type, 0) if att else 100
-        return v * 10 - a
+def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: int = 4, ply: int = 0) -> float:
+    if board.is_checkmate():
+        return -MATE_SCORE + ply
+    if board.is_stalemate() or board.is_insufficient_material():
+        return 0.0
 
-    captures.sort(key=mvv_lva, reverse=True)
-    for m in captures:
+    in_check = board.is_check()
+    if not in_check:
+        stand_pat = evaluate_material(board)
+        if stand_pat >= beta:
+            return beta
+        if stand_pat > alpha:
+            alpha = stand_pat
+        if q_depth <= 0:
+            return stand_pat
+        moves = [m for m in board.legal_moves if board.is_capture(m)]
+        if not moves:
+            return stand_pat
+    else:
+        # In check: must evade check! Stand-pat is illegal while in check.
+        moves = list(board.legal_moves)
+        if not moves:
+            return -MATE_SCORE + ply
+
+    moves.sort(key=lambda m: mvv_lva(board, m), reverse=True)
+    for m in moves:
         board.push(m)
-        score = -quiescence_search(board, -beta, -alpha, q_depth - 1)
+        score = -quiescence_search(board, -beta, -alpha, q_depth - 1 if not in_check else q_depth, ply + 1)
         board.pop()
         if score >= beta:
             return beta
@@ -91,20 +106,24 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
     return alpha
 
 
-def alphabeta_search(board: chess.Board, depth: int, alpha: float, beta: float) -> float:
-    if depth == 0 or board.is_game_over():
-        return quiescence_search(board, alpha, beta)
+def alphabeta_search(board: chess.Board, depth: int, alpha: float, beta: float, ply: int = 0) -> float:
+    if board.is_checkmate():
+        return -MATE_SCORE + ply
+    if board.is_stalemate() or board.is_insufficient_material():
+        return 0.0
+    if depth <= 0:
+        return quiescence_search(board, alpha, beta, ply=ply)
 
     moves = list(board.legal_moves)
     if not moves:
         if board.is_check():
-            return -30000.0
+            return -MATE_SCORE + ply
         return 0.0
 
-    moves.sort(key=lambda m: board.is_capture(m), reverse=True)
+    moves.sort(key=lambda m: (board.is_capture(m) * 1000 + mvv_lva(board, m)), reverse=True)
     for m in moves:
         board.push(m)
-        score = -alphabeta_search(board, depth - 1, -beta, -alpha)
+        score = -alphabeta_search(board, depth - 1, -beta, -alpha, ply + 1)
         board.pop()
         if score >= beta:
             return beta
@@ -159,14 +178,14 @@ class OrionSearchPlayer:
 
         best_m = ranked[0]
         best_val = -float("inf")
-        # Search candidate moves
-        for i, m in enumerate(ranked[:8]):
-            d = 2 if i < 4 else 1
+        # Search candidate moves: search top candidates deeper, evaluate all to prevent blunders
+        for i, m in enumerate(ranked):
+            d = 2 if i < 6 else 1
             board.push(m)
-            val = -alphabeta_search(board, d, -50000.0, 50000.0)
+            val = -alphabeta_search(board, d, -50000.0, 50000.0, ply=1)
             board.pop()
             prior = float(p_scores[fast_encode_action(m)])
-            combined = val + prior * 2.5
+            combined = val + prior * 0.1
             if combined > best_val:
                 best_val = combined
                 best_m = m
