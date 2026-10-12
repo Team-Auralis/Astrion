@@ -460,8 +460,9 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
             vic_val = PIECE_VAL_ARRAY[vic] if vic else 100
             if stand_pat + vic_val + 200 < alpha:
                 continue
-            # ponytail: SEE delta pruning drops losing captures that explode q-search
-            if see(board, m) < 0:
+            # ponytail: only run SEE when attacker > victim (pawn takes queen is guaranteed >= 0)
+            att = board.piece_type_at(m.from_square) or 1
+            if PIECE_VAL_ARRAY[att] > vic_val and see(board, m) < 0:
                 continue
 
         board.push(m)
@@ -536,16 +537,17 @@ class OptimizedSearchEngine:
             return 1000000
         if m.promotion == chess.QUEEN:
             return 950000
-        # ponytail: SEE determines winning captures > equal > killers > losing captures
+        # ponytail: direct diff for winning captures; only run SEE when attacker > victim
         vic = board.piece_type_at(m.to_square)
         if vic:
+            att = board.piece_type_at(m.from_square) or 1
+            diff = PIECE_VAL_ARRAY[vic] * 10 - PIECE_VAL_ARRAY[att]
+            if PIECE_VAL_ARRAY[vic] >= PIECE_VAL_ARRAY[att]:
+                return 100000 + diff
             see_val = see(board, m)
-            if see_val > 0:
-                return 100000 + see_val
-            elif see_val == 0:
-                return 85000
-            else:
-                return 40000 + see_val
+            if see_val >= 0:
+                return 85000 + see_val
+            return 40000 + see_val
         if board.is_en_passant(m):
             return 100900
         if m.promotion:
@@ -592,10 +594,10 @@ class OptimizedSearchEngine:
         if tt_val is not None:
             return tt_val
 
-        # ponytail: Reverse Futility Pruning (Static Null Move Pruning) at pre-frontier nodes
-        if depth <= 3 and not in_check and ply > 0 and abs(beta) < MATE_SCORE - 100:
+        # ponytail: Reverse Futility Pruning (Static Null Move Pruning) at pre-frontier nodes (depth <= 2)
+        if depth <= 2 and not in_check and ply > 0 and abs(beta) < MATE_SCORE - 100:
             static_eval = evaluate_tapered(board)
-            if static_eval - (120 * depth) >= beta:
+            if static_eval - (160 * depth) >= beta:
                 return static_eval
 
         # Null-Move Pruning (NMP): if passing turn still beats beta, prune branch
