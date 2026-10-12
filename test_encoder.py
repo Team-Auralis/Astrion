@@ -19,15 +19,15 @@ print("Columns          :", len(tensor[0][0]))
 print("Flattened size   :", len(flat))
 print("Active values    :", encoder.count_active(tensor))
 
-assert len(tensor) == 14
+assert len(tensor) == 18
 assert len(tensor[0]) == 8
 assert len(tensor[0][0]) == 8
-assert len(flat) == 14 * 8 * 8
+assert len(flat) == 18 * 8 * 8
 
 # Starting position:
-# 32 pieces + 64 squares for side-to-move
-# = 96 active values.
-assert encoder.count_active(tensor) == 96
+# 32 pieces + 64 squares side-to-move + 4*64 squares castling rights
+# = 352 active values.
+assert encoder.count_active(tensor) == 352
 
 print()
 print("[PASS] Tensor shape")

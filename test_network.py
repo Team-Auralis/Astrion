@@ -22,7 +22,7 @@ print("Policy size      :", len(output["policy"]))
 print("Value            :", output["value"])
 print("Parameters       :", model.parameter_count())
 
-assert len(inputs) == 896
+assert len(inputs) == 1152
 assert len(output["policy"]) == 4096
 assert 0.0 <= output["value"] <= 1.0
 
