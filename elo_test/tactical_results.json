@@ -1,12 +1,12 @@
 {
   "benchmark": "ORION Tactical Benchmark Suite (100 Positions)",
   "total_positions": 100,
-  "solved_count": 77,
-  "accuracy_percent": 77.0,
-  "sub_1s_count": 77,
+  "solved_count": 75,
+  "accuracy_percent": 75.0,
+  "sub_1s_count": 75,
   "blunders_into_mate": 0,
-  "avg_time_ms": 98.94,
-  "avg_nodes": 1340.0,
+  "avg_time_ms": 100.77,
+  "avg_nodes": 1396.5,
   "category_breakdown": {
     "mate_in_1": {
       "total": 5,
@@ -22,7 +22,7 @@
     },
     "forks_pins": {
       "total": 5,
-      "solved": 5
+      "solved": 4
     },
     "defense": {
       "total": 6,
@@ -34,7 +34,7 @@
     },
     "wac_tactics": {
       "total": 65,
-      "solved": 43
+      "solved": 42
     }
   },
   "detailed_results": [
@@ -49,7 +49,7 @@
       "actual": "h5f7",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.7,
+      "time_ms": 0.8,
       "eval_cp": 29999.0,
       "pass": true,
       "blunder_mate": false
@@ -66,7 +66,7 @@
       "actual": "e1e8",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.37,
+      "time_ms": 0.42,
       "eval_cp": 29999.0,
       "pass": true,
       "blunder_mate": false
@@ -82,7 +82,7 @@
       "actual": "e2e8",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.29,
+      "time_ms": 0.36,
       "eval_cp": 29999.0,
       "pass": true,
       "blunder_mate": false
@@ -98,7 +98,7 @@
       "actual": "e1e8",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.28,
+      "time_ms": 0.32,
       "eval_cp": 29999.0,
       "pass": true,
       "blunder_mate": false
@@ -116,8 +116,8 @@
       ],
       "actual": "d1c2",
       "depth": 3,
-      "nodes": 1223,
-      "time_ms": 91.24,
+      "nodes": 2304,
+      "time_ms": 136.72,
       "eval_cp": 710.8,
       "pass": true,
       "blunder_mate": false
@@ -133,7 +133,7 @@
       "actual": "b2g7",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.93,
+      "time_ms": 0.64,
       "eval_cp": 29999.0,
       "pass": true,
       "blunder_mate": false
@@ -154,7 +154,7 @@
       "actual": "f6f7",
       "depth": 1,
       "nodes": 51,
-      "time_ms": 5.4,
+      "time_ms": 3.52,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -170,8 +170,8 @@
       ],
       "actual": "e1f2",
       "depth": 3,
-      "nodes": 1321,
-      "time_ms": 93.18,
+      "nodes": 2432,
+      "time_ms": 132.17,
       "eval_cp": 683.8,
       "pass": false,
       "blunder_mate": false
@@ -185,10 +185,10 @@
         "e1e8"
       ],
       "actual": "e1e8",
-      "depth": 3,
-      "nodes": 1425,
-      "time_ms": 103.95,
-      "eval_cp": 957.5,
+      "depth": 4,
+      "nodes": 1878,
+      "time_ms": 115.83,
+      "eval_cp": 917.5,
       "pass": true,
       "blunder_mate": false
     },
@@ -206,8 +206,8 @@
       ],
       "actual": "b3a4",
       "depth": 4,
-      "nodes": 1425,
-      "time_ms": 87.24,
+      "nodes": 2176,
+      "time_ms": 135.5,
       "eval_cp": 300.0,
       "pass": true,
       "blunder_mate": false
@@ -222,10 +222,10 @@
         "d3e4",
         "h2h3"
       ],
-      "actual": "c3e4",
+      "actual": "d3e4",
       "depth": 3,
-      "nodes": 1336,
-      "time_ms": 98.61,
+      "nodes": 1237,
+      "time_ms": 90.14,
       "eval_cp": 125.0,
       "pass": true,
       "blunder_mate": false
@@ -241,7 +241,7 @@
       "actual": "d8d1",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.59,
+      "time_ms": 0.61,
       "eval_cp": 29999.0,
       "pass": true,
       "blunder_mate": false
@@ -257,7 +257,7 @@
       "actual": "f3e5",
       "depth": 99,
       "nodes": 0,
-      "time_ms": 0.34,
+      "time_ms": 0.36,
       "eval_cp": 0.0,
       "pass": true,
       "blunder_mate": false
@@ -271,10 +271,10 @@
         "c3b4"
       ],
       "actual": "c3b4",
-      "depth": 3,
-      "nodes": 1142,
-      "time_ms": 102.17,
-      "eval_cp": 175.6,
+      "depth": 4,
+      "nodes": 899,
+      "time_ms": 101.0,
+      "eval_cp": 161.9,
       "pass": true,
       "blunder_mate": false
     },
@@ -292,8 +292,8 @@
       ],
       "actual": "f1b5",
       "depth": 99,
-      "nodes": 1142,
-      "time_ms": 0.52,
+      "nodes": 899,
+      "time_ms": 0.65,
       "eval_cp": 0.0,
       "pass": true,
       "blunder_mate": false
@@ -310,7 +310,7 @@
       "actual": "d1b3",
       "depth": 2,
       "nodes": 1152,
-      "time_ms": 130.47,
+      "time_ms": 131.97,
       "eval_cp": 320.0,
       "pass": true,
       "blunder_mate": false
@@ -326,8 +326,8 @@
       ],
       "actual": "c4f7",
       "depth": 2,
-      "nodes": 1536,
-      "time_ms": 136.22,
+      "nodes": 1280,
+      "time_ms": 131.94,
       "eval_cp": 1.7,
       "pass": true,
       "blunder_mate": false
@@ -346,8 +346,8 @@
       ],
       "actual": "e1g1",
       "depth": 2,
-      "nodes": 1152,
-      "time_ms": 132.46,
+      "nodes": 1408,
+      "time_ms": 135.08,
       "eval_cp": 32.5,
       "pass": true,
       "blunder_mate": false
@@ -365,8 +365,8 @@
       ],
       "actual": "c8e6",
       "depth": 3,
-      "nodes": 1408,
-      "time_ms": 132.22,
+      "nodes": 1536,
+      "time_ms": 149.99,
       "eval_cp": -32.5,
       "pass": true,
       "blunder_mate": false
@@ -383,12 +383,12 @@
         "f1b5",
         "e1g1"
       ],
-      "actual": "a1c1",
+      "actual": "e3e4",
       "depth": 2,
-      "nodes": 1152,
-      "time_ms": 133.01,
-      "eval_cp": 318.8,
-      "pass": true,
+      "nodes": 1408,
+      "time_ms": 137.4,
+      "eval_cp": 340.0,
+      "pass": false,
       "blunder_mate": false
     },
     {
@@ -403,8 +403,8 @@
       ],
       "actual": "c3c6",
       "depth": 3,
-      "nodes": 2579,
-      "time_ms": 127.67,
+      "nodes": 1624,
+      "time_ms": 80.63,
       "eval_cp": 862.5,
       "pass": true,
       "blunder_mate": false
@@ -422,8 +422,8 @@
       ],
       "actual": "f6h5",
       "depth": 4,
-      "nodes": 1529,
-      "time_ms": 110.06,
+      "nodes": 1664,
+      "time_ms": 137.86,
       "eval_cp": 905.0,
       "pass": true,
       "blunder_mate": false
@@ -443,8 +443,8 @@
       ],
       "actual": "f3g5",
       "depth": 2,
-      "nodes": 640,
-      "time_ms": 183.98,
+      "nodes": 1536,
+      "time_ms": 137.17,
       "eval_cp": 35.0,
       "pass": true,
       "blunder_mate": false
@@ -460,10 +460,10 @@
         "d4e5"
       ],
       "actual": "d4e5",
-      "depth": 2,
-      "nodes": 1408,
-      "time_ms": 141.13,
-      "eval_cp": 100.0,
+      "depth": 3,
+      "nodes": 1349,
+      "time_ms": 128.15,
+      "eval_cp": 106.7,
       "pass": true,
       "blunder_mate": false
     },
@@ -479,8 +479,8 @@
       ],
       "actual": "d1d4",
       "depth": 3,
-      "nodes": 1651,
-      "time_ms": 117.99,
+      "nodes": 1240,
+      "time_ms": 114.01,
       "eval_cp": 373.1,
       "pass": true,
       "blunder_mate": false
@@ -497,8 +497,8 @@
       ],
       "actual": "b8c6",
       "depth": 99,
-      "nodes": 1651,
-      "time_ms": 0.48,
+      "nodes": 1240,
+      "time_ms": 0.54,
       "eval_cp": 0.0,
       "pass": true,
       "blunder_mate": false
@@ -517,8 +517,8 @@
       ],
       "actual": "c8f5",
       "depth": 3,
-      "nodes": 1459,
-      "time_ms": 80.96,
+      "nodes": 1457,
+      "time_ms": 104.02,
       "eval_cp": -15.0,
       "pass": true,
       "blunder_mate": false
@@ -535,8 +535,8 @@
       ],
       "actual": "e2e3",
       "depth": 8,
-      "nodes": 2534,
-      "time_ms": 95.63,
+      "nodes": 1650,
+      "time_ms": 84.63,
       "eval_cp": 135.0,
       "pass": true,
       "blunder_mate": false
@@ -564,7 +564,7 @@
       "actual": "b1h1",
       "depth": 3,
       "nodes": 439,
-      "time_ms": 17.93,
+      "time_ms": 20.26,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -580,7 +580,7 @@
       "actual": "e1d2",
       "depth": 1,
       "nodes": 0,
-      "time_ms": 0.28,
+      "time_ms": 0.45,
       "eval_cp": 0.0,
       "pass": true,
       "blunder_mate": false
@@ -596,11 +596,11 @@
         "e2f2",
         "e2f3"
       ],
-      "actual": "e2d2",
-      "depth": 6,
-      "nodes": 3328,
-      "time_ms": 130.37,
-      "eval_cp": 861.7,
+      "actual": "e2d3",
+      "depth": 7,
+      "nodes": 2688,
+      "time_ms": 132.74,
+      "eval_cp": 901.7,
       "pass": true,
       "blunder_mate": false
     },
@@ -615,8 +615,8 @@
       ],
       "actual": "e7e8q",
       "depth": 5,
-      "nodes": 2017,
-      "time_ms": 83.81,
+      "nodes": 2688,
+      "time_ms": 134.09,
       "eval_cp": 896.7,
       "pass": true,
       "blunder_mate": false
@@ -636,9 +636,9 @@
       ],
       "actual": "b1c3",
       "depth": 2,
-      "nodes": 1408,
-      "time_ms": 133.66,
-      "eval_cp": -20.0,
+      "nodes": 1536,
+      "time_ms": 140.49,
+      "eval_cp": -15.0,
       "pass": true,
       "blunder_mate": false
     },
@@ -658,7 +658,7 @@
       "actual": "h2h3",
       "depth": 2,
       "nodes": 1536,
-      "time_ms": 133.83,
+      "time_ms": 134.56,
       "eval_cp": 30.0,
       "pass": true,
       "blunder_mate": false
@@ -679,8 +679,8 @@
       ],
       "actual": "d1b3",
       "depth": 3,
-      "nodes": 1533,
-      "time_ms": 99.7,
+      "nodes": 1491,
+      "time_ms": 106.02,
       "eval_cp": 45.0,
       "pass": true,
       "blunder_mate": false
@@ -693,11 +693,11 @@
       "expected": [
         "g3g6"
       ],
-      "actual": "g3f4",
+      "actual": "e5c6",
       "depth": 2,
-      "nodes": 896,
-      "time_ms": 133.0,
-      "eval_cp": -218.3,
+      "nodes": 1280,
+      "time_ms": 136.87,
+      "eval_cp": -230.0,
       "pass": false,
       "blunder_mate": false
     },
@@ -710,9 +710,9 @@
         "b3b2"
       ],
       "actual": "f6e6",
-      "depth": 3,
-      "nodes": 1536,
-      "time_ms": 138.34,
+      "depth": 4,
+      "nodes": 1646,
+      "time_ms": 137.76,
       "eval_cp": 25.0,
       "pass": false,
       "blunder_mate": false
@@ -727,9 +727,9 @@
       ],
       "actual": "e3g3",
       "depth": 2,
-      "nodes": 1408,
-      "time_ms": 132.38,
-      "eval_cp": 133.1,
+      "nodes": 1536,
+      "time_ms": 132.27,
+      "eval_cp": 38.1,
       "pass": true,
       "blunder_mate": false
     },
@@ -743,8 +743,8 @@
       ],
       "actual": "h6h7",
       "depth": 1,
-      "nodes": 47,
-      "time_ms": 6.23,
+      "nodes": 46,
+      "time_ms": 6.15,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -759,8 +759,8 @@
       ],
       "actual": "c6c4",
       "depth": 2,
-      "nodes": 221,
-      "time_ms": 16.74,
+      "nodes": 171,
+      "time_ms": 10.53,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -773,12 +773,12 @@
       "expected": [
         "b6b7"
       ],
-      "actual": "b6b7",
+      "actual": "h6g5",
       "depth": 4,
-      "nodes": 3200,
-      "time_ms": 132.84,
-      "eval_cp": 405.0,
-      "pass": true,
+      "nodes": 2688,
+      "time_ms": 130.6,
+      "eval_cp": 40.0,
+      "pass": false,
       "blunder_mate": false
     },
     {
@@ -791,8 +791,8 @@
       ],
       "actual": "g4e5",
       "depth": 3,
-      "nodes": 2176,
-      "time_ms": 136.25,
+      "nodes": 2048,
+      "time_ms": 132.52,
       "eval_cp": 15.0,
       "pass": false,
       "blunder_mate": false
@@ -807,8 +807,8 @@
       ],
       "actual": "e7f7",
       "depth": 3,
-      "nodes": 2061,
-      "time_ms": 129.37,
+      "nodes": 1371,
+      "time_ms": 114.74,
       "eval_cp": 500.0,
       "pass": true,
       "blunder_mate": false
@@ -822,9 +822,9 @@
         "d6h2"
       ],
       "actual": "d6h2",
-      "depth": 3,
-      "nodes": 2086,
-      "time_ms": 122.97,
+      "depth": 4,
+      "nodes": 2432,
+      "time_ms": 134.57,
       "eval_cp": 0.0,
       "pass": true,
       "blunder_mate": false
@@ -840,7 +840,7 @@
       "actual": "h4h7",
       "depth": 2,
       "nodes": 2304,
-      "time_ms": 137.81,
+      "time_ms": 133.93,
       "eval_cp": 122.5,
       "pass": true,
       "blunder_mate": false
@@ -855,8 +855,8 @@
       ],
       "actual": "a4c5",
       "depth": 2,
-      "nodes": 1920,
-      "time_ms": 132.34,
+      "nodes": 2048,
+      "time_ms": 133.18,
       "eval_cp": -2.5,
       "pass": false,
       "blunder_mate": false
@@ -871,8 +871,8 @@
       ],
       "actual": "g4f3",
       "depth": 2,
-      "nodes": 212,
-      "time_ms": 18.02,
+      "nodes": 199,
+      "time_ms": 13.42,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -886,9 +886,9 @@
         "f1f8"
       ],
       "actual": "f1f8",
-      "depth": 3,
-      "nodes": 1079,
-      "time_ms": 81.28,
+      "depth": 4,
+      "nodes": 1629,
+      "time_ms": 101.61,
       "eval_cp": 81.7,
       "pass": true,
       "blunder_mate": false
@@ -901,12 +901,12 @@
       "expected": [
         "h3h7"
       ],
-      "actual": "a1d1",
-      "depth": 2,
-      "nodes": 1536,
-      "time_ms": 139.42,
-      "eval_cp": -20.0,
-      "pass": false,
+      "actual": "h3h7",
+      "depth": 3,
+      "nodes": 1596,
+      "time_ms": 128.25,
+      "eval_cp": 244.0,
+      "pass": true,
       "blunder_mate": false
     },
     {
@@ -918,9 +918,9 @@
         "b8b7"
       ],
       "actual": "b8b7",
-      "depth": 3,
-      "nodes": 1103,
-      "time_ms": 80.79,
+      "depth": 4,
+      "nodes": 1058,
+      "time_ms": 79.41,
       "eval_cp": 550.8,
       "pass": true,
       "blunder_mate": false
@@ -935,9 +935,9 @@
       ],
       "actual": "e2c3",
       "depth": 3,
-      "nodes": 1334,
-      "time_ms": 87.91,
-      "eval_cp": -10.0,
+      "nodes": 1291,
+      "time_ms": 95.1,
+      "eval_cp": -15.0,
       "pass": true,
       "blunder_mate": false
     },
@@ -950,10 +950,10 @@
         "c4e5"
       ],
       "actual": "c4e5",
-      "depth": 2,
-      "nodes": 1920,
-      "time_ms": 135.71,
-      "eval_cp": 5.0,
+      "depth": 3,
+      "nodes": 1879,
+      "time_ms": 131.73,
+      "eval_cp": 20.0,
       "pass": true,
       "blunder_mate": false
     },
@@ -967,8 +967,8 @@
       ],
       "actual": "g1f1",
       "depth": 4,
-      "nodes": 1733,
-      "time_ms": 108.09,
+      "nodes": 1561,
+      "time_ms": 97.91,
       "eval_cp": 79.2,
       "pass": false,
       "blunder_mate": false
@@ -983,8 +983,8 @@
       ],
       "actual": "c5c6",
       "depth": 2,
-      "nodes": 1408,
-      "time_ms": 135.13,
+      "nodes": 1792,
+      "time_ms": 134.85,
       "eval_cp": -101.2,
       "pass": true,
       "blunder_mate": false
@@ -999,8 +999,8 @@
       ],
       "actual": "d7b5",
       "depth": 3,
-      "nodes": 2195,
-      "time_ms": 124.79,
+      "nodes": 1570,
+      "time_ms": 101.01,
       "eval_cp": 703.8,
       "pass": true,
       "blunder_mate": false
@@ -1015,8 +1015,8 @@
       ],
       "actual": "d2c3",
       "depth": 2,
-      "nodes": 2304,
-      "time_ms": 133.46,
+      "nodes": 2176,
+      "time_ms": 136.14,
       "eval_cp": 30.0,
       "pass": false,
       "blunder_mate": false
@@ -1032,9 +1032,9 @@
       ],
       "actual": "c4a2",
       "depth": 2,
-      "nodes": 1280,
-      "time_ms": 131.17,
-      "eval_cp": -25.8,
+      "nodes": 1792,
+      "time_ms": 137.8,
+      "eval_cp": 41.2,
       "pass": true,
       "blunder_mate": false
     },
@@ -1046,11 +1046,11 @@
       "expected": [
         "g2g4"
       ],
-      "actual": "d4f4",
+      "actual": "c5e6",
       "depth": 2,
-      "nodes": 1024,
-      "time_ms": 131.16,
-      "eval_cp": 120.0,
+      "nodes": 1792,
+      "time_ms": 134.45,
+      "eval_cp": 95.0,
       "pass": false,
       "blunder_mate": false
     },
@@ -1064,8 +1064,8 @@
       ],
       "actual": "g7d4",
       "depth": 3,
-      "nodes": 1959,
-      "time_ms": 120.91,
+      "nodes": 1664,
+      "time_ms": 132.33,
       "eval_cp": 510.6,
       "pass": true,
       "blunder_mate": false
@@ -1079,10 +1079,10 @@
         "g4h4"
       ],
       "actual": "g4h4",
-      "depth": 4,
-      "nodes": 1456,
-      "time_ms": 88.69,
-      "eval_cp": 846.7,
+      "depth": 5,
+      "nodes": 1700,
+      "time_ms": 102.61,
+      "eval_cp": 848.3,
       "pass": true,
       "blunder_mate": false
     },
@@ -1095,10 +1095,10 @@
         "d7f5"
       ],
       "actual": "d7f5",
-      "depth": 2,
-      "nodes": 1792,
-      "time_ms": 131.89,
-      "eval_cp": 90.0,
+      "depth": 3,
+      "nodes": 1984,
+      "time_ms": 129.9,
+      "eval_cp": 110.0,
       "pass": true,
       "blunder_mate": false
     },
@@ -1112,8 +1112,8 @@
       ],
       "actual": "a3f8",
       "depth": 2,
-      "nodes": 324,
-      "time_ms": 36.38,
+      "nodes": 237,
+      "time_ms": 20.76,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -1128,8 +1128,8 @@
       ],
       "actual": "b4e1",
       "depth": 2,
-      "nodes": 896,
-      "time_ms": 134.0,
+      "nodes": 1792,
+      "time_ms": 134.46,
       "eval_cp": -40.0,
       "pass": true,
       "blunder_mate": false
@@ -1144,9 +1144,9 @@
       ],
       "actual": "f1d1",
       "depth": 2,
-      "nodes": 1280,
-      "time_ms": 136.55,
-      "eval_cp": 37.5,
+      "nodes": 1920,
+      "time_ms": 134.74,
+      "eval_cp": 32.5,
       "pass": false,
       "blunder_mate": false
     },
@@ -1160,8 +1160,8 @@
       ],
       "actual": "c1c3",
       "depth": 2,
-      "nodes": 1408,
-      "time_ms": 133.59,
+      "nodes": 1536,
+      "time_ms": 141.72,
       "eval_cp": 20.0,
       "pass": false,
       "blunder_mate": false
@@ -1176,11 +1176,11 @@
         "d5d6",
         "d5e6"
       ],
-      "actual": "d5d6",
-      "depth": 3,
-      "nodes": 1533,
-      "time_ms": 105.12,
-      "eval_cp": 365.0,
+      "actual": "d5e6",
+      "depth": 2,
+      "nodes": 2304,
+      "time_ms": 133.48,
+      "eval_cp": 369.6,
       "pass": true,
       "blunder_mate": false
     },
@@ -1194,8 +1194,8 @@
       ],
       "actual": "d1d8",
       "depth": 3,
-      "nodes": 1548,
-      "time_ms": 108.54,
+      "nodes": 1492,
+      "time_ms": 100.98,
       "eval_cp": 55.0,
       "pass": true,
       "blunder_mate": false
@@ -1211,8 +1211,8 @@
       ],
       "actual": "e4e5",
       "depth": 2,
-      "nodes": 1792,
-      "time_ms": 132.44,
+      "nodes": 1920,
+      "time_ms": 132.3,
       "eval_cp": 95.0,
       "pass": true,
       "blunder_mate": false
@@ -1225,12 +1225,12 @@
       "expected": [
         "d4g1"
       ],
-      "actual": "d4g1",
-      "depth": 3,
-      "nodes": 2006,
-      "time_ms": 123.16,
-      "eval_cp": 122.9,
-      "pass": true,
+      "actual": "h8g8",
+      "depth": 2,
+      "nodes": 1664,
+      "time_ms": 137.65,
+      "eval_cp": -1.7,
+      "pass": false,
       "blunder_mate": false
     },
     {
@@ -1243,8 +1243,8 @@
       ],
       "actual": "d1c1",
       "depth": 2,
-      "nodes": 1536,
-      "time_ms": 136.1,
+      "nodes": 1792,
+      "time_ms": 138.81,
       "eval_cp": 133.3,
       "pass": false,
       "blunder_mate": false
@@ -1258,9 +1258,9 @@
         "e7e1"
       ],
       "actual": "e7e1",
-      "depth": 3,
-      "nodes": 1556,
-      "time_ms": 91.62,
+      "depth": 4,
+      "nodes": 1139,
+      "time_ms": 81.99,
       "eval_cp": 245.0,
       "pass": true,
       "blunder_mate": false
@@ -1275,9 +1275,9 @@
       ],
       "actual": "c6d4",
       "depth": 2,
-      "nodes": 2048,
-      "time_ms": 132.2,
-      "eval_cp": 136.7,
+      "nodes": 1536,
+      "time_ms": 138.32,
+      "eval_cp": 76.7,
       "pass": true,
       "blunder_mate": false
     },
@@ -1290,10 +1290,10 @@
         "d2d8"
       ],
       "actual": "d2d8",
-      "depth": 3,
-      "nodes": 2101,
-      "time_ms": 127.86,
-      "eval_cp": 24.6,
+      "depth": 4,
+      "nodes": 1518,
+      "time_ms": 106.11,
+      "eval_cp": 48.3,
       "pass": true,
       "blunder_mate": false
     },
@@ -1306,10 +1306,10 @@
         "c3a4"
       ],
       "actual": "c3a4",
-      "depth": 2,
+      "depth": 4,
       "nodes": 1792,
-      "time_ms": 132.18,
-      "eval_cp": 222.5,
+      "time_ms": 136.69,
+      "eval_cp": 202.5,
       "pass": true,
       "blunder_mate": false
     },
@@ -1322,9 +1322,9 @@
         "d8c8"
       ],
       "actual": "d8c8",
-      "depth": 3,
-      "nodes": 1566,
-      "time_ms": 105.03,
+      "depth": 4,
+      "nodes": 1595,
+      "time_ms": 111.47,
       "eval_cp": 314.2,
       "pass": true,
       "blunder_mate": false
@@ -1340,8 +1340,8 @@
       ],
       "actual": "b6b7",
       "depth": 4,
-      "nodes": 2271,
-      "time_ms": 118.18,
+      "nodes": 2102,
+      "time_ms": 126.67,
       "eval_cp": 350.0,
       "pass": false,
       "blunder_mate": false
@@ -1356,8 +1356,8 @@
       ],
       "actual": "b4a5",
       "depth": 2,
-      "nodes": 1920,
-      "time_ms": 133.78,
+      "nodes": 1792,
+      "time_ms": 130.88,
       "eval_cp": 30.0,
       "pass": true,
       "blunder_mate": false
@@ -1373,8 +1373,8 @@
       ],
       "actual": "a3e7",
       "depth": 2,
-      "nodes": 1920,
-      "time_ms": 131.36,
+      "nodes": 1664,
+      "time_ms": 131.84,
       "eval_cp": 260.0,
       "pass": true,
       "blunder_mate": false
@@ -1388,10 +1388,10 @@
         "d5c4"
       ],
       "actual": "d5c4",
-      "depth": 2,
-      "nodes": 2176,
-      "time_ms": 134.14,
-      "eval_cp": 85.0,
+      "depth": 3,
+      "nodes": 1664,
+      "time_ms": 140.27,
+      "eval_cp": 175.0,
       "pass": true,
       "blunder_mate": false
     },
@@ -1404,10 +1404,10 @@
         "f1a1"
       ],
       "actual": "f1a1",
-      "depth": 3,
-      "nodes": 1967,
-      "time_ms": 103.64,
-      "eval_cp": 415.0,
+      "depth": 4,
+      "nodes": 1393,
+      "time_ms": 97.27,
+      "eval_cp": 425.0,
       "pass": true,
       "blunder_mate": false
     },
@@ -1421,8 +1421,8 @@
       ],
       "actual": "f1d3",
       "depth": 2,
-      "nodes": 1536,
-      "time_ms": 131.76,
+      "nodes": 2048,
+      "time_ms": 138.46,
       "eval_cp": -23.8,
       "pass": false,
       "blunder_mate": false
@@ -1436,9 +1436,9 @@
         "c6d4"
       ],
       "actual": "c6d4",
-      "depth": 3,
-      "nodes": 2088,
-      "time_ms": 120.11,
+      "depth": 2,
+      "nodes": 2048,
+      "time_ms": 131.43,
       "eval_cp": 65.0,
       "pass": true,
       "blunder_mate": false
@@ -1453,8 +1453,8 @@
       ],
       "actual": "b8b7",
       "depth": 2,
-      "nodes": 1024,
-      "time_ms": 135.57,
+      "nodes": 1664,
+      "time_ms": 133.65,
       "eval_cp": -60.0,
       "pass": false,
       "blunder_mate": false
@@ -1467,11 +1467,11 @@
       "expected": [
         "h5h7"
       ],
-      "actual": "h5h6",
-      "depth": 2,
-      "nodes": 1152,
-      "time_ms": 132.24,
-      "eval_cp": -137.5,
+      "actual": "g5g2",
+      "depth": 3,
+      "nodes": 1227,
+      "time_ms": 91.02,
+      "eval_cp": -182.5,
       "pass": false,
       "blunder_mate": false
     },
@@ -1485,8 +1485,8 @@
       ],
       "actual": "b7b6",
       "depth": 2,
-      "nodes": 474,
-      "time_ms": 32.03,
+      "nodes": 490,
+      "time_ms": 36.27,
       "eval_cp": 29995.0,
       "pass": true,
       "blunder_mate": false
@@ -1501,8 +1501,8 @@
       ],
       "actual": "c3c4",
       "depth": 2,
-      "nodes": 1152,
-      "time_ms": 133.37,
+      "nodes": 1664,
+      "time_ms": 142.12,
       "eval_cp": -332.9,
       "pass": false,
       "blunder_mate": false
@@ -1517,8 +1517,8 @@
       ],
       "actual": "d5c3",
       "depth": 2,
-      "nodes": 1920,
-      "time_ms": 136.44,
+      "nodes": 2048,
+      "time_ms": 137.54,
       "eval_cp": 210.0,
       "pass": false,
       "blunder_mate": false
@@ -1533,8 +1533,8 @@
       ],
       "actual": "a6a5",
       "depth": 2,
-      "nodes": 1152,
-      "time_ms": 131.7,
+      "nodes": 1536,
+      "time_ms": 138.18,
       "eval_cp": -95.0,
       "pass": false,
       "blunder_mate": false
@@ -1549,8 +1549,8 @@
       ],
       "actual": "h5h1",
       "depth": 2,
-      "nodes": 421,
-      "time_ms": 43.1,
+      "nodes": 399,
+      "time_ms": 40.47,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -1565,8 +1565,8 @@
       ],
       "actual": "f4f2",
       "depth": 2,
-      "nodes": 1152,
-      "time_ms": 131.55,
+      "nodes": 2048,
+      "time_ms": 137.83,
       "eval_cp": -100.0,
       "pass": false,
       "blunder_mate": false
@@ -1581,8 +1581,8 @@
       ],
       "actual": "c5f2",
       "depth": 3,
-      "nodes": 1649,
-      "time_ms": 133.86,
+      "nodes": 1792,
+      "time_ms": 137.93,
       "eval_cp": 493.8,
       "pass": true,
       "blunder_mate": false
@@ -1598,7 +1598,7 @@
       "actual": "f3f8",
       "depth": 1,
       "nodes": 52,
-      "time_ms": 4.19,
+      "time_ms": 7.22,
       "eval_cp": 29995.0,
       "pass": true,
       "blunder_mate": false
@@ -1613,8 +1613,8 @@
       ],
       "actual": "c6c5",
       "depth": 2,
-      "nodes": 1664,
-      "time_ms": 133.54,
+      "nodes": 1792,
+      "time_ms": 140.38,
       "eval_cp": 185.0,
       "pass": false,
       "blunder_mate": false
@@ -1629,8 +1629,8 @@
       ],
       "actual": "c3d5",
       "depth": 3,
-      "nodes": 2169,
-      "time_ms": 131.87,
+      "nodes": 1246,
+      "time_ms": 97.86,
       "eval_cp": 503.3,
       "pass": true,
       "blunder_mate": false
@@ -1645,8 +1645,8 @@
       ],
       "actual": "h3h8",
       "depth": 2,
-      "nodes": 252,
-      "time_ms": 28.82,
+      "nodes": 186,
+      "time_ms": 25.07,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -1661,8 +1661,8 @@
       ],
       "actual": "f3f7",
       "depth": 2,
-      "nodes": 420,
-      "time_ms": 30.51,
+      "nodes": 422,
+      "time_ms": 38.37,
       "eval_cp": 29997.0,
       "pass": true,
       "blunder_mate": false
@@ -1677,8 +1677,8 @@
       ],
       "actual": "g8d8",
       "depth": 2,
-      "nodes": 1024,
-      "time_ms": 144.9,
+      "nodes": 1280,
+      "time_ms": 137.17,
       "eval_cp": -52.1,
       "pass": false,
       "blunder_mate": false
@@ -1693,8 +1693,8 @@
       ],
       "actual": "d2e3",
       "depth": 2,
-      "nodes": 351,
-      "time_ms": 99.59,
+      "nodes": 1536,
+      "time_ms": 131.03,
       "eval_cp": 45.0,
       "pass": false,
       "blunder_mate": false
@@ -1709,8 +1709,8 @@
       ],
       "actual": "g2g4",
       "depth": 3,
-      "nodes": 1807,
-      "time_ms": 98.14,
+      "nodes": 1841,
+      "time_ms": 107.62,
       "eval_cp": 29995.0,
       "pass": true,
       "blunder_mate": false
@@ -1724,10 +1724,10 @@
         "d5e7"
       ],
       "actual": "d5e7",
-      "depth": 2,
-      "nodes": 1536,
-      "time_ms": 130.74,
-      "eval_cp": 445.0,
+      "depth": 3,
+      "nodes": 1427,
+      "time_ms": 130.65,
+      "eval_cp": 400.0,
       "pass": true,
       "blunder_mate": false
     }

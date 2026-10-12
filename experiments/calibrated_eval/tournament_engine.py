@@ -335,6 +335,54 @@ def mvv_lva(board: chess.Board, m: chess.Move) -> int:
     return v * 10 - a
 
 
+def see(board: chess.Board, m: chess.Move) -> int:
+    """Static Exchange Evaluation (SEE) using CPW canonical swap-list algorithm."""
+    from_sq = m.from_square
+    to_sq = m.to_square
+    piece = board.piece_type_at(from_sq)
+    if not piece:
+        return 0
+    victim = board.piece_type_at(to_sq)
+    if not victim:
+        victim = chess.PAWN if board.is_en_passant(m) else 0
+
+    gain = [0] * 32
+    gain[0] = PIECE_VAL_ARRAY[victim] if victim else 0
+
+    occupied = board.occupied ^ (1 << from_sq)
+    color = not board.turn
+    current_piece = piece
+    d = 0
+
+    while True:
+        attackers = board.attackers(color, to_sq) & occupied
+        if not attackers:
+            break
+        lva_sq = None
+        lva_val = 99999
+        lva_type = None
+        for sq in attackers:
+            pt = board.piece_type_at(sq)
+            if pt and PIECE_VAL_ARRAY[pt] < lva_val:
+                lva_val = PIECE_VAL_ARRAY[pt]
+                lva_sq = sq
+                lva_type = pt
+        if lva_sq is None:
+            break
+
+        d += 1
+        gain[d] = PIECE_VAL_ARRAY[current_piece] - gain[d - 1]
+        current_piece = lva_type
+        occupied ^= (1 << lva_sq)
+        color = not color
+
+    while d > 0:
+        d -= 1
+        gain[d] = -max(-gain[d], gain[d + 1])
+
+    return gain[0]
+
+
 class TranspositionTable:
     """64-bit Zobrist Transposition Table with replacement policy."""
     def __init__(self, max_entries: int = 500000):
@@ -412,6 +460,9 @@ def quiescence_search(board: chess.Board, alpha: float, beta: float, q_depth: in
             vic_val = PIECE_VAL_ARRAY[vic] if vic else 100
             if stand_pat + vic_val + 200 < alpha:
                 continue
+            # ponytail: SEE delta pruning drops losing captures that explode q-search
+            if see(board, m) < 0:
+                continue
 
         board.push(m)
         score = -quiescence_search(board, -beta, -alpha, q_depth - 1 if not in_check else q_depth, ply + 1)
@@ -485,14 +536,16 @@ class OptimizedSearchEngine:
             return 1000000
         if m.promotion == chess.QUEEN:
             return 950000
-        # ponytail: direct piece_type_at categorizes winning captures > killers > losing captures
+        # ponytail: SEE determines winning captures > equal > killers > losing captures
         vic = board.piece_type_at(m.to_square)
         if vic:
-            att = board.piece_type_at(m.from_square) or 1
-            diff = PIECE_VAL_ARRAY[vic] * 10 - PIECE_VAL_ARRAY[att]
-            if PIECE_VAL_ARRAY[vic] >= PIECE_VAL_ARRAY[att]:
-                return 100000 + diff
-            return 65000 + diff
+            see_val = see(board, m)
+            if see_val > 0:
+                return 100000 + see_val
+            elif see_val == 0:
+                return 85000
+            else:
+                return 40000 + see_val
         if board.is_en_passant(m):
             return 100900
         if m.promotion:
@@ -538,6 +591,12 @@ class OptimizedSearchEngine:
         tt_val, tt_move = self.tt.probe(pos_key, depth, alpha, beta, ply)
         if tt_val is not None:
             return tt_val
+
+        # ponytail: Reverse Futility Pruning (Static Null Move Pruning) at pre-frontier nodes
+        if depth <= 3 and not in_check and ply > 0 and abs(beta) < MATE_SCORE - 100:
+            static_eval = evaluate_tapered(board)
+            if static_eval - (120 * depth) >= beta:
+                return static_eval
 
         # Null-Move Pruning (NMP): if passing turn still beats beta, prune branch
         if depth >= 3 and not in_check and ply > 0:
