@@ -511,7 +511,8 @@ class OptimizedSearchEngine:
     def negamax(self, board: chess.Board, depth: int, alpha: float, beta: float, ply: int = 0, prev_move: Optional[chess.Move] = None) -> float:
         self.nodes_visited += 1
 
-        if (self.nodes_visited & 1023) == 0:
+        # ponytail: check time every 128 nodes (python-chess searches ~3k nps, 1024 caused 300ms overruns)
+        if (self.nodes_visited & 127) == 0:
             if time.perf_counter() - self.start_time >= self.time_limit:
                 self.stop_search = True
                 return alpha

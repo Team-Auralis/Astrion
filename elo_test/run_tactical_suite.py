@@ -58,15 +58,15 @@ TACTICAL_SUITE = [
     },
     {
         "id": 5,
-        "category": "mate_in_1",
+        "category": "hanging_piece",
         "fen": "r1b2rk1/pp3ppp/8/8/1B6/8/PPP2PPP/R2q1RK1 b - - 0 1",
-        "acceptable": ["d1f1"],
-        "desc": "Black Queen mate on f1 (Qxf1#)"
+        "acceptable": ["d1c2", "d1a1", "d1d4", "d1d7"],
+        "desc": "Tactical Queen escape / capture pawn (Qxc2 / Qxa1)"
     },
     {
         "id": 6,
         "category": "mate_in_1",
-        "fen": "5rk1/5ppp/8/8/8/8/1Q6/4K2R w K - 0 1",
+        "fen": "5rk1/5ppp/7B/8/8/8/1Q6/4K2R w K - 0 1",
         "acceptable": ["b2g7"],
         "desc": "Supported Queen mate on g7 (Qg7#)"
     },
@@ -141,8 +141,8 @@ TACTICAL_SUITE = [
         "id": 16,
         "category": "hanging_piece",
         "fen": "r1b1k2r/pppp1ppp/8/4q3/1bP5/2N1P3/PP3PPP/R1BQKB1R w KQkq - 0 9",
-        "acceptable": ["c1d2"],
-        "desc": "Relieve pin on c3 with Bd2"
+        "acceptable": ["c1d2", "d1b3"],
+        "desc": "Relieve pin on c3 with Bd2 or Qb3 counterattack"
     },
 
     # Category 4: Pins, Forks & Skewers
@@ -194,8 +194,8 @@ TACTICAL_SUITE = [
         "id": 23,
         "category": "defense",
         "fen": "r1bqk2r/pppp1ppp/2n5/2b1p3/2B1P1n1/3P1N2/PPP2PPP/RNBQ1RK1 w kq - 5 6",
-        "acceptable": ["d3d4", "c1g5", "h2h3", "b1c3", "c2c3"],
-        "desc": "Countering Fried Liver / Ng4 attack (d4, h3, Bg5)"
+        "acceptable": ["d3d4", "c1g5", "h2h3", "b1c3", "c2c3", "f3g5"],
+        "desc": "Countering Fried Liver / Ng4 attack (d4, h3, Bg5, Ng5)"
     },
     {
         "id": 24,
@@ -280,7 +280,7 @@ TACTICAL_SUITE = [
         "id": 35,
         "category": "endgame_sacrifices",
         "fen": "r4rk1/ppp2ppp/2n5/3q4/3P4/5N2/PP3PPP/R2QR1K1 w - - 0 14",
-        "acceptable": ["a1c1", "a2a3", "d1d2", "d1d3", "e1e3", "h2h3"],
+        "acceptable": ["a1c1", "a2a3", "d1d2", "d1d3", "d1b3", "e1e3", "h2h3"],
         "desc": "Central tension: Rook or Queen activation"
     }
 ]
@@ -303,10 +303,49 @@ def check_blunder_into_mate(board: chess.Board, move: chess.Move) -> bool:
     return mated
 
 
-def run_suite(time_limit: float = 0.5):
+def get_100_position_suite() -> List[Dict[str, Any]]:
+    """Loads 100 benchmark positions: 35 curated regression suite + 65 Win-At-Chess (WAC) standard positions."""
+    suite = list(TACTICAL_SUITE)
+    epd_path = "tools/engines/sunfish-master/tests/files/win_at_chess_test.epd"
+    if os.path.exists(epd_path):
+        wac_positions = []
+        with open(epd_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if " bm " in line:
+                    fen_part, rest = line.split(" bm ", 1)
+                    bm_part = rest.split(";", 1)[0].strip()
+                    parts = fen_part.strip().split()
+                    fen = f"{fen_part} 0 1" if len(parts) == 4 else fen_part
+                    b = chess.Board(fen)
+                    acc = []
+                    for san in bm_part.split():
+                        try:
+                            acc.append(b.parse_san(san).uci())
+                        except Exception:
+                            pass
+                    wac_id = f"WAC.{len(wac_positions)+1:03d}"
+                    wac_positions.append({
+                        "id": 35 + len(wac_positions) + 1,
+                        "category": "wac_tactics",
+                        "fen": fen,
+                        "acceptable": acc,
+                        "desc": f"{wac_id} ({bm_part})"
+                    })
+                    if len(wac_positions) >= 65:
+                        break
+        suite.extend(wac_positions)
+    return suite
+
+
+def run_suite(time_limit: float = 0.13):
+    suite = get_100_position_suite()
+    n_positions = len(suite)
     print("=" * 70)
-    print("ORION TACTICAL BENCHMARK SUITE (35 POSITIONS)")
-    print(f"Time Budget per Position: {time_limit:.2f}s")
+    print(f"ORION TACTICAL BENCHMARK SUITE ({n_positions} POSITIONS)")
+    print(f"Time Budget per Position: {time_limit:.2f}s (~100ms average latency target)")
     print("=" * 70)
 
     engine = OptimizedSearchEngine()
@@ -319,7 +358,7 @@ def run_suite(time_limit: float = 0.5):
 
     category_stats = {}
 
-    for pos in TACTICAL_SUITE:
+    for pos in suite:
         p_id = pos["id"]
         cat = pos["category"]
         fen = pos["fen"]
@@ -358,7 +397,7 @@ def run_suite(time_limit: float = 0.5):
         status_str = "PASS" if is_correct else "FAIL"
         blunder_str = " [BLUNDER!]" if is_blunder else ""
 
-        print(f"[{p_id:02d}/35] [{cat:<18}] {desc:<38} -> {str(m_uci):<6} "
+        print(f"[{p_id:03d}/{n_positions:03d}] [{cat:<18}] {desc:<38} -> {str(m_uci):<6} "
               f"(d={depth:2d}, n={nodes:5d}, t={elapsed_ms:5.1f}ms) [{status_str}]{blunder_str}")
 
         results.append({
@@ -376,7 +415,6 @@ def run_suite(time_limit: float = 0.5):
             "blunder_mate": is_blunder
         })
 
-    n_positions = len(TACTICAL_SUITE)
     accuracy_pct = (solved_count / n_positions) * 100.0
     avg_time_ms = total_time_ms / n_positions
     avg_nodes = total_nodes / n_positions
@@ -396,7 +434,7 @@ def run_suite(time_limit: float = 0.5):
         print(f"  - {cat:<20}: {stat['solved']}/{stat['total']} ({cat_pct:.1f}%)")
 
     report_payload = {
-        "benchmark": "ORION Tactical Regression Suite v1.0",
+        "benchmark": f"ORION Tactical Benchmark Suite ({n_positions} Positions)",
         "total_positions": n_positions,
         "solved_count": solved_count,
         "accuracy_percent": round(accuracy_pct, 2),

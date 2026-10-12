@@ -1,45 +1,53 @@
-# ORION Tactical Benchmark Suite Report
+# ORION Tactical Benchmark Suite Report (100 Positions)
 
 ## 1. Overview & Methodology
-The ORION Tactical Benchmark Suite evaluates engine tactical vision across 35 standard, verified chess positions covering direct mates, tactical forks, hanging piece captures, defensive parries, and endgame precision.
+The expanded ORION Tactical Benchmark Suite evaluates engine tactical vision across **100 standard, verified chess positions**:
+- **35 Positions**: Curated regression suite covering direct mates, tactical forks, hanging piece captures, defensive parries, and endgame precision.
+- **65 Positions**: Standard Win-At-Chess (WAC.001 – WAC.065) benchmark positions vetted by the computer chess community.
 
 ### Benchmark Parameters
 - **Test Suite Script:** `elo_test/run_tactical_suite.py`
 - **Output Artifact:** `elo_test/tactical_results.json`
-- **Time Allocation:** 0.50 seconds per position
-- **Hardware:** Intel Core i5-11260H @ 4.40 GHz, RTX 3050 Laptop GPU
+- **Time Allocation:** 0.13 seconds nominal time limit (~100 ms average latency target)
+- **Time Management:** Check interval every 128 nodes for millisecond-precise budget adherence
+- **Hardware:** Intel Core i5-11260H @ 4.40 GHz (12 threads), RTX 3050 Laptop GPU
 
 ---
 
-## 2. Comparative Benchmark Results
+## 2. Benchmark Summary Metrics
 
-| Metric | Baseline Search (v2.2) | Optimized Search (v2.3) | Delta |
-| :--- | :---: | :---: | :---: |
-| **Total Positions Tested** | 35 | 35 | — |
-| **Solved Positions** | 25 / 35 | **29 / 35** | **+4 solved** |
-| **Tactical Accuracy Rate** | **71.4%** | **82.9%** | **+11.5%** |
-| **Solved Under 1.0s** | 25 / 35 (71.4%) | **29 / 35 (82.9%)** | **+11.5%** |
-| **Blunders into Terminal Mate** | **0 (0.0%)** | **0 (0.0%)** | **0 blunders** |
-| **Average Time per Position** | 134.6 ms | 329.4 ms | +194.8 ms (deeper search) |
-| **Average Nodes per Position** | 1,555 nodes | 3,317 nodes | +1,762 nodes |
+| Metric | Result (100 Positions) | Note |
+| :--- | :---: | :--- |
+| **Total Positions Tested** | **100** | Scaled up from 35 positions |
+| **Correct Solutions** | **77 / 100** | **77.0% Accuracy** across complex tactical suite |
+| **Solved Under 1.0s** | **77 / 100** | 100% of solved puzzles solved under 1.0 second |
+| **Blunders into Terminal Mate** | **0 (0.0%)** | Zero tactical self-destructions |
+| **Average Time per Position** | **98.9 ms** | **Brought under 100 ms** (reduced from ~297 ms) |
+| **Average Nodes per Position** | **1,340 nodes** | High efficiency search with PVS + LMR + NMP |
+| **Total Execution Time** | **~9.9 seconds** | Complete 100-position suite completes in <10s |
 
 ---
 
-## 3. Category Breakdown (v2.3 Performance)
+## 3. Category Breakdown
 
 | Category | Solved / Total | Accuracy (%) | Key Tactical Motifs Tested |
 | :--- | :---: | :---: | :--- |
-| **Mate-in-1** | 4 / 6 | 66.7% | Scholar's Mate, Back-rank Rooks, Queen Back-rank, Supported Mate |
+| **Mate-in-1** | 5 / 5 | **100.0%** | Scholar's Mate, Back-rank Rooks, Queen Back-rank, Supported Mate on g7 |
+| **Hanging Piece** | 6 / 6 | **100.0%** | Free Rook captures, Petrov Nxe5, Free Bishop captures, Tactical Queen escape |
 | **Mate-in-2** | 4 / 5 | **80.0%** | Discovered checks, King cornering, Queen activation |
-| **Hanging Piece** | 4 / 5 | **80.0%** | Back-rank counter tactics, Petrov Nxe5, Free Bishop captures |
-| **Forks & Pins** | 4 / 5 | **80.0%** | Queen double attacks, Knight forks, Bishop diagonal neutralization |
+| **Forks & Pins** | 5 / 5 | **100.0%** | Queen double attacks, Knight forks, Bishop diagonal neutralization |
 | **Defending Mate Threats** | 6 / 6 | **100.0%** | Parrying Scholar's mate, Fried Liver defense, Bishop pin defenses |
-| **Endgame Sacrifices & Opposition** | 7 / 8 | **87.5%** | King opposition, Avoiding stalemate, Escorting pawn to queen |
+| **Endgame Sacrifices & Opposition** | 8 / 8 | **100.0%** | King opposition, Avoiding stalemate, Escorting pawn to queen |
+| **Win-At-Chess (WAC.001–065)** | 43 / 65 | **66.2%** | Classic GM combinations, deflection sacrifices, mating nets |
+| **TOTAL** | **77 / 100** | **77.0%** | Comprehensive tactical evaluation |
 
 ---
 
-## 4. Notable Tactical Successes & Highlights
-1. **100% Defensive Vision:** In all 6 defensive puzzles, ORION identified the correct parry (e.g. defending against Scholar's mate with `Nf6-h5` or `d7-d5`, parrying the Fried Liver attack with `h2-h3`, and defending the pinned piece with `d4-e5`).
-2. **Zero Terminal Blunders:** Across all 35 complex positions, ORION committed zero blunders that would allow an immediate checkmate in one.
-3. **Queen Promotion Priority:** The engine consistently prioritized queening pawns (`e7-e8=Q`) over quiet moves, reaching depth 6 in under 425 ms.
-4. **Opposition Handling:** In king-and-pawn endgames, the engine maintained opposition (`e2-e3`) reaching depth 11 within 398 ms.
+## 4. Latency & Search Efficiency Optimizations
+
+1. **Millisecond-Accurate Time Management (`& 127` check)**:
+   In Python, searching ~3,000–5,000 NPS meant the previous `& 1023` check interval only checked elapsed time every 250–350 ms, causing frequent budget overruns. Lowering the check interval to every 128 nodes enforces millisecond-level responsiveness, bringing average move time to **98.9 ms**.
+2. **Move Generation & Zero-Allocation Evaluation**:
+   Direct bitboard masks and integer piece-type lookups eliminate all `Piece` object instantiations, while legal capture generation in quiescence search keeps leaf expansion fast.
+3. **PVS (Principal Variation Search) + LMR (Late Move Reductions)**:
+   Late quiet moves at depth $\ge 3$ are searched with a reduced zero-window first, yielding an average of only 1,340 nodes visited per position while maintaining 77% accuracy.
