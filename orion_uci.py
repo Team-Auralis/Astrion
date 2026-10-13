@@ -57,7 +57,7 @@ def main():
             command = parts[0]
 
             if command == "uci":
-                print("id name ORION Gaming Mind v2.2")
+                print("id name Astrion v2.3")
                 print("id author Team-Auralis")
                 print("option name Book type string default tools/engines/vice-main/Vice11/src/performance.bin")
                 print("uciok")

@@ -1,17 +1,18 @@
 <div align="center">
 
-<img src="docs/assets/orion_logo.png" alt="ORION Chess AI Logo" width="180" height="180" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0, 195, 255, 0.25);" />
+<img src="docs/assets/astrion_logo.png" alt="ASTRION Chess AI Logo" width="200" height="200" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(0, 195, 255, 0.35);" />
 
-# 🌌 ORION Gaming Mind
+# 🌌 ASTRION Chess AI
 ### *High-Performance Hybrid Neural Chess Engine & Deep RL Platform*
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![C++20](https://img.shields.io/badge/C%2B%2B-20%20AVX2-00599C.svg)](https://en.cppreference.com/w/cpp/20)
-[![Stockfish NNUE](https://img.shields.io/badge/Evaluation-HalfKP%20NNUE-orange.svg)](#-how-orion-works-the-nnue-revolution)
+[![Evaluation](https://img.shields.io/badge/Evaluation-HalfKP%20NNUE-orange.svg)](#-the-nnue-revolution-how-astrion-evaluates)
 [![Certified Elo](https://img.shields.io/badge/Certified%20Elo-2400.0%20(Ordo)-brightgreen.svg)](#-certified-high-tier-benchmarks)
 [![UCI Compliant](https://img.shields.io/badge/UCI-Compatible-success.svg)](#-universal-chess-interface-uci)
-[![Android APK](https://img.shields.io/badge/Android%20APK-Download%20Release-brightgreen?logo=android&logoColor=white)](https://github.com/Team-Auralis/orion-gaming-mind/releases/tag/mobile-latest)
-[![Tests Passing](https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen.svg)](tests/)
+[![Repository](https://img.shields.io/badge/GitHub-Team--Auralis%2FAstrion-blueviolet.svg)](https://github.com/Team-Auralis/Astrion)
+[![Android APK](https://img.shields.io/badge/Android%20APK-Download%20Release-brightgreen?logo=android&logoColor=white)](https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest)
+[![Tests](https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen.svg)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -20,21 +21,23 @@
 
 ## 📖 Overview
 
-**ORION Gaming Mind** is an open-source, hybrid neural chess intelligence platform developed by [Team-Auralis](https://github.com/Team-Auralis). It combines **native C++20 HalfKP NNUE evaluation (AVX2 SIMD)** for tournament-grade tactical play with a **PyTorch Deep Reinforcement Learning pipeline** for self-play and policy distillation.
+**ASTRION** (*from Latin Astra "stars" + Orion "celestial hunter"*) is an open-source, hybrid neural chess intelligence platform developed by [Team-Auralis](https://github.com/Team-Auralis). 
 
-ORION’s playing strength is empirically validated using official **fastchess** tournaments and certified with **Ordo Maximum-Likelihood Estimation** against official **Stockfish** anchors, achieving an official rating of **2400.0 Elo**.
+It bridges the gap between **sub-millisecond C++20 AVX2 tournament execution** (HalfKP NNUE evaluation, Aspiration Windows, PVS, LMR, 64-bit Zobrist Transposition Tables) and a **PyTorch Deep Reinforcement Learning pipeline** (dual-head policy/value networks, grandmaster distillation, and self-play).
+
+ASTRION’s playing strength is empirically validated using official **fastchess** tournaments and certified with **Ordo Maximum-Likelihood Estimation** against official **Stockfish** anchors, holding a certified rating of **2400.0 Elo**.
 
 ---
 
-## 💡 How ORION Works: The Dual-Architecture Design
+## 💡 Dual-Engine Architecture
 
-Most chess projects either build a slow Python-based neural network or a pure C++ engine without research tooling. ORION uses a **dual-architecture paradigm**:
+ASTRION operates on a unified two-tier architecture:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        ORION CHESS PLATFORM                            │
+│                        ASTRION CHESS PLATFORM                          │
 ├───────────────────────────────────┬────────────────────────────────────┤
-│   🚀 TOURNAMENT ENGINE (C++20)   │    🧠 RL RESEARCH SUITE (Python)   │
+│   ⚔️ TOURNAMENT KERNEL (C++20)   │    🧠 RL RESEARCH SUITE (Python)   │
 ├───────────────────────────────────┼────────────────────────────────────┤
 │ • Official Stockfish HalfKP NNUE  │ • Dual-Head Policy / Value Net     │
 │ • AVX2 Vectorized Accumulators    │ • High-Speed PyTorch Batch Trainer │
@@ -47,19 +50,19 @@ Most chess projects either build a slow Python-based neural network or a pure C+
 
 ---
 
-## 🧠 The NNUE Revolution: Why ORION Plays at 2400+ Elo
+## 🧠 The NNUE Revolution: How ASTRION Evaluates
 
 ### What is NNUE?
 Traditional chess engines evaluated positions using handcrafted formulas (counting piece values, pawn islands, open files). Running a heavy deep neural network on a GPU gives great intuition (like AlphaZero), but is limited to a few thousand nodes per second.
 
 **NNUE (Efficiently Updatable Neural Network)** bridges this gap:
-1. **Incremental Updates**: When a piece moves from square $A$ to square $B$, the neural network does not recompute the entire board. It only adds the new piece-square feature and subtracts the old one from its accumulator in nanoseconds.
-2. **AVX2 Vectorization**: Using Intel/AMD AVX2 SIMD CPU instructions, ORION computes the neural activation functions across 256-bit registers simultaneously.
-3. **Instant Elo Leap**: Embedding official 21MB Stockfish HalfKP weights (`nn-eba324f53044.nnue`) into ORION produced a measured **+333 to +440 Elo leap** over handcrafted evaluation, completely eliminating tactical blunders in positional endgames.
+1. **Incremental Updates**: When a piece moves from square $A$ to square $B$, the neural network does not recompute the entire board. It incrementally adds the new piece-square feature and subtracts the old one from its accumulator in nanoseconds.
+2. **AVX2 Vectorization**: Using Intel/AMD AVX2 SIMD CPU instructions, ASTRION computes the neural activation functions across 256-bit registers simultaneously.
+3. **Instant Elo Leap**: Embedding official 21MB Stockfish HalfKP weights (`nn-eba324f53044.nnue`) into ASTRION produced a measured **+333 to +440 Elo leap** over handcrafted evaluation, completely eliminating tactical blunders in positional endgames.
 
 ---
 
-## 🔍 The Search Pipeline: How ORION Thinks
+## 🔍 The Search Pipeline: How ASTRION Thinks
 
 ```
                        [ Board Position (FEN) ]
@@ -101,11 +104,11 @@ Traditional chess engines evaluated positions using handcrafted formulas (counti
 
 ## 📊 Certified High-Tier Benchmarks
 
-ORION was benchmarked across a certified 60-game tournament pool (5s + 0.05s blitz, UHO opening suite) with official Ordo Maximum-Likelihood Estimation:
+ASTRION was benchmarked across a certified 60-game tournament pool (5s + 0.05s blitz, UHO opening suite) with official Ordo Maximum-Likelihood Estimation:
 
 ```
 ========================================================================================
-                              ORION-NNUE HIGH-TIER GAUNTLET
+                              ASTRION-NNUE HIGH-TIER GAUNTLET
 ========================================================================================
 Opponent           Games   Wins   Draws   Losses   Score (%)   Draw-Resistance   Perf Elo
 ----------------------------------------------------------------------------------------
@@ -118,7 +121,7 @@ Total Gauntlet      60      14      11      35       32.5%          18.3%       
 ```
 
 ### Cumulative Stockfish-2200 Record
-In earlier certified benchmark testing under `/goal`, ORION amassed **201+ outright wins against Stockfish-2200**, including a 350-game verification run with **zero clock flags**.
+In earlier certified benchmark testing under `/goal`, ASTRION amassed **201+ outright wins against Stockfish-2200**, including a 350-game verification run with **zero clock flags**.
 
 > [!NOTE]
 > Detailed statistical analysis is available in the [Master Benchmark Report](docs/ORION_MASTER_BENCHMARK_REPORT.md).
@@ -130,7 +133,7 @@ In earlier certified benchmark testing under `/goal`, ORION amassed **201+ outri
 The codebase is organized into modular directories:
 
 ```
-orion-gaming-mind/
+Astrion/
 ├── orion/                     # Core Python RL & Chess Environment
 │   ├── arena/                 # Bot Arena, Head-to-Head & FIDE Elo Tracker
 │   ├── environment/           # Chess Rules & State Engine
@@ -151,7 +154,7 @@ orion-gaming-mind/
 │   ├── benchmarks/            # Performance Benchmarks & Gauntlets
 │   └── debug/                 # Diagnostic Probes & Telemetry Probes
 ├── docs/                      # Technical Documentation & Benchmark Reports
-│   ├── assets/                # Logos, diagrams, and media
+│   ├── assets/                # Logos (astrion_logo.png), diagrams, and media
 │   ├── ORION_MASTER_BENCHMARK_REPORT.md # Certified NNUE Tournament Report
 │   ├── CALIBRATED_BENCHMARK_REPORT.md   # Statistical Ordo Calibration
 │   ├── ENGINE_ARCHITECTURE.md           # Native Kernel Design
@@ -178,9 +181,13 @@ python -m pytest
 ```
 
 ### 2. 🌐 Universal Chess Interface (UCI)
-Plug ORION into **Arena Chess GUI**, **Cutechess**, **Banksia GUI**, or run it as a 24/7 bot on **Lichess**:
+Plug ASTRION into **Arena Chess GUI**, **Cutechess**, **Banksia GUI**, or run it as a 24/7 bot on **Lichess**:
 ```bash
 python orion_uci.py
+```
+Or run the native high-speed C++ tournament binary:
+```bash
+tools/engines/vice-main/Vice11/src/astrion_fast_kernel.exe
 ```
 Supports standard UCI commands: `uci`, `isready`, `ucinewgame`, `position`, `go depth <N>`, `quit`.
 
@@ -198,14 +205,14 @@ python cli.py battle --opponent minimax --rounds 4
 python orion_app_server.py --port 8000
 ```
 - **Mobile Web / PWA**: Navigate to `http://localhost:8000` (or your phone's LAN IP) for a responsive chess board with real-time neural evaluation.
-- **Android APK**: Download the pre-built [ORION-Chess-AI.apk](https://github.com/Team-Auralis/orion-gaming-mind/releases/tag/mobile-latest) compiled directly via GitHub Actions.
+- **Android APK**: Download the pre-built [ORION-Chess-AI.apk](https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest) compiled directly via GitHub Actions.
 
 ---
 
 ## 👥 Authors & Credits
 
 Developed by **Team-Auralis**:
-- **Project**: [Team-Auralis/orion-gaming-mind](https://github.com/Team-Auralis/orion-gaming-mind)
+- **Project**: [Team-Auralis/Astrion](https://github.com/Team-Auralis/Astrion)
 - Search & NNUE principles inspired by the [Stockfish Chess Project](https://github.com/official-stockfish/Stockfish).
 
 ---

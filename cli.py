@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ================================================================================
-                    ORION Gaming Mind - Unified Master CLI
+                    ASTRION Chess AI - Unified Master CLI
                        Developed by Team-Auralis
 ================================================================================
 Single command entry point for training, evaluating, testing against real bots,
