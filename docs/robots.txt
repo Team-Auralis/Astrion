@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://team-auralis.github.io/Astrion/sitemap.xml

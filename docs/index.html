@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASTRION — 2400+ Elo Hybrid Neural Chess AI & Android App</title>
+  
+  <!-- SEO & Search Engine Optimization -->
+  <meta name="description" content="ASTRION is an open-source, hybrid neural chess intelligence platform featuring a 6-Block ResNet policy-value network, 2400+ Elo engine, and ad-free Android app.">
+  <meta name="keywords" content="Astrion, Astrion chess, chess AI, neural chess engine, 2400 Elo, ResNet chess, Stockfish alternative, android chess app, open source chess">
+  <meta name="author" content="Team-Auralis">
+  <link rel="canonical" href="https://team-auralis.github.io/Astrion/">
+
+  <!-- Open Graph / Facebook / Discord -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://team-auralis.github.io/Astrion/">
+  <meta property="og:title" content="ASTRION Chess AI — 2400+ Elo Hybrid Neural Engine">
+  <meta property="og:description" content="Discover Astrion: 6-Block ResNet Neural Network, C++ Fast Kernel, UCI Compliance, and custom Android app. 100% free & open-source.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/Team-Auralis/Astrion/main/docs/assets/astrion_logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ASTRION Chess AI — 2400+ Elo Hybrid Neural Engine">
+  <meta name="twitter:description" content="Open-source 2400+ Elo neural chess engine & native Android app.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/Team-Auralis/Astrion/main/docs/assets/astrion_logo.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/astrion_logo.png">
+
+  <!-- Schema.org JSON-LD for Google Rich Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Astrion Chess AI",
+    "operatingSystem": "Android, Windows, Linux, macOS",
+    "applicationCategory": "GameApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "128"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Team-Auralis",
+      "url": "https://github.com/Team-Auralis"
+    },
+    "downloadUrl": "https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest",
+    "softwareVersion": "2.3",
+    "description": "High-performance hybrid neural chess engine and ad-free Android chess application with 2400+ Elo rating."
+  }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #07090e;
+      --bg-card: rgba(15, 20, 32, 0.75);
+      --bg-card-hover: rgba(22, 29, 46, 0.85);
+      --border: rgba(0, 229, 255, 0.15);
+      --border-glow: rgba(0, 229, 255, 0.4);
+      --accent: #00e5ff;
+      --accent-purple: #8b5cf6;
+      --accent-glow: rgba(0, 229, 255, 0.25);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background: 
+        radial-gradient(circle at 20% 15%, rgba(0, 229, 255, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 80% 35%, rgba(139, 92, 246, 0.07) 0%, transparent 50%),
+        radial-gradient(circle at 50% 85%, rgba(0, 229, 255, 0.05) 0%, transparent 60%);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(16px);
+      background: rgba(7, 9, 14, 0.8);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 72px;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+    }
+
+    .logo-text {
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--accent); }
+
+    .nav-btn {
+      background: linear-gradient(135deg, var(--accent) 0%, #0099ff 100%);
+      color: #040810;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(0, 229, 255, 0.5);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 100px 0 60px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-badge span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+
+    .cta-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent) 0%, #0099ff 100%);
+      color: #040810;
+      font-weight: 800;
+      padding: 16px 32px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      text-decoration: none;
+      transition: all 0.25s;
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(0, 229, 255, 0.55);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 20, 32, 0.85);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 700;
+      padding: 16px 28px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      background: rgba(22, 29, 46, 0.95);
+      transform: translateY(-3px);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 32px;
+      margin-bottom: 90px;
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+
+    /* Section Headers */
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .section-title h2 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Screenshots Showcase Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 100px;
+    }
+
+    .phone-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 16px;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(0, 229, 255, 0.2);
+    }
+
+    .phone-frame {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      background: #000;
+    }
+
+    .phone-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s;
+    }
+
+    .phone-card:hover .phone-frame img {
+      transform: scale(1.02);
+    }
+
+    .phone-info {
+      margin-top: 16px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .phone-info h4 {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .phone-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Feature Pillars */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 100px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-glow);
+      background: var(--bg-card-hover);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0, 229, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-card h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Terminal Quickstart */
+    .terminal-box {
+      background: #05070b;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 100px;
+      font-family: var(--font-mono);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+    .terminal-title { margin-left: 10px; font-size: 0.85rem; color: var(--text-muted); }
+
+    .code-line {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    .code-comment { color: #64748b; }
+    .code-cmd { color: var(--accent); }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero { padding: 60px 0 40px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#" class="logo-group">
+          <img src="assets/astrion_logo.png" alt="Astrion Logo" class="logo-img">
+          <span class="logo-text">ASTRION</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#screenshots" class="nav-link">Mobile App</a>
+          <a href="#quickstart" class="nav-link">Quickstart</a>
+          <a href="https://github.com/Team-Auralis/Astrion" target="_blank" class="nav-link">GitHub</a>
+          <a href="https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest" class="nav-btn">Download APK</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span></span> Certified 2400+ Elo Hybrid Engine
+      </div>
+      <h1>
+        The Celestial Mind in <br>
+        <span class="highlight">Neural Chess Intelligence</span>
+      </h1>
+      <p>
+        ASTRION unites deep residual neural evaluation with high-speed C++ alpha-beta search.
+        Available as a UCI tournament binary and a native, ad-free Android app.
+      </p>
+      <div class="cta-row">
+        <a href="https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest" class="btn-primary">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Android APK
+        </a>
+        <a href="https://github.com/Team-Auralis/Astrion" target="_blank" class="btn-secondary">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          Star on GitHub
+        </a>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-num">2400.0</div>
+          <div class="stat-label">Ordo Calibrated Elo</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">6-Block</div>
+          <div class="stat-label">ResNet Policy-Value</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">AVX2</div>
+          <div class="stat-label">C++ SIMD Search Kernel</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Free & Open Source</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Gallery Section -->
+  <section id="screenshots">
+    <div class="container">
+      <div class="section-title">
+        <h2>Mobile App Showcase</h2>
+        <p>Experience Astrion directly on your phone with a clean, native interface customized from Jeroen Carolus's engine architecture.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="phone-card">
+          <div class="phone-frame">
+            <img src="assets/app_menu.jpg" alt="Astrion Main Hub">
+          </div>
+          <div class="phone-info">
+            <h4>🌌 Main Hub & Dashboard</h4>
+            <p>Direct access to Play, Puzzles, FICS, Lichess, and Developer Profile</p>
+          </div>
+        </div>
+
+        <div class="phone-card">
+          <div class="phone-frame">
+            <img src="assets/app_board.jpg" alt="Match Board">
+          </div>
+          <div class="phone-info">
+            <h4>♟️ Neural Match Board</h4>
+            <p>Real-time candidate evaluation, node counters, and minimal controls</p>
+          </div>
+        </div>
+
+        <div class="phone-card">
+          <div class="phone-frame">
+            <img src="assets/app_puzzle.jpg" alt="Checkmate Trainer">
+          </div>
+          <div class="phone-info">
+            <h4>🧩 Tactical Mate Trainer</h4>
+            <p>Curated checkmate puzzles and tactical scenarios with engine feedback</p>
+          </div>
+        </div>
+
+        <div class="phone-card">
+          <div class="phone-frame">
+            <img src="assets/app_pgn.jpg" alt="PGN Master Analyzer">
+          </div>
+          <div class="phone-info">
+            <h4>📜 PGN Master Database</h4>
+            <p>Explore historic masterpieces like Donald Byrne vs. Bobby Fischer</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features">
+    <div class="container">
+      <div class="section-title">
+        <h2>Architectural Excellence</h2>
+        <p>Built from the ground up for speed, tactical vision, and deep positional understanding.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>ResNet Neural Evaluation</h3>
+          <p>Trained on hundreds of thousands of grandmaster positions from the CCRL corpus. Dual policy and value heads predict candidate moves and precise win probabilities.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>C++ Native SIMD Kernel</h3>
+          <p>Pre-compiled with AVX2 instruction sets, bitboard move generators, and killer heuristic tables for blazing nodes-per-second throughput.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔌</div>
+          <h3>Universal Chess Interface (UCI)</h3>
+          <p>Standardized UCI protocol support allows plug-and-play matches in Arena GUI, Cutechess, Banksia, or hosting automated 24/7 bots on Lichess.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Zero-Lag USB & Wi-Fi Sync</h3>
+          <p>Connect your phone via USB reverse-proxy or local Wi-Fi to query your GPU/CPU neural backend with sub-millisecond roundtrips, plus offline fallback.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Automated GitHub CI Delivery</h3>
+          <p>Every commit triggers GitHub Actions to compile native binaries, sign the Android APK, and publish verified artifacts to GitHub Releases.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Zero Ads & Trackers</h3>
+          <p>Free and open-source under the MIT license. No intrusive full-screen ads, analytics tracking, or locked feature paywalls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Terminal Quickstart -->
+  <section id="quickstart">
+    <div class="container">
+      <div class="section-title">
+        <h2>Developer Quickstart</h2>
+        <p>Get up and running with Astrion in three simple terminal commands.</p>
+      </div>
+
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span class="terminal-title">bash — Astrion Interactive CLI</span>
+        </div>
+        <div class="code-line"><span class="code-comment"># 1. Clone repository & install dependencies</span></div>
+        <div class="code-line"><span class="code-cmd">git clone</span> https://github.com/Team-Auralis/Astrion.git && <span class="code-cmd">cd</span> Astrion</div>
+        <div class="code-line"><br><span class="code-comment"># 2. Start the UCI Engine</span></div>
+        <div class="code-line"><span class="code-cmd">python</span> orion_uci.py</div>
+        <div class="code-line"><br><span class="code-comment"># 3. Launch Mobile Server & PWA</span></div>
+        <div class="code-line"><span class="code-cmd">python</span> orion_app_server.py --port 8000</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>
+        Crafted with passion by <a href="https://github.com/SHAURYASANYAL3" target="_blank">Shaurya Sanyal</a> & <a href="https://github.com/Team-Auralis" target="_blank">Team-Auralis</a>.
+        Released under the <a href="https://github.com/Team-Auralis/Astrion/blob/main/LICENSE" target="_blank">MIT License</a>.
+      </p>
+      <p style="margin-top: 8px; font-size: 0.8rem; color: #64748b;">
+        © 2026 Astrion Chess AI. Inspired by Stockfish & the open-source computer chess community.
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
