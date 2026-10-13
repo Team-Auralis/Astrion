@@ -96,7 +96,7 @@ public class StartBaseActivity extends AppCompatActivity {
                 i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
             } else {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.jwtc.nl/")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Team-Auralis/Astrion")));
             }
         });
 

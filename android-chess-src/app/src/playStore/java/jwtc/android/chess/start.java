@@ -125,7 +125,7 @@ public class start extends StartBaseActivity {
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("text/plain");
             i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
-            i.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=" + packageName);
+            i.putExtra(Intent.EXTRA_TEXT, "https://github.com/Team-Auralis/Astrion");
             startActivity(Intent.createChooser(i, "Share"));
             return true;
         }
