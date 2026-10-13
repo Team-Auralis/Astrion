@@ -201,11 +201,22 @@ python cli.py battle --opponent minimax --rounds 4
 ```
 
 ### 4. 📱 Mobile App & Web Interface
-```bash
-python orion_app_server.py --port 8000
-```
-- **Mobile Web / PWA**: Navigate to `http://localhost:8000` (or your phone's LAN IP) for a responsive chess board with real-time neural evaluation.
-- **Android APK**: Download the pre-built [ORION-Chess-AI.apk](https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest) compiled directly via GitHub Actions.
+
+Astrion features a native Android chess application powered by Astrion's neural engine, customized from [jcarolus/android-chess](https://github.com/jcarolus/android-chess) with real-time neural evaluation, tactical puzzle training, master game database analysis, and online play.
+
+<div align="center">
+
+| 🌌 Main Hub & Modes | ♟️ Neural Match Board | 🧩 Tactical Mate Trainer | 📜 PGN Master Database |
+| :---: | :---: | :---: | :---: |
+| <img src="docs/assets/app_menu.jpg" width="220" alt="Astrion Chess AI Menu"/> | <img src="docs/assets/app_board.jpg" width="220" alt="Astrion Chess Board"/> | <img src="docs/assets/app_puzzle.jpg" width="220" alt="Tactical Mate Trainer"/> | <img src="docs/assets/app_pgn.jpg" width="220" alt="Master PGN Analyzer"/> |
+
+</div>
+
+#### 📲 Features & Setup
+- **📦 Android APK Download**: [**Astrion-Chess-AI.apk**](https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest) (Automated CI build signed and ready to install on Android 7.0+).
+- **⚡ Neural Engine Sync**: Connects to the host PC running Astrion via USB reverse-proxy (`adb reverse tcp:8000 tcp:8000`) or local Wi-Fi.
+- **🛡️ 100% Offline Mode**: Automatically falls back to the high-speed native C++ engine when disconnected.
+- **🌐 Mobile Web / PWA**: Run `python orion_app_server.py --port 8000` to launch the mobile web interface locally on your network.
 
 ---
 
