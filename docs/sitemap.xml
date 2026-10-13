@@ -1,9 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://team-auralis.github.io/Astrion/</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://team-auralis.github.io/Astrion/assets/astrion_logo.png</image:loc>
+      <image:title>Astrion Chess AI Logo</image:title>
+      <image:caption>Official Celestial Knight Emblem for Astrion Chess AI</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://team-auralis.github.io/Astrion/assets/app_menu.jpg</image:loc>
+      <image:title>Astrion Chess AI Android Main Menu</image:title>
+      <image:caption>Main dashboard and game modes in Astrion mobile chess app</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://team-auralis.github.io/Astrion/assets/app_board.jpg</image:loc>
+      <image:title>Astrion Chess Match Board</image:title>
+      <image:caption>Interactive match board with live neural engine evaluations</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://team-auralis.github.io/Astrion/assets/app_puzzle.jpg</image:loc>
+      <image:title>Tactical Checkmate Trainer</image:title>
+      <image:caption>Tactical mate and puzzle trainer in Astrion chess</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://team-auralis.github.io/Astrion/assets/app_pgn.jpg</image:loc>
+      <image:title>PGN Master Database Viewer</image:title>
+      <image:caption>Historic chess masterpieces analysis in Astrion</image:caption>
+    </image:image>
   </url>
 </urlset>
