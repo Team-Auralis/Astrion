@@ -94,6 +94,13 @@ public class OrionEngine extends EngineApi {
         abort(null);
     }
 
+    private String[] getCandidateUrls() {
+        if (serverUrl != null && !serverUrl.isEmpty() && !serverUrl.equals("http://127.0.0.1:8000") && !serverUrl.equals("http://10.0.2.2:8000")) {
+            return new String[]{serverUrl, "http://127.0.0.1:8000", "http://10.0.2.2:8000"};
+        }
+        return new String[]{"http://127.0.0.1:8000", "http://10.0.2.2:8000"};
+    }
+
     private class RunnableOrionSearch implements Runnable {
         @Override
         public void run() {
@@ -106,60 +113,69 @@ public class OrionEngine extends EngineApi {
                 String fen = jni.toFEN();
                 int searchDepth = (ply > 0) ? ply : 2;
 
-                // 2. Call ORION API Server
-                URL url = new URL(serverUrl + "/api/move");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                conn.setRequestProperty("Accept", "application/json");
-                conn.setConnectTimeout(4000);
-                conn.setReadTimeout(10000);
-                conn.setDoOutput(true);
+                // 2. Call Astrion API Server (try USB reverse proxy 127.0.0.1:8000, then emulator 10.0.2.2:8000)
+                JSONObject res = null;
+                for (String endpoint : getCandidateUrls()) {
+                    if (isAborted) return;
+                    try {
+                        URL url = new URL(endpoint + "/api/move");
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                        conn.setRequestProperty("Accept", "application/json");
+                        conn.setConnectTimeout(1500);
+                        conn.setReadTimeout(10000);
+                        conn.setDoOutput(true);
 
-                JSONObject req = new JSONObject();
-                req.put("fen", fen);
-                req.put("depth", searchDepth);
+                        JSONObject req = new JSONObject();
+                        req.put("fen", fen);
+                        req.put("depth", searchDepth);
 
-                byte[] postData = req.toString().getBytes(StandardCharsets.UTF_8);
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(postData);
-                }
+                        byte[] postData = req.toString().getBytes(StandardCharsets.UTF_8);
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(postData);
+                        }
 
-                int responseCode = conn.getResponseCode();
-                if (responseCode != 200) {
-                    Log.e(TAG, "ORION server returned code: " + responseCode + ", falling back to local search");
-                    fallbackLocalSearch(searchDepth);
-                    return;
-                }
-
-                StringBuilder sb = new StringBuilder();
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
+                        int responseCode = conn.getResponseCode();
+                        if (responseCode == 200) {
+                            StringBuilder sb = new StringBuilder();
+                            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            }
+                            res = new JSONObject(sb.toString());
+                            serverUrl = endpoint;
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                        // try next candidate endpoint
                     }
                 }
 
                 if (isAborted) return;
 
-                JSONObject res = new JSONObject(sb.toString());
-                String bestMoveUci = res.optString("best_move", "");
-                double score = res.optDouble("score", 0.0);
-                int nodes = res.optInt("nodes", 0);
+                if (res != null) {
+                    String bestMoveUci = res.optString("best_move", "");
+                    double score = res.optDouble("score", 0.0);
+                    int nodes = res.optInt("nodes", 0);
 
-                Log.d(TAG, "ORION AI chose: " + bestMoveUci + " (Eval: " + score + ", Nodes: " + nodes + ")");
+                    Log.d(TAG, "Astrion AI chose: " + bestMoveUci + " (Eval: " + score + ", Nodes: " + nodes + ")");
 
-                int resolvedMove = resolveMove(bestMoveUci);
-                if (resolvedMove != 0) {
-                    sendMoveMessageFromThread(resolvedMove, -1, (int) score);
-                    sendMessageFromThread("ORION AI (" + nodes + " nodes)\n\tEval: " + String.format("%.2f", score / 100.0), (float) (score / 100.0));
-                } else {
-                    Log.w(TAG, "Could not resolve move: " + bestMoveUci + ", falling back to local move");
-                    fallbackLocalSearch(searchDepth);
+                    int resolvedMove = resolveMove(bestMoveUci);
+                    if (resolvedMove != 0) {
+                        sendMoveMessageFromThread(resolvedMove, -1, (int) score);
+                        sendMessageFromThread("Astrion AI (" + nodes + " nodes)\n\tEval: " + String.format("%.2f", score / 100.0), (float) (score / 100.0));
+                        return;
+                    }
                 }
 
+                Log.d(TAG, "Astrion server offline or unreachable, using local high-speed engine");
+                fallbackLocalSearch((ply > 0) ? ply : 2);
+
             } catch (Exception ex) {
-                Log.e(TAG, "Error connecting to ORION server: " + ex.getMessage() + ", falling back to local engine");
+                Log.e(TAG, "Error running Astrion search: " + ex.getMessage() + ", falling back to local engine");
                 fallbackLocalSearch((ply > 0) ? ply : 2);
             }
         }
