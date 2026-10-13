@@ -58,3 +58,7 @@ dbg/
 # External engine clones/repos & NNUE weights
 elo_test/bbc_repo/
 *.nnue
+
+# fastchess generated config and local states
+config.json
+states/

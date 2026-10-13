@@ -1,12 +1,11 @@
 
-   # PLAYER               :   RATING  POINTS  PLAYED   (%)
-   1 BBC-1.2              :   2157.4     9.5      10    95
-   2 Vice-1.2             :   1850.0     7.5      10    75
-   3 ORION-Search-Full    :   1777.1     7.0      10    70
-   4 Sunfish-2026         :   -483.7     4.0      10    40
-   5 Stockfish-1350       :  -2684.0     2.0      10    20
-   6 ORION-Neural-Only  < :  -2975.8     0.0      10     0
+   # PLAYER               :  RATING   ERROR  POINTS  PLAYED   (%)
+   1 Vice-1.2             :  1850.0  1315.1    19.0      20    95
+   2 BBC-1.2              :  1657.5  1205.6    17.0      20    85
+   3 Sunfish-2026         :  -728.8  1240.1     9.0      20    45
+   4 ORION-Search-Full    :  -759.5  1246.2     8.5      20    42
+   5 Stockfish-1350       :  -882.6  1297.9     6.5      20    32
 
-White advantage = 0.00
-Draw rate (equal opponents) = 50.00 %
+White advantage = 0.00 +/- 0.00
+Draw rate (equal opponents) = 50.00 % +/- 0.00
 
