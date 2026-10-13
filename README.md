@@ -10,6 +10,7 @@
 [![Evaluation](https://img.shields.io/badge/Evaluation-HalfKP%20NNUE-orange.svg)](#-the-nnue-revolution-how-astrion-evaluates)
 [![Certified Elo](https://img.shields.io/badge/Certified%20Elo-2400.0%20(Ordo)-brightgreen.svg)](#-certified-high-tier-benchmarks)
 [![UCI Compliant](https://img.shields.io/badge/UCI-Compatible-success.svg)](#-universal-chess-interface-uci)
+[![Official Website](https://img.shields.io/badge/Official%20Site-team--auralis.github.io%2FAstrion-00e5ff.svg?logo=googlechrome&logoColor=white)](https://team-auralis.github.io/Astrion/)
 [![Repository](https://img.shields.io/badge/GitHub-Team--Auralis%2FAstrion-blueviolet.svg)](https://github.com/Team-Auralis/Astrion)
 [![Android APK](https://img.shields.io/badge/Android%20APK-Download%20Release-brightgreen?logo=android&logoColor=white)](https://github.com/Team-Auralis/Astrion/releases/tag/mobile-latest)
 [![Tests](https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen.svg)](tests/)
